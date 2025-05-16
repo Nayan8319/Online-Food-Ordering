@@ -34,45 +34,47 @@ const LoginPage = () => {
     return valid;
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+const handleLogin = async (e) => {
+  e.preventDefault();
 
-    if (!validate()) {
-      return;
-    }
+  if (!validate()) {
+    return;
+  }
 
-    const loginData = { email, password }; // Prepare login data
+  const loginData = { email, password };
 
-    try {
-      const response = await fetch("http://localhost:5110/api/Auth/login", {  // Replace with your actual API URL
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginData),
-      });
+  try {
+    const response = await fetch("http://localhost:5110/api/Auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginData),
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.token) {
-          // Store the token in localStorage on successful login
-          localStorage.setItem("token", data.token);
-          
-          // Redirect to the home page after login
-          navigate("/", { replace: true });
-          window.location.reload();
-        } else {
-          setMessage("Login failed. Please check your credentials.");
-        }
+    const data = await response.json();
+
+    if (response.ok && data.token) {
+      // Store token and role in localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.roleName); // "Admin" or "User"
+      localStorage.setItem("userId", data.userId);
+
+      // Redirect based on role
+      if (data.roleName === "Admin") {
+        navigate("/admin/dashboard");
       } else {
-        const data = await response.json();
-        setMessage(data.message || "Invalid email or password");
+        navigate("/");
+        window.location.reload(); 
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      setMessage("An error occurred while logging in.");
+    } else {
+      setMessage(data.message || "Invalid email or password");
     }
-  };
+  } catch (err) {
+    console.error("Login error:", err);
+    setMessage("An error occurred while logging in.");
+  }
+};
 
   return (
     <section className="book_section layout_padding">

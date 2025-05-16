@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\ICT\\Sem 2\\Project\\FoodieApi\\FoodieApi.csproj": {}
+    "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\FoodieApi.csproj": {}
   },
   "projects": {
-    "F:\\ICT\\Sem 2\\Project\\FoodieApi\\FoodieApi.csproj": {
+    "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\FoodieApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\ICT\\Sem 2\\Project\\FoodieApi\\FoodieApi.csproj",
+        "projectUniqueName": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\FoodieApi.csproj",
         "projectName": "FoodieApi",
-        "projectPath": "F:\\ICT\\Sem 2\\Project\\FoodieApi\\FoodieApi.csproj",
+        "projectPath": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\FoodieApi.csproj",
         "packagesPath": "C:\\Users\\pratham sarang\\.nuget\\packages\\",
-        "outputPath": "F:\\ICT\\Sem 2\\Project\\FoodieApi\\obj\\",
+        "outputPath": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

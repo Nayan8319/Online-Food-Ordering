@@ -10,6 +10,8 @@ import {
   Grid,
   Paper,
   Box,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
@@ -17,6 +19,8 @@ const VerifyOtpPage = () => {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const pendingUser = JSON.parse(localStorage.getItem("pendingUser"));
 
@@ -97,7 +101,7 @@ const VerifyOtpPage = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          marginBottom: 20,
+          marginBottom: 10,
         }}
       >
         <Grid
@@ -107,22 +111,18 @@ const VerifyOtpPage = () => {
             backgroundColor: "#f5f5f5",
             padding: 4,
             borderRadius: 2,
-            marginLeft: 10,
             boxShadow: 3,
             textAlign: "center",
           }}
         >
           <Grid item xs={12}>
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main",marginLeft: 9 }}>
+            <Avatar sx={{ m: 1, bgcolor: "secondary.main", mx: "auto" }}>
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
               OTP Verification
             </Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Typography variant="body1" gutterBottom>
+            <Typography variant="body1" marginBottom={3} sx={{ mt: 1 }}>
               Enter the verification code sent to your email
             </Typography>
           </Grid>
@@ -153,10 +153,10 @@ const VerifyOtpPage = () => {
                     {...props}
                     inputMode="numeric"
                     style={{
-                      width: "10rem",
-                      height: "10rem",
-                      margin: "0 0.5rem",
-                      fontSize: "10rem",
+                      width: isSmallScreen ? "2.5rem" : "3rem",
+                      height: isSmallScreen ? "2.5rem" : "3rem",
+                      margin: "0 0.3rem",
+                      fontSize: isSmallScreen ? "1.5rem" : "2rem",
                       borderRadius: 4,
                       border: "1px solid #ced4da",
                       textAlign: "center",
