@@ -10,13 +10,14 @@ import RegisterPage from './Pages/RegisterPage';
 import VerifyOtpPage from './Pages/VerifyOtpPage';
 
 import AdminDashboard from './Admin/pages/AdminDashboard';
+// import CategoryPage from './Admin/pages/CategoryPage';
+// import ProductPage from './Admin/pages/ProductPage';
 
 import UserLayout from './layouts/UserLayout';
 import AdminLayout from './layouts/AdminLayout';
-import ProtectedAdminRoute from './utils/ProtectedAdminRoute'; // optional wrapper for protection
 
 const Mainrouter = createBrowserRouter([
-  // User Routes
+  // User routes
   {
     path: '/',
     element: <UserLayout><Homepage /></UserLayout>
@@ -46,17 +47,19 @@ const Mainrouter = createBrowserRouter([
     element: <UserLayout><VerifyOtpPage /></UserLayout>
   },
 
-  // Admin Routes (protected)
+  // Admin routes — protected at layout level
   {
     path: '/admin/dashboard',
-    element: (
-      <ProtectedAdminRoute>
-        <AdminLayout>
-          <AdminDashboard />
-        </AdminLayout>
-      </ProtectedAdminRoute>
-    )
+    element: <AdminLayout><AdminDashboard /></AdminLayout>
   },
+  // {
+  //   path: '/admin/categories',
+  //   element: <AdminLayout><CategoryPage /></AdminLayout>
+  // },
+  // {
+  //   path: '/admin/products',
+  //   element: <AdminLayout><ProductPage /></AdminLayout>
+  // },
 ]);
 
 export default Mainrouter;

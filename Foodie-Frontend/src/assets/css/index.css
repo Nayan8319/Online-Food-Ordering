@@ -4,6 +4,12 @@ html {
     scroll-behavior: initial !important;
 }
 
+.sb-sidenav-toggled #layoutSidenav_nav {
+  margin-left: -250px; /* or display: none; */
+  transition: margin 0.3s ease;
+}
+
+
 body {
     font-family: "Open Sans", sans-serif;
     color: #0c0c0c;
