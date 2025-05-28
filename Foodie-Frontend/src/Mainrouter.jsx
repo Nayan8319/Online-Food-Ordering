@@ -10,11 +10,15 @@ import RegisterPage from './Pages/RegisterPage';
 import VerifyOtpPage from './Pages/VerifyOtpPage';
 
 import AdminDashboard from './Admin/pages/AdminDashboard';
-// import CategoryPage from './Admin/pages/CategoryPage';
-// import ProductPage from './Admin/pages/ProductPage';
+
 
 import UserLayout from './layouts/UserLayout';
 import AdminLayout from './layouts/AdminLayout';
+import Categories from './Admin/pages/Categories';
+import Product from './Admin/pages/Product';
+import Users from './Admin/pages/Users';
+import Orders from './Admin/pages/Orders';
+import Reports from './Admin/pages/Reports';
 
 const Mainrouter = createBrowserRouter([
   // User routes
@@ -52,14 +56,26 @@ const Mainrouter = createBrowserRouter([
     path: '/admin/dashboard',
     element: <AdminLayout><AdminDashboard /></AdminLayout>
   },
-  // {
-  //   path: '/admin/categories',
-  //   element: <AdminLayout><CategoryPage /></AdminLayout>
-  // },
-  // {
-  //   path: '/admin/products',
-  //   element: <AdminLayout><ProductPage /></AdminLayout>
-  // },
+  {
+    path: '/admin/categories',
+    element: <AdminLayout><Categories /></AdminLayout>
+  },
+  {
+    path: '/admin/product',
+    element: <AdminLayout><Product /></AdminLayout>
+  },
+  {
+    path: '/admin/Users',
+    element: <AdminLayout><Users /></AdminLayout>
+  },
+  {
+    path: '/admin/Orders',
+    element: <AdminLayout><Orders /></AdminLayout>
+  },
+  {
+    path: '/admin/Reports',
+    element: <AdminLayout><Reports /></AdminLayout>
+  },
 ]);
 
 export default Mainrouter;

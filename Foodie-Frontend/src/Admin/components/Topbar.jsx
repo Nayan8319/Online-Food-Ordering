@@ -1,8 +1,15 @@
 import React from "react";
-import { Navbar, Nav, NavDropdown, Form, FormControl } from "react-bootstrap";
-
+import { Navbar, Nav, NavDropdown } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const Topbar = ({ onToggleSidebar }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
     <Navbar
       expand="lg"
@@ -19,7 +26,7 @@ const Topbar = ({ onToggleSidebar }) => {
 
       <span className="text-warning fw-bold fs-4 me-auto">FoodieAdmin</span>
 
-            {/* Right-side icons */}
+      {/* Right-side icons */}
       <Nav className="ms-auto">
         <Nav.Link href="/admin/dashboard" className="text-white">
           <i className="fas fa-external-link-alt me-1" /> Home
@@ -33,14 +40,13 @@ const Topbar = ({ onToggleSidebar }) => {
           <NavDropdown.Item href="#">Edit Profile</NavDropdown.Item>
           <NavDropdown.Item href="#">Change Password</NavDropdown.Item>
           <NavDropdown.Divider />
-          <NavDropdown.Item href="#">Logout</NavDropdown.Item>
+          <NavDropdown.Item onClick={handleLogout} className="text-danger">
+            <i className="fas fa-sign-out-alt me-2" /> Logout
+          </NavDropdown.Item>
         </NavDropdown>
       </Nav>
-
     </Navbar>
   );
 };
 
 export default Topbar;
-
-
