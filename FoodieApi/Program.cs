@@ -18,7 +18,6 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Foodie API", Version = "v1" });
 
-    // ✅ Add JWT bearer auth to Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -45,15 +44,15 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Database context
+// ✅ Database context
 builder.Services.AddDbContext<FoodieOrderningContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// JWT & Email Services
+// ✅ JWT & Email Services
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddScoped<EmailService>();
 
-// CORS policy for React
+// ✅ CORS policy for React frontend
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", builder =>
@@ -64,7 +63,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// JWT Authentication
+// ✅ JWT Authentication with error handling
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -79,9 +78,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
+
+        // ✅ Custom JSON error for unauthorized or forbidden access
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = context =>
+            {
+                context.HandleResponse();
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                return context.Response.WriteAsync("{\"message\":\"Unauthorized access\"}");
+            },
+            OnForbidden = context =>
+            {
+                context.Response.StatusCode = 403;
+                context.Response.ContentType = "application/json";
+                return context.Response.WriteAsync("{\"message\":\"Access denied: Admins only\"}");
+            }
+        };
     });
 
-// Authorization policy for Admin
+// ✅ Authorization policy for Admin
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy =>
@@ -90,7 +107,7 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-// Middleware
+// ✅ Middleware pipeline
 app.UseDeveloperExceptionPage();
 
 app.UseSwagger();
@@ -103,5 +120,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// ✅ App URL for local testing
 app.Urls.Add("http://localhost:5110");
+
 app.Run();
