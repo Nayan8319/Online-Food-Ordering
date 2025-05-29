@@ -83,5 +83,32 @@ namespace FoodieApi.Controllers
             await _context.SaveChangesAsync();
             return Ok("Menu item deleted.");
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<MenuDto>> GetMenu(int id)
+        {
+            var menu = await _context.Menus
+                .Where(m => m.MenuId == id)
+                .Select(m => new MenuDto
+                {
+                    MenuId = m.MenuId,
+                    Name = m.Name,
+                    Description = m.Description,
+                    Price = m.Price,
+                    Quantity = m.Quantity,
+                    ImageUrl = m.ImageUrl,
+                    CategoryId = m.CategoryId,
+                    IsActive = m.IsActive
+                })
+                .FirstOrDefaultAsync();
+
+            if (menu == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(menu);
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import {
   BsCart3,
   BsGrid1X2Fill,
@@ -23,50 +24,103 @@ const Sidebar = ({ collapsed }) => {
         transition: "width 0.3s",
       }}
     >
-      <ul className="list-unstyled">
+      <ul className="list-unstyled p-0 m-0">
         <li className="mb-3">
-          <a href="/admin/dashboard" className="text-white d-flex align-items-center text-decoration-none">
+          <NavLink
+            to="/admin/dashboard"
+            className={({ isActive }) =>
+              "d-flex align-items-center text-decoration-none text-white " + 
+              (isActive ? "active" : "")
+            }
+          >
             <BsGrid1X2Fill size={24} className="me-2" />
             {!collapsed && "Dashboard"}
-          </a>
+          </NavLink>
         </li>
         <li className="mb-3">
-          <a href="/admin/Product" className="text-white d-flex align-items-center text-decoration-none">
+          <NavLink
+            to="/admin/Product"
+            className={({ isActive }) =>
+              "d-flex align-items-center text-decoration-none text-white " + 
+              (isActive ? "active" : "")
+            }
+          >
             <BsFillArchiveFill size={24} className="me-2" />
             {!collapsed && "Products"}
-          </a>
+          </NavLink>
         </li>
         <li className="mb-3">
-          <a href="/admin/Categories" className="text-white d-flex align-items-center text-decoration-none">
+          <NavLink
+            to="/admin/Categories"
+            className={({ isActive }) =>
+              "d-flex align-items-center text-decoration-none text-white " + 
+              (isActive ? "active" : "")
+            }
+          >
             <BsFillGrid3X3GapFill size={24} className="me-2" />
             {!collapsed && "Categories"}
-          </a>
+          </NavLink>
         </li>
         <li className="mb-3">
-          <a href="/admin/Users" className="text-white d-flex align-items-center text-decoration-none">
+          <NavLink
+            to="/admin/Users"
+            className={({ isActive }) =>
+              "d-flex align-items-center text-decoration-none text-white " + 
+              (isActive ? "active" : "")
+            }
+          >
             <BsPeopleFill size={24} className="me-2" />
             {!collapsed && "Users"}
-          </a>
+          </NavLink>
         </li>
         <li className="mb-3">
-          <a href="/admin/Orders" className="text-white d-flex align-items-center text-decoration-none">
+          <NavLink
+            to="/admin/Orders"
+            className={({ isActive }) =>
+              "d-flex align-items-center text-decoration-none text-white " + 
+              (isActive ? "active" : "")
+            }
+          >
             <BsListCheck size={24} className="me-2" />
             {!collapsed && "Orders"}
-          </a>
+          </NavLink>
         </li>
         <li className="mb-3">
-          <a href="/admin/Reports" className="text-white d-flex align-items-center text-decoration-none">
+          <NavLink
+            to="/admin/Reports"
+            className={({ isActive }) =>
+              "d-flex align-items-center text-decoration-none text-white " + 
+              (isActive ? "active" : "")
+            }
+          >
             <BsMenuButtonWideFill size={24} className="me-2" />
             {!collapsed && "Reports"}
-          </a>
+          </NavLink>
         </li>
         <li className="mb-3">
-          <a href="/admin/settings" className="text-white d-flex align-items-center text-decoration-none">
+          <NavLink
+            to="/admin/settings"
+            className={({ isActive }) =>
+              "d-flex align-items-center text-decoration-none text-white " + 
+              (isActive ? "active" : "")
+            }
+          >
             <BsFillGearFill size={24} className="me-2" />
             {!collapsed && "Settings"}
-          </a>
+          </NavLink>
         </li>
       </ul>
+
+      {/* Add this CSS inside your global CSS or CSS module */}
+      <style>{`
+        .active {
+          background-color: #1a73e8;
+          border-radius: 4px;
+        }
+        .active svg {
+          color: #fff;
+        }
+      `}</style>
     </aside>
   );
 };

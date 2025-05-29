@@ -19,6 +19,8 @@ import Product from './Admin/pages/Product';
 import Users from './Admin/pages/Users';
 import Orders from './Admin/pages/Orders';
 import Reports from './Admin/pages/Reports';
+import AddProduct from './Admin/components/Product/AddProduct';
+import EditProduct from './Admin/components/Product/EditProduct';
 
 const Mainrouter = createBrowserRouter([
   // User routes
@@ -64,6 +66,15 @@ const Mainrouter = createBrowserRouter([
     path: '/admin/product',
     element: <AdminLayout><Product /></AdminLayout>
   },
+  {
+  path: '/admin/add-product',
+  element: <AdminLayout><AddProduct /></AdminLayout>
+},
+  {
+  path: '/admin/edit-product/:id',
+  element: <AdminLayout><EditProduct /></AdminLayout>
+},
+
   {
     path: '/admin/Users',
     element: <AdminLayout><Users /></AdminLayout>

@@ -28,6 +28,7 @@
     "bootstrap": "^5.3.6",
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
+    "file-saver": "^2.0.5",
     "formik": "^2.4.6",
     "i": "^0.3.7",
     "jquery": "^3.7.0",
@@ -35,6 +36,7 @@
     "mdbreact": "^5.2.0",
     "npm": "^9.7.1",
     "owl.carousel": "^2.3.4",
+    "papaparse": "^5.5.3",
     "primereact": "^10.9.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.10",
@@ -75,11 +77,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.7",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.7"
   }
 }

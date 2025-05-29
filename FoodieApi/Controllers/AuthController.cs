@@ -3,10 +3,11 @@ using FoodieApi.Helpers;
 using FoodieApi.Models;
 using FoodieApi.Models.Auth;
 using FoodieApi.Services;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using LoginRequest = FoodieApi.Models.Auth.LoginRequest;
 using RegisterRequest = FoodieApi.Models.Auth.RegisterRequest;
 using ResetPasswordRequest = FoodieApi.Models.Auth.ResetPasswordRequest;
@@ -21,8 +22,8 @@ namespace FoodieApi.Controllers
         private readonly EmailService _emailService;
         private readonly JwtHelper _jwtHelper;
 
-        // Temporary in-memory storage for OTPs
-        private static Dictionary<string, string> otpStore = new();
+        // Temporary in-memory storage for OTPs with timestamps
+        private static Dictionary<string, (string Otp, DateTime GeneratedAt)> otpStore = new();
 
         public AuthController(FoodieOrderningContext context, EmailService emailService, JwtHelper jwtHelper)
         {
@@ -39,8 +40,7 @@ namespace FoodieApi.Controllers
                 return BadRequest("Email already registered.");
 
             var otp = GenerateOtp();
-            otpStore[request.Email] = otp;
-
+            otpStore[request.Email] = (otp, DateTime.UtcNow);
             await _emailService.SendOtpEmailAsync(request.Email, otp);
 
             return Ok("OTP sent to your email. Please verify to complete registration.");
@@ -50,8 +50,12 @@ namespace FoodieApi.Controllers
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest model)
         {
-            if (!otpStore.ContainsKey(model.Email) || otpStore[model.Email] != model.Otp)
-                return BadRequest("Invalid OTP.");
+            if (!otpStore.TryGetValue(model.Email, out var otpEntry) ||
+                otpEntry.Otp != model.Otp ||
+                DateTime.UtcNow > otpEntry.GeneratedAt.AddMinutes(5))
+            {
+                return BadRequest("Invalid or expired OTP.");
+            }
 
             otpStore.Remove(model.Email);
 
@@ -63,7 +67,7 @@ namespace FoodieApi.Controllers
                 Password = PasswordHelper.HashPassword(model.Password),
                 Mobile = model.Mobile,
                 ImageUrl = model.ImageUrl ?? "",
-                RoleId = 2, // Default user
+                RoleId = 2, // Default user role
                 CreatedDate = DateTime.Now,
                 IsVerified = true
             };
@@ -99,12 +103,14 @@ namespace FoodieApi.Controllers
             });
         }
 
+        // Helper: Generate a 6-digit OTP
         private string GenerateOtp()
         {
             var random = new Random();
-            return random.Next(100000, 999999).ToString(); // 6-digit OTP
+            return random.Next(100000, 999999).ToString();
         }
 
+        // POST: api/Auth/resend-otp
         [HttpPost("resend-otp")]
         public async Task<IActionResult> ResendOtp([FromBody] string email)
         {
@@ -112,12 +118,13 @@ namespace FoodieApi.Controllers
                 return BadRequest("User already registered.");
 
             var otp = GenerateOtp();
-            otpStore[email] = otp;
-
+            otpStore[email] = (otp, DateTime.UtcNow);
             await _emailService.SendOtpEmailAsync(email, otp);
+
             return Ok("OTP resent to your email.");
         }
 
+        // POST: api/Auth/forgot-password
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] string email)
         {
@@ -126,22 +133,28 @@ namespace FoodieApi.Controllers
                 return BadRequest("User not found.");
 
             var otp = GenerateOtp();
-            otpStore[email] = otp;
-
+            otpStore[email] = (otp, DateTime.UtcNow);
             await _emailService.SendOtpEmailAsync(email, otp);
+
             return Ok("OTP sent to reset password.");
         }
 
+        // POST: api/Auth/verify-forgot-otp
         [HttpPost("verify-forgot-otp")]
         public IActionResult VerifyForgotOtp([FromBody] OtpOnlyRequest model)
         {
-            if (!otpStore.ContainsKey(model.Email) || otpStore[model.Email] != model.Otp)
-                return BadRequest("Invalid OTP.");
+            if (!otpStore.TryGetValue(model.Email, out var otpEntry) ||
+                otpEntry.Otp != model.Otp ||
+                DateTime.UtcNow > otpEntry.GeneratedAt.AddMinutes(5))
+            {
+                return BadRequest("Invalid or expired OTP.");
+            }
 
             otpStore.Remove(model.Email);
             return Ok("OTP verified. You can now reset your password.");
         }
 
+        // POST: api/Auth/reset-password
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest model)
         {
@@ -154,6 +167,5 @@ namespace FoodieApi.Controllers
 
             return Ok("Password reset successfully.");
         }
-
     }
 }

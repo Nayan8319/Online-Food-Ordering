@@ -1,23 +1,17 @@
 import React, { useEffect, useState } from "react";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
+import {
+  Paper, Table, TableBody, TableCell, TableContainer,
+  TableHead, TablePagination, TableRow, Typography, Divider,
+  Box, Stack, Button, TextField, MenuItem, InputAdornment
+} from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
 import Swal from "sweetalert2";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
+import { saveAs } from "file-saver";
+import Papa from "papaparse";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductList() {
   const [page, setPage] = useState(0);
@@ -26,58 +20,21 @@ export default function ProductList() {
   const [filteredRows, setFilteredRows] = useState([]);
   const [categories, setCategories] = useState({});
   const [message, setMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCategories();
     fetchProducts();
   }, []);
 
-  // Fetch categories to map categoryId to category name
-  const fetchCategories = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5110/api/Category", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch categories");
-      const data = await response.json();
+  useEffect(() => {
+    handleSearchAndSort();
+  }, [searchTerm, rows, sortKey]);
 
-      const catMap = {};
-      data.forEach((cat) => {
-        catMap[cat.categoryId] = cat.name;
-      });
-      setCategories(catMap);
-    } catch (error) {
-      console.error("Category fetch error:", error);
-    }
-  };
-
-  // Fetch products from API
-  const fetchProducts = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5110/api/Menu", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || "Failed to fetch products");
-      }
-      const data = await response.json();
-      setRows(data);
-      setFilteredRows(data);
-      setMessage("");
-    } catch (err) {
-      setMessage(err.message || "Error fetching products");
-    }
-  };
-
+  
   const handleChangePage = (event, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = (event) => {
@@ -85,19 +42,81 @@ export default function ProductList() {
     setPage(0);
   };
 
-  // Filter products by selected product (from autocomplete)
-  const filterData = (selectedProduct) => {
-    if (selectedProduct) {
-      setFilteredRows([selectedProduct]);
-      setPage(0);
-    } else {
-      setFilteredRows(rows);
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5110/api/Category", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      const catMap = {};
+      data.forEach((cat) => (catMap[cat.categoryId] = cat.name));
+      setCategories(catMap);
+    } catch (error) {
+      console.error("Category fetch error:", error.message);
     }
   };
 
-  // Delete product confirmation
-  const deleteProduct = (id) => {
-    Swal.fire({
+  const fetchProducts = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5110/api/Menu", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      setRows(data);
+      setFilteredRows(data);
+    } catch (error) {
+      setMessage(error.message || "Error fetching products");
+    }
+  };
+
+  const handleSearchAndSort = () => {
+    let temp = [...rows];
+
+    if (searchTerm) {
+      temp = temp.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (categories[item.categoryId] || "")
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (sortKey) {
+      temp.sort((a, b) => {
+        if (sortKey === "price" || sortKey === "quantity") {
+          return a[sortKey] - b[sortKey];
+        }
+        return a[sortKey].localeCompare(b[sortKey]);
+      });
+    }
+
+    setFilteredRows(temp);
+    setPage(0);
+  };
+
+  const exportToCSV = () => {
+    const dataToExport = filteredRows.map((item) => ({
+      Name: item.name,
+      Description: item.description,
+      Price: item.price,
+      Quantity: item.quantity,
+      Category: categories[item.categoryId] || item.categoryId,
+      Active: item.isActive ? "Yes" : "No",
+    }));
+
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "products.csv");
+  };
+
+  const deleteProduct = async (id) => {
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
       icon: "warning",
@@ -105,56 +124,103 @@ export default function ProductList() {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Add delete API call here if needed
-        Swal.fire("Deleted!", "Product has been deleted.", "success");
-      }
     });
+
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem("token");
+        await fetch(`http://localhost:5110/api/Menu/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        Swal.fire("Deleted!", "Product has been deleted.", "success");
+        const updated = rows.filter((r) => r.menuId !== id);
+        setRows(updated);
+      } catch (error) {
+        Swal.fire("Error!", "Failed to delete product", "error");
+      }
+    }
+  };
+
+  const getImageSrc = (imageUrl) => {
+    if (!imageUrl) return null;
+    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+      return imageUrl;
+    } else if (imageUrl.startsWith("/")) {
+      return `http://localhost:5110${imageUrl}`;
+    } else {
+      return `http://localhost:5110/${imageUrl}`;
+    }
   };
 
   return (
     <Paper sx={{ width: "98%", overflow: "hidden", padding: "12px" }}>
-      <Typography gutterBottom variant="h5" component="div" sx={{ padding: "20px" }}>
+      <Typography gutterBottom variant="h5" sx={{ padding: "20px" }}>
         Products List
       </Typography>
       <Divider />
-      <Box height={10} />
-      <Stack direction="row" spacing={2} className="my-2 mb-2">
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          options={rows}
-          sx={{ width: 300 }}
-          onChange={(e, v) => filterData(v)}
-          getOptionLabel={(option) => option.name || ""}
-          renderInput={(params) => <TextField {...params} size="small" label="Search Products" />}
+
+      <Stack direction="row" spacing={2} sx={{ mt: 2, mb: 2 }}>
+        <TextField
+          label="Search by name/category"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
         />
+
+        <TextField
+          select
+          label="Sort by"
+          size="small"
+          value={sortKey}
+          onChange={(e) => setSortKey(e.target.value)}
+        >
+          <MenuItem value="">None</MenuItem>
+          <MenuItem value="name">Name</MenuItem>
+          <MenuItem value="price">Price</MenuItem>
+          <MenuItem value="quantity">Quantity</MenuItem>
+        </TextField>
+
         <Box sx={{ flexGrow: 1 }} />
-        <Button variant="contained" endIcon={<AddCircleIcon />}>
+
+        <Button variant="outlined" onClick={exportToCSV}>
+          Export
+        </Button>
+
+        <Button
+          variant="contained"
+          endIcon={<AddCircleIcon />}
+          onClick={() => navigate("/admin/add-product")}
+        >
           Add
         </Button>
       </Stack>
 
-      {message && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {message}
-        </Typography>
-      )}
+      {message && <Typography color="error">{message}</Typography>}
 
       <TableContainer>
-        <Table stickyHeader aria-label="products table">
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell align="left" style={{ minWidth: 60 }}>ID</TableCell>
-              <TableCell align="left" style={{ minWidth: 150 }}>Name</TableCell>
-              <TableCell align="left" style={{ minWidth: 300 }}>Description</TableCell>
-              <TableCell align="left" style={{ minWidth: 80 }}>Price (₹)</TableCell>
-              <TableCell align="left" style={{ minWidth: 80 }}>Quantity</TableCell>
-              <TableCell align="left" style={{ minWidth: 150 }}>Image</TableCell>
-              <TableCell align="left" style={{ minWidth: 150 }}>Category</TableCell>
-              <TableCell align="center" style={{ minWidth: 100 }}>Active</TableCell>
-              <TableCell align="left" style={{ minWidth: 100 }}>Actions</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Price (₹)</TableCell>
+              <TableCell>Quantity</TableCell>
+              <TableCell>Image</TableCell>
+              <TableCell>Category</TableCell>
+              <TableCell align="center">Active</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -167,55 +233,56 @@ export default function ProductList() {
             ) : (
               filteredRows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => (
+                .map((row, index) => (
                   <TableRow key={row.menuId}>
-                    <TableCell align="left">{row.menuId}</TableCell>
-                    <TableCell align="left">{row.name}</TableCell>
-                    <TableCell align="left">{row.description}</TableCell>
-                    <TableCell align="left">₹{row.price}</TableCell>
-                    <TableCell align="left">{row.quantity}</TableCell>
-                    <TableCell align="left">
+                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.description}</TableCell>
+                    <TableCell>₹{row.price}</TableCell>
+                    <TableCell>{row.quantity}</TableCell>
+ <TableCell align="left">
                       {row.imageUrl ? (
                         <img
-                          src={`http://localhost:5110/images/${row.imageUrl}`}
+                          src={getImageSrc(row.imageUrl)}
                           alt={row.name}
-                          style={{ width: 80, height: 50, objectFit: "cover", borderRadius: 4 }}
+                          style={{
+                            width: 80,
+                            height: 50,
+                            objectFit: "cover",
+                            borderRadius: 4,
+                          }}
                           onError={(e) => {
                             e.target.onerror = null;
-                             e.target.src = '/images/fallback-image.png'; // fallback image path
+                            e.target.src = "/images/fallback-image.png";
                           }}
                         />
                       ) : (
                         "No Image"
                       )}
                     </TableCell>
-                    <TableCell align="left">
-                      {categories[row.categoryId] || `ID: ${row.categoryId}`}
-                    </TableCell>
+                    <TableCell>{categories[row.categoryId]}</TableCell>
                     <TableCell align="center">
                       <Box
                         sx={{
-                          color: "white",
                           backgroundColor: row.isActive ? "green" : "red",
-                          borderRadius: "4px",
-                          padding: "4px 8px",
-                          width: 90,
-                          textAlign: "center",
-                          fontWeight: "bold",
-                          userSelect: "none",
+                          color: "white",
+                          borderRadius: 1,
+                          px: 1,
+                          py: 0.5,
+                          fontSize: 12,
                         }}
                       >
                         {row.isActive ? "Active" : "Not Active"}
                       </Box>
                     </TableCell>
-                    <TableCell align="left">
+                    <TableCell>
                       <Stack direction="row" spacing={1}>
                         <EditIcon
-                          style={{ fontSize: "20px", color: "blue", cursor: "pointer" }}
-                          // onClick={() => editProduct(row.menuId)}
+                          sx={{ color: "blue", cursor: "pointer" }}
+                          onClick={() => navigate(`/admin/edit-product/${row.menuId}`)}
                         />
                         <DeleteIcon
-                          style={{ fontSize: "20px", color: "darkred", cursor: "pointer" }}
+                          sx={{ color: "darkred", cursor: "pointer" }}
                           onClick={() => deleteProduct(row.menuId)}
                         />
                       </Stack>
@@ -227,7 +294,7 @@ export default function ProductList() {
         </Table>
       </TableContainer>
 
-      <TablePagination
+ <TablePagination
         rowsPerPageOptions={[5, 10, 20, 25, 100]}
         component="div"
         count={filteredRows.length}
@@ -247,7 +314,12 @@ export default function ProductList() {
             whiteSpace: "nowrap",
           },
           "& .MuiTablePagination-select": {
-            marginRight: "16px",
+            marginRight: 2,
+          },
+          "& .MuiTablePagination-actions": {
+            whiteSpace: "nowrap",
+            display: "flex",
+            gap: "5px",
           },
         }}
       />

@@ -16,6 +16,32 @@ namespace FoodieApi.Controllers
             _context = context;
         }
 
+        // GET: api/UserMenuCategory/allActiveMenus
+        [HttpGet("allActiveMenus")]
+        public async Task<ActionResult<IEnumerable<MenuDto>>> GetAllActiveMenus()
+        {
+            var activeMenus = await _context.Menus
+                .Where(m => m.IsActive)
+                .Select(m => new MenuDto
+                {
+                    MenuId = m.MenuId,
+                    Name = m.Name,
+                    Description = m.Description,
+                    Price = m.Price,
+                    Quantity = m.Quantity,
+                    ImageUrl = m.ImageUrl,
+                    CategoryId = m.CategoryId,
+                    IsActive = m.IsActive
+                })
+                .ToListAsync();
+
+            if (activeMenus == null || activeMenus.Count == 0)
+                return NotFound("No active menu items found.");
+
+            return Ok(activeMenus);
+        }
+
+
         // GET: api/UserMenuCategory/categories
         [HttpGet("activeCategories")]
         public async Task<ActionResult<IEnumerable<CategoryDto>>> GetActiveCategories()
