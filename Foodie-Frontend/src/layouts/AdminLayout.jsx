@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Topbar from "../Admin/components/Topbar";
 import Sidebar from "../Admin/components/SideBar";
-// import { isAdmin, getToken } from "../utils/auth"; // ⬅️ Commented out
+import { isAdmin, getToken } from "../utils/auth"; // ⬅️ Commented out
 
 const AdminLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // const token = getToken();
-    // if (!token || !isAdmin()) {
-    //   navigate("/login"); // redirect if not logged in or not admin
-    // }
+    const token = getToken();
+    if (!token || !isAdmin()) {
+      navigate("/login"); // redirect if not logged in or not admin
+    }
   }, [navigate]);
 
   const toggleSidebar = () => {

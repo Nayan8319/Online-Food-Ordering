@@ -1,10 +1,10 @@
 import React from 'react'
+import CategoryList from '../components/Category/CategoryList'
 
 const Categories = () => {
   return (
     <div>
-      Categroies Page
-      <p>This is the categories page where you can manage product categories.</p>
+      <CategoryList />
     </div>
   )
 }

@@ -21,6 +21,8 @@ import Orders from './Admin/pages/Orders';
 import Reports from './Admin/pages/Reports';
 import AddProduct from './Admin/components/Product/AddProduct';
 import EditProduct from './Admin/components/Product/EditProduct';
+import AddCategory from './Admin/components/Category/AddCategory';
+import EditCategory from './Admin/components/Category/EditCategory';
 
 const Mainrouter = createBrowserRouter([
   // User routes
@@ -63,18 +65,25 @@ const Mainrouter = createBrowserRouter([
     element: <AdminLayout><Categories /></AdminLayout>
   },
   {
+  path: '/admin/Categories/add-Category',
+  element: <AdminLayout><AddCategory /></AdminLayout>
+  },
+  {
+  path: '/admin/categories/edit-Category/:id',
+  element: <AdminLayout><EditCategory /></AdminLayout>
+  },
+  {
     path: '/admin/product',
     element: <AdminLayout><Product /></AdminLayout>
   },
   {
-  path: '/admin/add-product',
+  path: '/admin/product/add-product',
   element: <AdminLayout><AddProduct /></AdminLayout>
-},
+  },
   {
-  path: '/admin/edit-product/:id',
+  path: '/admin/product/edit-product/:id',
   element: <AdminLayout><EditProduct /></AdminLayout>
-},
-
+  },
   {
     path: '/admin/Users',
     element: <AdminLayout><Users /></AdminLayout>
