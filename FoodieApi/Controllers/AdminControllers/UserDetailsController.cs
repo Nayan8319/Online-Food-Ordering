@@ -23,7 +23,6 @@ namespace FoodieApi.Controllers
         {
             var users = await _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Role.RoleName == "User") // Filter out Admins
                 .Select(u => new UserDto
                 {
                     UserId = u.UserId,
@@ -39,6 +38,20 @@ namespace FoodieApi.Controllers
                 .ToListAsync();
 
             return Ok(users);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("verify/{userId}")]
+        public async Task<IActionResult> SetUserVerificationStatus(int userId, [FromQuery] bool isVerified)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return NotFound("User not found.");
+
+            user.IsVerified = isVerified;
+            await _context.SaveChangesAsync();
+
+            return Ok($"User verification status set to {isVerified}.");
         }
     }
 }

@@ -231,7 +231,7 @@ export default function CategoryList() {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell>#</TableCell>
+              <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Image</TableCell>
               <TableCell align="center">Active</TableCell>

@@ -23,6 +23,8 @@ import AddProduct from './Admin/components/Product/AddProduct';
 import EditProduct from './Admin/components/Product/EditProduct';
 import AddCategory from './Admin/components/Category/AddCategory';
 import EditCategory from './Admin/components/Category/EditCategory';
+import SingleMenuItem from './Components/SingleMenuItem';
+import Cart from './Pages/Cart';
 
 const Mainrouter = createBrowserRouter([
   // User routes
@@ -34,6 +36,10 @@ const Mainrouter = createBrowserRouter([
     path: '/menu',
     element: <UserLayout><MenuPage /></UserLayout>
   },
+    {
+    path: '/menu/:id',             // <-- single menu item route with param id
+    element: <UserLayout><SingleMenuItem /></UserLayout>
+  },
   {
     path: '/about',
     element: <UserLayout><Aboutpage /></UserLayout>
@@ -41,6 +47,10 @@ const Mainrouter = createBrowserRouter([
   {
     path: '/contact',
     element: <UserLayout><Contact /></UserLayout>
+  },
+  {
+    path: '/cart',
+    element: <UserLayout><Cart /></UserLayout>
   },
   {
     path: '/login',
