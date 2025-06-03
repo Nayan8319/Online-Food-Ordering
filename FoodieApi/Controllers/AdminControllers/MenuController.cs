@@ -255,6 +255,26 @@ namespace FoodieApi.Controllers
             }
         }
 
+        [HttpPost("deactivate-out-of-stock")]
+        public async Task<IActionResult> DeactivateOutOfStockMenus()
+        {
+            var menus = await _context.Menus
+                .Where(m => m.Quantity <= 0 && m.IsActive)
+                .ToListAsync();
+
+            if (menus.Count == 0)
+                return Ok("No out-of-stock menu items to deactivate.");
+
+            foreach (var menu in menus)
+            {
+                menu.IsActive = false;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok($"{menus.Count} out-of-stock menu items deactivated.");
+        }
+
+
         private bool IsAbsoluteUrl(string url)
         {
             return Uri.IsWellFormedUriString(url, UriKind.Absolute);

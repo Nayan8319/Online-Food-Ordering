@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import Marquee from "react-fast-marquee";
 import Skeleton from "react-loading-skeleton";
-import { addCart } from "../redux/action";
 
 const SingleMenuItem = () => {
   const { id } = useParams();
-  const dispatch = useDispatch();
 
   const [menuItem, setMenuItem] = useState(null);
   const [similarMenus, setSimilarMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingSimilar, setLoadingSimilar] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
   const [categoryName, setCategoryName] = useState("");
+  const [quantity, setQuantity] = useState(1);
+
+  const fallbackImage = "/fallback-image.png";
 
   const fetchMenuDetails = async () => {
     try {
       setLoading(true);
       setError(null);
+      setSuccessMessage("");
 
       const res = await fetch(`http://localhost:5110/api/UserMenuCategory/menu/${id}`);
       if (!res.ok) throw new Error(`Failed to fetch menu item with id ${id}`);
@@ -40,7 +42,6 @@ const SingleMenuItem = () => {
       const similarData = await similarRes.json();
       setSimilarMenus(similarData.filter(item => item.menuId !== data.menuId));
       setLoadingSimilar(false);
-
     } catch (err) {
       setError(err.message || "Error loading menu item");
       setLoading(false);
@@ -50,12 +51,63 @@ const SingleMenuItem = () => {
 
   useEffect(() => {
     fetchMenuDetails();
-    // Scroll to top on route change
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [id]);
 
-  const addProduct = (item) => {
-    dispatch(addCart(item));
+  const addProductToCart = async (item) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login to add items to cart.");
+        return;
+      }
+
+      // Step 1: Fetch current cart
+      const cartRes = await fetch("http://localhost:5110/api/CartOrder", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!cartRes.ok) throw new Error("Failed to fetch cart");
+
+      const cartJson = await cartRes.json();
+      const cartItems = Array.isArray(cartJson) ? cartJson : cartJson.items || [];
+
+      const existingItem = cartItems.find(ci => ci.menuId === item.menuId);
+      const existingQty = existingItem ? existingItem.quantity : 0;
+      const newTotalQty = existingQty + quantity;
+
+      if (newTotalQty > 10) {
+        setError(`You can't add more than 10 units of "${item.name}" to your cart.`);
+        setTimeout(() => setError(""), 4000);
+        return;
+      }
+
+      // Step 2: Add to cart
+      const response = await fetch("http://localhost:5110/api/CartOrder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          menuId: item.menuId,
+          quantity: quantity
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || "Failed to add to cart");
+      }
+
+      setSuccessMessage(`"${item.name}" added to cart!`);
+      setTimeout(() => setSuccessMessage(""), 4000);
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+      setTimeout(() => setError(""), 4000);
+    }
   };
 
   const renderSkeleton = () => (
@@ -81,15 +133,10 @@ const SingleMenuItem = () => {
     </div>
   );
 
-  const fallbackImage = "/fallback-image.png";
-
   return (
     <div className="container pt-5 mt-4">
-      {error && (
-        <div className="alert alert-danger my-4" role="alert">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert alert-danger my-4">{error}</div>}
+      {successMessage && <div className="alert alert-success my-4">{successMessage}</div>}
 
       <div className="row">
         {loading ? (
@@ -111,10 +158,21 @@ const SingleMenuItem = () => {
               <h1 className="display-5">{menuItem.name}</h1>
               <h3 className="display-6 my-3">₹{menuItem.price}</h3>
               <p className="lead">{menuItem.description}</p>
+              <div className="d-flex align-items-center mb-3">
+                <label className="me-2">Qty:</label>
+                <select
+                  className="form-select w-auto"
+                  value={quantity}
+                  onChange={(e) => setQuantity(parseInt(e.target.value))}
+                >
+                  {[1, 2, 3, 4, 5].map(q => (
+                    <option key={q} value={q}>{q}</option>
+                  ))}
+                </select>
+              </div>
               <button
                 className="btn btn-outline-dark"
-                onClick={() => addProduct(menuItem)}
-                disabled={loading}
+                onClick={() => addProductToCart(menuItem)}
               >
                 Add to Cart
               </button>
@@ -146,8 +204,6 @@ const SingleMenuItem = () => {
                     <div className="card-body">
                       <h6 className="card-title">{item.name}</h6>
                       <p className="card-text">₹{item.price}</p>
-
-                      {/* View button with scroll-to-top */}
                       <Link
                         to={`/menu/${item.menuId}`}
                         className="btn btn-sm btn-outline-dark"
@@ -155,14 +211,10 @@ const SingleMenuItem = () => {
                       >
                         View
                       </Link>
-
-                      {/* Spacer */}
                       <div style={{ height: "10px" }}></div>
-
-                      {/* Add to Cart button */}
                       <button
                         className="btn btn-sm btn-dark"
-                        onClick={() => addProduct(item)}
+                        onClick={() => addProductToCart(item)}
                       >
                         Add to Cart
                       </button>

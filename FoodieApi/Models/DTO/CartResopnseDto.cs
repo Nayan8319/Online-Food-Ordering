@@ -8,6 +8,6 @@
         public decimal PricePerItem { get; set; }
         public int Quantity { get; set; }
         public decimal TotalPrice { get; set; }
+        public string ImageUrl { get; set; } = null!; // ✅ New property
     }
-
 }

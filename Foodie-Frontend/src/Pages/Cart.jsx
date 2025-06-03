@@ -1,63 +1,96 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { addCart, removeFromCart } from "../redux/action";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
-  const cartItems = useSelector((state) => state.cart);
-  const dispatch = useDispatch();
+  const [cartData, setCartData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // Dummy items for empty cart preview
-  const defaultItems = [
-    {
-      id: 1,
-      title: "Cheese Pizza",
-      price: 8.99,
-      qty: 1,
-      image: "https://via.placeholder.com/100x75?text=Cheese+Pizza",
-    },
-    {
-      id: 2,
-      title: "Veg Burger",
-      price: 5.49,
-      qty: 1,
-      image: "https://via.placeholder.com/100x75?text=Veg+Burger",
-    },
-    {
-      id: 3,
-      title: "Chocolate Cake",
-      price: 6.99,
-      qty: 1,
-      image: "https://via.placeholder.com/100x75?text=Choco+Cake",
-    },
-    {
-      id: 4,
-      title: "Cold Coffee",
-      price: 3.99,
-      qty: 1,
-      image: "https://via.placeholder.com/100x75?text=Cold+Coffee",
-    },
-  ];
+  const token = localStorage.getItem("token");
 
-  // Increase qty of product in cart
-  const addItem = (product) => {
-    dispatch(addCart(product));
+  const fetchCart = async () => {
+    try {
+      const response = await axios.get("http://localhost:5110/api/CartOrder", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setCartData(response.data);
+      setErrorMsg("");
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      setCartData({ items: [], totalAmount: 0 });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Decrease qty or remove product if qty=1
-  const removeItem = (productId) => {
-    dispatch(removeFromCart(productId));
+  const updateQty = async (cartId, newQty, menuId) => {
+    try {
+      setErrorMsg("");
+      const response = await axios.put(
+        `http://localhost:5110/api/CartOrder/${cartId}`,
+        { menuId: menuId, quantity: newQty },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setCartData(response.data);
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      const backendMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        "Failed to update quantity.";
+      setErrorMsg(backendMessage);
+    }
   };
 
-  const ShowCart = ({ items }) => {
-    let subtotal = 0;
-    let shipping = 30.0;
-    let totalItems = 0;
+  const removeItem = async (cartId) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:5110/api/CartOrder/${cartId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setCartData(response.data);
+      setErrorMsg("");
+    } catch (error) {
+      console.error("Error removing item:", error);
+      setErrorMsg("Failed to remove item. Please try again.");
+    }
+  };
 
-    items.forEach((item) => {
-      subtotal += item.price * item.qty;
-      totalItems += item.qty;
-    });
+  const getImageSrc = (imageUrl) => {
+    if (!imageUrl) return "";
+    return imageUrl.startsWith("/CategoryImages") ||
+      imageUrl.startsWith("/MenuImages")
+      ? `http://localhost:5110${imageUrl}`
+      : `http://localhost:5110/MenuImages/${imageUrl}`;
+  };
+
+  // Clear error message after 3 seconds
+  useEffect(() => {
+    if (errorMsg) {
+      const timer = setTimeout(() => setErrorMsg(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMsg]);
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  if (loading) return <div>Loading your cart...</div>;
+
+  const ShowCart = ({ items, total }) => {
+    const shipping = 30.0;
 
     return (
       <section className="h-100 gradient-custom">
@@ -66,76 +99,71 @@ const Cart = () => {
             <div className="col-md-8">
               <div className="card mb-4">
                 <div className="card-header py-3">
-                  <h5 className="mb-0">Item List</h5>
+                  <h5 className="mb-0">Your Cart Items</h5>
                 </div>
                 <div className="card-body">
+                  {errorMsg && (
+                    <div className="alert alert-danger" role="alert">
+                      {errorMsg}
+                    </div>
+                  )}
                   {items.map((item) => (
-                    <div key={item.id}>
-                      <div className="row d-flex align-items-center">
-                        <div className="col-lg-3 col-md-12">
-                          <div className="bg-image rounded">
-                            <img
-                              src={
-                                item.image ||
-                                "https://via.placeholder.com/100x75?text=No+Image"
-                              }
-                              alt={item.title}
-                              width={100}
-                              height={75}
-                            />
-                          </div>
+                    <div key={item.cartId}>
+                      <div className="row align-items-center mb-4">
+                        <div className="col-md-2">
+                          <img
+                            src={getImageSrc(item.imageUrl)}
+                            alt={item.menuName}
+                            className="img-fluid rounded"
+                            style={{ width: 80, height: 60, objectFit: "cover" }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/images/fallback-image.png";
+                            }}
+                          />
                         </div>
-
-                        <div className="col-lg-5 col-md-6">
-                          <p>
-                            <strong>{item.title}</strong>
-                          </p>
+                        <div className="col-md-3">
+                          <h6 className="mb-0">{item.menuName}</h6>
+                          <small className="text-muted">${item.pricePerItem.toFixed(2)}</small>
                         </div>
-
-                        <div className="col-lg-4 col-md-6">
-                          <div
-                            className="d-flex flex-column align-items-start mb-4"
-                            style={{ maxWidth: "350px" }}
+                        <div className="col-md-3 d-flex align-items-center">
+                          <button
+                            className="btn btn-sm btn-outline-dark me-2"
+                            onClick={() =>
+                              item.quantity > 1
+                                ? updateQty(item.cartId, item.quantity - 1, item.menuId)
+                                : removeItem(item.cartId)
+                            }
                           >
-                            <div className="d-flex align-items-center mb-2">
-                              <button
-                                className="btn btn-outline-dark px-3"
-                                onClick={() => removeItem(item.id)}
-                              >
-                                <i className="fas fa-minus"></i>
-                              </button>
-
-                              <span
-                                className="mx-3"
-                                style={{
-                                  fontSize: "1.2rem",
-                                  minWidth: "25px",
-                                  textAlign: "center",
-                                }}
-                              >
-                                {item.qty}
-                              </span>
-
-                              <button
-                                className="btn btn-outline-dark px-3"
-                                onClick={() => addItem(item)}
-                              >
-                                <i className="fas fa-plus"></i>
-                              </button>
-                            </div>
-
-                            <p
-                              className="mb-0"
-                              style={{ fontWeight: "600", fontSize: "1rem" }}
-                            >
-                              ${item.price.toFixed(2)} x {item.qty} = $
-                              {(item.price * item.qty).toFixed(2)}
-                            </p>
-                          </div>
+                            -
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button
+                            className="btn btn-sm btn-outline-dark ms-2"
+                            onClick={() => {
+                              if (item.quantity < 10) {
+                                updateQty(item.cartId, item.quantity + 1, item.menuId);
+                              } else {
+                                setErrorMsg("You cannot add more than 10 units of this item.");
+                              }
+                            }}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <div className="col-md-2">
+                          <strong>${item.totalPrice.toFixed(2)}</strong>
+                        </div>
+                        <div className="col-md-2 text-end">
+                          <button
+                            className="btn btn-sm btn-danger"
+                            onClick={() => removeItem(item.cartId)}
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
-
-                      <hr className="my-4" />
+                      <hr />
                     </div>
                   ))}
                 </div>
@@ -149,34 +177,22 @@ const Cart = () => {
                 </div>
                 <div className="card-body">
                   <ul className="list-group list-group-flush">
-                    <li className="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
-                      Products ({totalItems}) <span>${subtotal.toFixed(2)}</span>
+                    <li className="list-group-item d-flex justify-content-between">
+                      Products ({items.length})
+                      <span>${total.toFixed(2)}</span>
                     </li>
-                    <li className="list-group-item d-flex justify-content-between align-items-center px-0">
-                      Shipping <span>${shipping.toFixed(2)}</span>
+                    <li className="list-group-item d-flex justify-content-between">
+                      Shipping
+                      <span>${shipping.toFixed(2)}</span>
                     </li>
-                    <li className="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
-                      <div>
-                        <strong>Total amount</strong>
-                      </div>
-                      <span>
-                        <strong>${(subtotal + shipping).toFixed(2)}</strong>
-                      </span>
+                    <li className="list-group-item d-flex justify-content-between fw-bold">
+                      Total
+                      <span>${(total + shipping).toFixed(2)}</span>
                     </li>
                   </ul>
-
-                  {items.length > 0 ? (
-                    <Link
-                      to="/checkout"
-                      className="btn btn-dark btn-lg btn-block"
-                    >
-                      Go to checkout
-                    </Link>
-                  ) : (
-                    <button disabled className="btn btn-dark btn-lg btn-block">
-                      Go to checkout
-                    </button>
-                  )}
+                  <Link to="/checkout" className="btn btn-dark btn-lg w-100 mt-3">
+                    Go to Checkout
+                  </Link>
                 </div>
               </div>
             </div>
@@ -187,13 +203,17 @@ const Cart = () => {
   };
 
   return (
-<div className="container mt-1 mb-5 py-3 px-4">
-      {/* <h1 className="text-center">Cart</h1> */}
+    <div className="container mt-2 mb-5 py-3 px-4">
       <hr />
-      {cartItems && cartItems.length > 0 ? (
-        <ShowCart items={cartItems} />
+      {cartData?.items?.length > 0 ? (
+        <ShowCart items={cartData.items} total={cartData.totalAmount} />
       ) : (
-        <ShowCart items={defaultItems} />
+        <div className="text-center py-5">
+          <h4>Your cart is empty.</h4>
+          <Link to="/menu" className="btn btn-outline-dark mt-3">
+            Browse Menu
+          </Link>
+        </div>
       )}
     </div>
   );
