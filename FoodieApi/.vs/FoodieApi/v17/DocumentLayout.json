@@ -3,6 +3,18 @@
   "WorkspaceRootPath": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\controllers\\usercontrollers\\cartordercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:controllers\\usercontrollers\\cartordercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\helper\\jwthelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:helper\\jwthelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\controllers\\admincontrollers\\categorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:controllers\\admincontrollers\\categorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -11,16 +23,8 @@
       "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:controllers\\usercontrollers\\usermenucategorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\controllers\\usercontrollers\\cartcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:controllers\\usercontrollers\\cartcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\models\\dto\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -65,10 +69,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\models\\auth\\verifyotprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:models\\auth\\verifyotprequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\helper\\jwthelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|solutionrelative:helper\\jwthelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5510B27A-DA55-42F0-BF09-FCCDC196A533}|FoodieApi.csproj|f:\\ict\\sem 2\\project\\asp.net_project\\foodieapi\\models\\menu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -126,7 +126,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": 8,
           "Children": [
             {
               "$type": "Bookmark",
@@ -146,19 +146,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "User.cs",
-              "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\User.cs",
-              "RelativeDocumentMoniker": "Models\\User.cs",
-              "ToolTip": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\User.cs",
-              "RelativeToolTip": "Models\\User.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-11T06:36:07.266Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "UserDetailsController.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\AdminControllers\\UserDetailsController.cs",
               "RelativeDocumentMoniker": "Controllers\\AdminControllers\\UserDetailsController.cs",
@@ -170,19 +158,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "AuthController.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "Controllers\\AuthController.cs",
               "ToolTip": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\AuthController.cs",
               "RelativeToolTip": "Controllers\\AuthController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAKsAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-11T07:52:51.789Z"
+              "WhenOpened": "2025-04-11T07:52:51.789Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 4,
               "Title": "UserMenuCategoryController.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\UserControllers\\UserMenuCategoryController.cs",
               "RelativeDocumentMoniker": "Controllers\\UserControllers\\UserMenuCategoryController.cs",
@@ -190,12 +179,11 @@
               "RelativeToolTip": "Controllers\\UserControllers\\UserMenuCategoryController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAIYAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-28T07:14:52.859Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-28T07:14:52.859Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "Program.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -207,20 +195,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "CartController.cs",
-              "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\UserControllers\\CartController.cs",
-              "RelativeDocumentMoniker": "Controllers\\UserControllers\\CartController.cs",
-              "ToolTip": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\UserControllers\\CartController.cs",
-              "RelativeToolTip": "Controllers\\UserControllers\\CartController.cs",
-              "ViewState": "AgIAAFYAAAAAAAAAAAAswHEAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "CartOrderController.cs",
+              "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\UserControllers\\CartOrderController.cs",
+              "RelativeDocumentMoniker": "Controllers\\UserControllers\\CartOrderController.cs",
+              "ToolTip": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\UserControllers\\CartOrderController.cs",
+              "RelativeToolTip": "Controllers\\UserControllers\\CartOrderController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-29T08:02:51.792Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "CategoryController.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\AdminControllers\\CategoryController.cs",
               "RelativeDocumentMoniker": "Controllers\\AdminControllers\\CategoryController.cs",
@@ -233,7 +221,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 1,
+              "Title": "JwtHelper.cs",
+              "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Helper\\JwtHelper.cs",
+              "RelativeDocumentMoniker": "Helper\\JwtHelper.cs",
+              "ToolTip": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Helper\\JwtHelper.cs",
+              "RelativeToolTip": "Helper\\JwtHelper.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAIwDQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-11T07:40:01.222Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "User.cs",
+              "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\User.cs",
+              "RelativeDocumentMoniker": "Models\\User.cs",
+              "ToolTip": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\User.cs",
+              "RelativeToolTip": "Models\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-11T06:36:07.266Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
               "Title": "MenuDto.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\DTO\\MenuDto.cs",
               "RelativeDocumentMoniker": "Models\\DTO\\MenuDto.cs",
@@ -245,7 +258,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "UserDto.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\DTO\\UserDto.cs",
               "RelativeDocumentMoniker": "Models\\DTO\\UserDto.cs",
@@ -257,7 +270,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "appsettings.json",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -269,7 +282,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "CategoryDto.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\DTO\\CategoryDto.cs",
               "RelativeDocumentMoniker": "Models\\DTO\\CategoryDto.cs",
@@ -281,7 +294,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "FoodieApi.csproj",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\FoodieApi.csproj",
               "RelativeDocumentMoniker": "FoodieApi.csproj",
@@ -293,7 +306,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "MenuController.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\AdminControllers\\MenuController.cs",
               "RelativeDocumentMoniker": "Controllers\\AdminControllers\\MenuController.cs",
@@ -305,7 +318,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "CartRequestDto.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\DTO\\CartRequestDto.cs",
               "RelativeDocumentMoniker": "Models\\DTO\\CartRequestDto.cs",
@@ -317,7 +330,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "CartResopnseDto.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\DTO\\CartResopnseDto.cs",
               "RelativeDocumentMoniker": "Models\\DTO\\CartResopnseDto.cs",
@@ -326,18 +339,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-29T08:01:27.166Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "JwtHelper.cs",
-              "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Helper\\JwtHelper.cs",
-              "RelativeDocumentMoniker": "Helper\\JwtHelper.cs",
-              "ToolTip": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Helper\\JwtHelper.cs",
-              "RelativeToolTip": "Helper\\JwtHelper.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAwwCsAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-11T07:40:01.222Z"
             },
             {
               "$type": "Document",
@@ -353,7 +354,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "VerifyOtpRequest.cs",
               "DocumentMoniker": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Models\\Auth\\VerifyOtpRequest.cs",
               "RelativeDocumentMoniker": "Models\\Auth\\VerifyOtpRequest.cs",

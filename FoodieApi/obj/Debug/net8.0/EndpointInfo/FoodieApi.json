@@ -290,10 +290,22 @@
         }
       }
     },
-    "/api/Cart": {
+    "/api/Auth/profile": {
       "get": {
         "tags": [
-          "Cart"
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/CartOrder": {
+      "get": {
+        "tags": [
+          "CartOrder"
         ],
         "responses": {
           "200": {
@@ -329,7 +341,7 @@
       },
       "post": {
         "tags": [
-          "Cart"
+          "CartOrder"
         ],
         "requestBody": {
           "content": {
@@ -357,10 +369,10 @@
         }
       }
     },
-    "/api/Cart/{cartId}": {
+    "/api/CartOrder/{cartId}": {
       "put": {
         "tags": [
-          "Cart"
+          "CartOrder"
         ],
         "parameters": [
           {
@@ -400,7 +412,7 @@
       },
       "delete": {
         "tags": [
-          "Cart"
+          "CartOrder"
         ],
         "parameters": [
           {

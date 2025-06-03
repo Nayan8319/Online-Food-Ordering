@@ -74,6 +74,16 @@
   },
   {
     "ContainingType": "FoodieApi.Controllers.AuthController",
+    "Method": "GetProfile",
+    "RelativePath": "api/Auth/profile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FoodieApi.Controllers.AuthController",
     "Method": "Register",
     "RelativePath": "api/Auth/register",
     "HttpMethod": "POST",
@@ -153,9 +163,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "CartController",
+    "ContainingType": "FoodieApi.Controllers.UserControllers.CartOrderController",
     "Method": "GetUserCart",
-    "RelativePath": "api/Cart",
+    "RelativePath": "api/CartOrder",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -173,9 +183,9 @@
     ]
   },
   {
-    "ContainingType": "CartController",
+    "ContainingType": "FoodieApi.Controllers.UserControllers.CartOrderController",
     "Method": "AddToCart",
-    "RelativePath": "api/Cart",
+    "RelativePath": "api/CartOrder",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -189,9 +199,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "CartController",
+    "ContainingType": "FoodieApi.Controllers.UserControllers.CartOrderController",
     "Method": "UpdateQuantity",
-    "RelativePath": "api/Cart/{cartId}",
+    "RelativePath": "api/CartOrder/{cartId}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -210,9 +220,9 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "CartController",
+    "ContainingType": "FoodieApi.Controllers.UserControllers.CartOrderController",
     "Method": "DeleteItem",
-    "RelativePath": "api/Cart/{cartId}",
+    "RelativePath": "api/CartOrder/{cartId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
