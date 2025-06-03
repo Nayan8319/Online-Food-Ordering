@@ -40,7 +40,7 @@ const MenuCard = ({ menuId, price, heading, imgsrc, description }) => {
           <h5 onClick={handleViewProduct} style={{ cursor: 'pointer' }}>{heading}</h5>
           <p>{description}</p>
           <div className="options">
-            <h6>${price?.toFixed(2)}</h6>
+            <h6>₹{price?.toFixed(2)}</h6>
             <button className="btn p-0 border-0 bg-transparent" onClick={handleAddToCart}>
               <i className="fa-solid fa-cart-shopping"></i>
             </button>
