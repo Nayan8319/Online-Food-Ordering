@@ -1,8 +1,21 @@
 import React, { useEffect, useState } from "react";
 import {
-  Paper, Table, TableBody, TableCell, TableContainer,
-  TableHead, TablePagination, TableRow, Typography, Divider,
-  Box, Stack, Button, TextField, MenuItem, InputAdornment
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Typography,
+  Divider,
+  Box,
+  Stack,
+  Button,
+  TextField,
+  MenuItem,
+  InputAdornment,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
@@ -34,7 +47,6 @@ export default function ProductList() {
     handleSearchAndSort();
   }, [searchTerm, rows, sortKey]);
 
-  
   const handleChangePage = (event, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = (event) => {
@@ -59,44 +71,42 @@ export default function ProductList() {
     }
   };
 
-const fetchProducts = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch("http://localhost:5110/api/Menu", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await response.json();
+  const fetchProducts = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5110/api/Menu", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
 
-    // Check if data is an array, else fallback to []
-    if (Array.isArray(data)) {
-      setRows(data);
-      setFilteredRows(data);
-    } else if (data && Array.isArray(data.items)) {
-      // sometimes APIs send paginated data: { items: [], total: 10 }
-      setRows(data.items);
-      setFilteredRows(data.items);
-    } else {
-      setRows([]);
-      setFilteredRows([]);
-      setMessage("No valid product data found.");
+      if (Array.isArray(data)) {
+        setRows(data);
+        setFilteredRows(data);
+      } else if (data && Array.isArray(data.items)) {
+        setRows(data.items);
+        setFilteredRows(data.items);
+      } else {
+        setRows([]);
+        setFilteredRows([]);
+        setMessage("No valid product data found.");
+      }
+    } catch (error) {
+      setMessage(error.message || "Error fetching products");
     }
-  } catch (error) {
-    setMessage(error.message || "Error fetching products");
-  }
-};
-
+  };
 
   const handleSearchAndSort = () => {
     let temp = [...rows];
 
     if (searchTerm) {
-      temp = temp.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (categories[item.categoryId] || "")
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
+      temp = temp.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (categories[item.categoryId] || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
 
@@ -157,6 +167,46 @@ const fetchProducts = async () => {
     }
   };
 
+  // New function to deactivate out-of-stock menu items
+  const deactivateOutOfStock = async () => {
+    const confirm = await Swal.fire({
+      title: "Deactivate Out-of-Stock Items?",
+      text: "This will deactivate all menu items with quantity 0 or less.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, deactivate",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:5110/api/Menu/deactivate-out-of-stock",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const resultText = await response.text();
+
+      if (response.ok) {
+        Swal.fire("Success", resultText, "success");
+        // Refresh the product list after deactivation
+        fetchProducts();
+      } else {
+        Swal.fire("Error", resultText || "Failed to deactivate", "error");
+      }
+    } catch (error) {
+      Swal.fire("Error", error.message || "Failed to deactivate", "error");
+    }
+  };
+
   const getImageSrc = (imageUrl) => {
     if (!imageUrl) return null;
     if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
@@ -206,6 +256,11 @@ const fetchProducts = async () => {
 
         <Box sx={{ flexGrow: 1 }} />
 
+        {/* New Out of Stock Button */}
+        <Button variant="outlined" color="error" onClick={deactivateOutOfStock}>
+          Out of Stock
+        </Button>
+
         <Button variant="outlined" onClick={exportToCSV}>
           Export
         </Button>
@@ -252,53 +307,82 @@ const fetchProducts = async () => {
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.description}</TableCell>
                     <TableCell>₹{row.price}</TableCell>
-                    <TableCell>{row.quantity}</TableCell>
- <TableCell align="left">
+                    <TableCell>
+                      {row.quantity === 0 ? (
+                        <span
+                          className="badge rounded-pill"
+                          style={{ backgroundColor: "#ff1a1a", color: "#fff" }} // Red
+                        >
+                          Out of Stock
+                        </span>
+                      ) : row.quantity <= 5 ? (
+                        <span
+                          className="badge rounded-pill"
+                          style={{ backgroundColor: "#ffcc00", color: "#000" }} // Yellow
+                        >
+                          Low Stock ({row.quantity})
+                        </span>
+                      ) : (
+                        row.quantity
+                      )}
+                    </TableCell>
+
+                    <TableCell>
                       {row.imageUrl ? (
                         <img
-                          src={getImageSrc(row.imageUrl)}
                           alt={row.name}
-                          style={{
-                            width: 80,
-                            height: 50,
-                            objectFit: "cover",
-                            borderRadius: 4,
-                          }}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "/images/fallback-image.png";
-                          }}
+                          src={getImageSrc(row.imageUrl)}
+                          style={{ width: 50, height: 50, objectFit: "cover" }}
                         />
                       ) : (
-                        "No Image"
+                        "N/A"
                       )}
                     </TableCell>
                     <TableCell>{categories[row.categoryId]}</TableCell>
                     <TableCell align="center">
-                      <Box
-                        sx={{
+                      <span
+                        className="badge rounded-pill"
+                        style={{
                           backgroundColor: row.isActive ? "green" : "red",
                           color: "white",
-                          borderRadius: 1,
-                          px: 1,
-                          py: 0.5,
-                          fontSize: 12,
+                          fontWeight: "bold",
+                          fontSize: "0.8rem",
+                          padding: "0.25em 0.75em",
+                          minHeight: "24px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "50rem",
+                          userSelect: "none",
+                          width: "75px",
+                          textAlign: "center",
                         }}
                       >
-                        {row.isActive ? "Active" : "Not Active"}
-                      </Box>
+                        {row.isActive ? "Active" : "Inactive"}
+                      </span>
                     </TableCell>
                     <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <EditIcon
-                          sx={{ color: "blue", cursor: "pointer" }}
-                          onClick={() => navigate(`/admin/product/edit-product/${row.menuId}`)}
-                        />
-                        <DeleteIcon
-                          sx={{ color: "darkred", cursor: "pointer" }}
-                          onClick={() => deleteProduct(row.menuId)}
-                        />
-                      </Stack>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        startIcon={<EditIcon />}
+                        sx={{ mr: 1 }}
+                        onClick={() =>
+                          navigate(`/admin/product/edit-product/${row.menuId}`)
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => deleteProduct(row.menuId)}
+                      >
+                        Delete
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -307,7 +391,8 @@ const fetchProducts = async () => {
         </Table>
       </TableContainer>
 
- <TablePagination
+
+      <TablePagination
         rowsPerPageOptions={[5, 10, 20, 25, 100]}
         component="div"
         count={filteredRows.length}
@@ -322,10 +407,11 @@ const fetchProducts = async () => {
             justifyContent: "space-between",
             alignItems: "center",
           },
-          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-            margin: 0,
-            whiteSpace: "nowrap",
-          },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
+            {
+              margin: 0,
+              whiteSpace: "nowrap",
+            },
           "& .MuiTablePagination-select": {
             marginRight: 2,
           },

@@ -293,20 +293,29 @@ export default function CategoryList() {
                       </Box>
                     </TableCell>
                     <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <EditIcon
-                          sx={{ cursor: "pointer", color: "#0d6efd" }}
-                          onClick={() =>
-                            navigate(
-                              `/admin/Categories/edit-category/${row.categoryId}`
-                            )
-                          }
-                        />
-                        <DeleteIcon
-                          sx={{ cursor: "pointer", color: "#d32f2f" }}
-                          onClick={() => deleteCategory(row.categoryId)}
-                        />
-                      </Stack>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        startIcon={<EditIcon />}
+                        sx={{ mr: 1 }}
+                        onClick={() =>
+                          navigate(
+                            `/admin/Categories/edit-category/${row.categoryId}`
+                          )
+                        }
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => deleteCategory(row.categoryId)}
+                      >
+                        Delete
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -315,7 +324,7 @@ export default function CategoryList() {
         </Table>
       </TableContainer>
 
- <TablePagination
+      <TablePagination
         rowsPerPageOptions={[5, 10, 20, 25, 100]}
         component="div"
         count={filteredRows.length}
@@ -330,10 +339,11 @@ export default function CategoryList() {
             justifyContent: "space-between",
             alignItems: "center",
           },
-          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-            margin: 0,
-            whiteSpace: "nowrap",
-          },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
+            {
+              margin: 0,
+              whiteSpace: "nowrap",
+            },
           "& .MuiTablePagination-select": {
             marginRight: 2,
           },
