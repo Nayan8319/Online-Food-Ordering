@@ -1,8 +1,8 @@
 import React from "react";
-import { Navbar, Nav, NavDropdown } from "react-bootstrap";
+import { Navbar } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-const Topbar = ({ onToggleSidebar }) => {
+const Topbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -13,38 +13,54 @@ const Topbar = ({ onToggleSidebar }) => {
   return (
     <Navbar
       expand="lg"
-      className="px-3 shadow-sm"
-      style={{ backgroundColor: "#000", color: "#fff", height: "60px" }}
+      className="px-3 shadow-sm justify-content-between"
+      style={{
+        backgroundColor: "#6c757d",
+        color: "#fff",
+        height: "60px",
+      }}
       variant="dark"
     >
-      <button
-        className="btn btn-link text-white me-3"
-        onClick={onToggleSidebar}
-      >
-        <i className="fas fa-bars" />
-      </button>
-
+      {/* Brand / Title */}
       <span className="text-warning fw-bold fs-4 me-auto">FoodieAdmin</span>
 
-      {/* Right-side icons */}
-      <Nav className="ms-auto">
-        <Nav.Link href="/admin/dashboard" className="text-white">
-          <i className="fas fa-external-link-alt me-1" /> Home
-        </Nav.Link>
+      {/* Home + User dropdown (desktop only) */}
+      <div className="d-none d-lg-flex align-items-center">
+        <a href="/admin/dashboard" className="nav-link text-white me-3">
+          <i className="fas fa-home me-1"></i> Home
+        </a>
 
-        <NavDropdown
-          title={<i className="fas fa-user fa-fw text-white"></i>}
-          id="user-dropdown"
-          align="end"
-        >
-          <NavDropdown.Item href="#">Edit Profile</NavDropdown.Item>
-          <NavDropdown.Item href="#">Change Password</NavDropdown.Item>
-          <NavDropdown.Divider />
-          <NavDropdown.Item onClick={handleLogout} className="text-danger">
-            <i className="fas fa-sign-out-alt me-2" /> Logout
-          </NavDropdown.Item>
-        </NavDropdown>
-      </Nav>
+        <div className="dropdown">
+          <button
+            className="btn text-white dropdown-toggle"
+            type="button"
+            id="userDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            style={{ background: "none", border: "none" }}
+          >
+            <i className="fas fa-user fa-fw"></i>
+          </button>
+          <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li>
+              <a className="dropdown-item" href="#">
+                Edit Profile
+              </a>
+            </li>
+            <li>
+              <a className="dropdown-item" href="#">
+                Change Password
+              </a>
+            </li>
+            <li><hr className="dropdown-divider" /></li>
+            <li>
+              <button className="dropdown-item text-danger" onClick={handleLogout}>
+                <i className="fas fa-sign-out-alt me-2" /> Logout
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
     </Navbar>
   );
 };

@@ -24,4 +24,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\CategoryImages\" />
+    <Folder Include="wwwroot\images\menus\" />
+  </ItemGroup>
+
 </Project>

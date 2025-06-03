@@ -349,3 +349,4 @@ F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\refint\FoodieApi
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\FoodieApi.pdb
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\FoodieApi.genruntimeconfig.cache
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\ref\FoodieApi.dll
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\bin\Debug\net8.0\FoodieApi.staticwebassets.runtime.json

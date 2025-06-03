@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using FoodieApi.Models.DTO; // Assuming your DbContext is here
 using Microsoft.EntityFrameworkCore;
 using FoodieApi.Models;
+using FoodieApi.Models.DTO;
 
 namespace FoodieApi.Controllers
 {
@@ -16,12 +16,12 @@ namespace FoodieApi.Controllers
             _context = context;
         }
 
-        // GET: api/UserMenuCategory/allActiveMenus
+        // ✅ GET: api/UserMenuCategory/allActiveMenus
         [HttpGet("allActiveMenus")]
         public async Task<ActionResult<IEnumerable<MenuDto>>> GetAllActiveMenus()
         {
             var activeMenus = await _context.Menus
-                .Where(m => m.IsActive)
+                .Where(m => m.IsActive && m.Category.IsActive)
                 .Select(m => new MenuDto
                 {
                     MenuId = m.MenuId,
@@ -41,8 +41,7 @@ namespace FoodieApi.Controllers
             return Ok(activeMenus);
         }
 
-
-        // GET: api/UserMenuCategory/categories
+        // ✅ GET: api/UserMenuCategory/activeCategories
         [HttpGet("activeCategories")]
         public async Task<ActionResult<IEnumerable<CategoryDto>>> GetActiveCategories()
         {
@@ -60,10 +59,14 @@ namespace FoodieApi.Controllers
             return Ok(categories);
         }
 
-        // GET: api/UserMenuCategory/category/{categoryId}/menus
+        // ✅ GET: api/UserMenuCategory/category/{categoryId}/menus
         [HttpGet("category/{categoryId}/menus")]
         public async Task<ActionResult<IEnumerable<MenuDto>>> GetMenusByCategory(int categoryId)
         {
+            var category = await _context.Categories.FindAsync(categoryId);
+            if (category == null || !category.IsActive)
+                return NotFound("Category not found or inactive.");
+
             var menus = await _context.Menus
                 .Where(m => m.CategoryId == categoryId && m.IsActive)
                 .Select(m => new MenuDto
@@ -85,38 +88,42 @@ namespace FoodieApi.Controllers
             return Ok(menus);
         }
 
-
+        // ✅ GET: api/UserMenuCategory/searchMenus?keyword=pizza
         [HttpGet("searchMenus")]
         public async Task<ActionResult<IEnumerable<MenuDto>>> SearchMenus(string? keyword)
         {
-            var query = _context.Menus.Where(m => m.IsActive);
+            var query = _context.Menus
+                .Where(m => m.IsActive && m.Category.IsActive);
 
             if (!string.IsNullOrEmpty(keyword))
             {
                 query = query.Where(m => m.Name.Contains(keyword));
             }
 
-            var result = await query.Select(m => new MenuDto
-            {
-                MenuId = m.MenuId,
-                Name = m.Name,
-                Description = m.Description,
-                Price = m.Price,
-                Quantity = m.Quantity,
-                ImageUrl = m.ImageUrl,
-                CategoryId = m.CategoryId,
-                IsActive = m.IsActive
-            }).ToListAsync();
+            var result = await query
+                .Select(m => new MenuDto
+                {
+                    MenuId = m.MenuId,
+                    Name = m.Name,
+                    Description = m.Description,
+                    Price = m.Price,
+                    Quantity = m.Quantity,
+                    ImageUrl = m.ImageUrl,
+                    CategoryId = m.CategoryId,
+                    IsActive = m.IsActive
+                })
+                .ToListAsync();
 
             return Ok(result);
         }
 
-        // GET: api/UserMenuCategory/menu/{menuId}
+        // ✅ GET: api/UserMenuCategory/menu/{menuId}
         [HttpGet("menu/{menuId}")]
         public async Task<ActionResult<MenuDto>> GetMenuById(int menuId)
         {
             var menu = await _context.Menus
-                .Where(m => m.MenuId == menuId && m.IsActive)
+                .Include(m => m.Category)
+                .Where(m => m.MenuId == menuId && m.IsActive && m.Category.IsActive)
                 .Select(m => new MenuDto
                 {
                     MenuId = m.MenuId,
@@ -135,6 +142,5 @@ namespace FoodieApi.Controllers
 
             return Ok(menu);
         }
-
     }
 }

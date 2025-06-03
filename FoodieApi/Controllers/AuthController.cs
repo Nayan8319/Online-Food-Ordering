@@ -2,11 +2,13 @@
 using FoodieApi.Helpers;
 using FoodieApi.Models;
 using FoodieApi.Models.Auth;
+using FoodieApi.Models.Dto;
 using FoodieApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims; // ✅ Required
 using System.Threading.Tasks;
 using LoginRequest = FoodieApi.Models.Auth.LoginRequest;
 using RegisterRequest = FoodieApi.Models.Auth.RegisterRequest;
@@ -22,7 +24,6 @@ namespace FoodieApi.Controllers
         private readonly EmailService _emailService;
         private readonly JwtHelper _jwtHelper;
 
-        // Temporary in-memory storage for OTPs with timestamps
         private static Dictionary<string, (string Otp, DateTime GeneratedAt)> otpStore = new();
 
         public AuthController(FoodieOrderningContext context, EmailService emailService, JwtHelper jwtHelper)
@@ -32,7 +33,6 @@ namespace FoodieApi.Controllers
             _jwtHelper = jwtHelper;
         }
 
-        // POST: api/Auth/Register
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
@@ -46,7 +46,6 @@ namespace FoodieApi.Controllers
             return Ok("OTP sent to your email. Please verify to complete registration.");
         }
 
-        // POST: api/Auth/VerifyOtp
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest model)
         {
@@ -67,7 +66,7 @@ namespace FoodieApi.Controllers
                 Password = PasswordHelper.HashPassword(model.Password),
                 Mobile = model.Mobile,
                 ImageUrl = model.ImageUrl ?? "",
-                RoleId = 2, // Default user role
+                RoleId = 2,
                 CreatedDate = DateTime.Now,
                 IsVerified = true
             };
@@ -78,7 +77,6 @@ namespace FoodieApi.Controllers
             return Ok("User registered successfully.");
         }
 
-        // POST: api/Auth/Login
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest model)
         {
@@ -103,14 +101,12 @@ namespace FoodieApi.Controllers
             });
         }
 
-        // Helper: Generate a 6-digit OTP
         private string GenerateOtp()
         {
             var random = new Random();
             return random.Next(100000, 999999).ToString();
         }
 
-        // POST: api/Auth/resend-otp
         [HttpPost("resend-otp")]
         public async Task<IActionResult> ResendOtp([FromBody] string email)
         {
@@ -124,7 +120,6 @@ namespace FoodieApi.Controllers
             return Ok("OTP resent to your email.");
         }
 
-        // POST: api/Auth/forgot-password
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] string email)
         {
@@ -139,7 +134,6 @@ namespace FoodieApi.Controllers
             return Ok("OTP sent to reset password.");
         }
 
-        // POST: api/Auth/verify-forgot-otp
         [HttpPost("verify-forgot-otp")]
         public IActionResult VerifyForgotOtp([FromBody] OtpOnlyRequest model)
         {
@@ -154,7 +148,6 @@ namespace FoodieApi.Controllers
             return Ok("OTP verified. You can now reset your password.");
         }
 
-        // POST: api/Auth/reset-password
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest model)
         {
@@ -166,6 +159,43 @@ namespace FoodieApi.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Password reset successfully.");
+        }
+
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            // ❌ Old
+            // var email = User?.FindFirst("email")?.Value;
+
+            // ✅ Updated for fallback safety
+            var email = User?.FindFirst("email")?.Value;
+            if (string.IsNullOrEmpty(email))
+                email = User?.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(email))
+                return Unauthorized("User email not found in token.");
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+                return NotFound("User not found.");
+
+            var userDto = new UserDto
+            {
+                UserId = user.UserId,
+                Name = user.Name,
+                Username = user.Username,
+                Email = user.Email,
+                Mobile = user.Mobile,
+                ImageUrl = user.ImageUrl,
+                RoleName = user.Role.RoleName,
+                CreatedDate = user.CreatedDate,
+                IsVerified = user.IsVerified
+            };
+
+            return Ok(userDto);
         }
     }
 }

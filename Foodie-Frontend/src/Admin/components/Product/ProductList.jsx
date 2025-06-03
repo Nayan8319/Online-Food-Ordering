@@ -59,21 +59,34 @@ export default function ProductList() {
     }
   };
 
-  const fetchProducts = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5110/api/Menu", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
+const fetchProducts = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch("http://localhost:5110/api/Menu", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+
+    // Check if data is an array, else fallback to []
+    if (Array.isArray(data)) {
       setRows(data);
       setFilteredRows(data);
-    } catch (error) {
-      setMessage(error.message || "Error fetching products");
+    } else if (data && Array.isArray(data.items)) {
+      // sometimes APIs send paginated data: { items: [], total: 10 }
+      setRows(data.items);
+      setFilteredRows(data.items);
+    } else {
+      setRows([]);
+      setFilteredRows([]);
+      setMessage("No valid product data found.");
     }
-  };
+  } catch (error) {
+    setMessage(error.message || "Error fetching products");
+  }
+};
+
 
   const handleSearchAndSort = () => {
     let temp = [...rows];
@@ -200,7 +213,7 @@ export default function ProductList() {
         <Button
           variant="contained"
           endIcon={<AddCircleIcon />}
-          onClick={() => navigate("/admin/add-product")}
+          onClick={() => navigate("/admin/product/add-product")}
         >
           Add
         </Button>
@@ -279,7 +292,7 @@ export default function ProductList() {
                       <Stack direction="row" spacing={1}>
                         <EditIcon
                           sx={{ color: "blue", cursor: "pointer" }}
-                          onClick={() => navigate(`/admin/edit-product/${row.menuId}`)}
+                          onClick={() => navigate(`/admin/product/edit-product/${row.menuId}`)}
                         />
                         <DeleteIcon
                           sx={{ color: "darkred", cursor: "pointer" }}

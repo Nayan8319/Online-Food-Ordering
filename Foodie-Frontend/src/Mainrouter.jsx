@@ -21,6 +21,10 @@ import Orders from './Admin/pages/Orders';
 import Reports from './Admin/pages/Reports';
 import AddProduct from './Admin/components/Product/AddProduct';
 import EditProduct from './Admin/components/Product/EditProduct';
+import AddCategory from './Admin/components/Category/AddCategory';
+import EditCategory from './Admin/components/Category/EditCategory';
+import SingleMenuItem from './Components/SingleMenuItem';
+import Cart from './Pages/Cart';
 
 const Mainrouter = createBrowserRouter([
   // User routes
@@ -32,6 +36,10 @@ const Mainrouter = createBrowserRouter([
     path: '/menu',
     element: <UserLayout><MenuPage /></UserLayout>
   },
+    {
+    path: '/menu/:id',             // <-- single menu item route with param id
+    element: <UserLayout><SingleMenuItem /></UserLayout>
+  },
   {
     path: '/about',
     element: <UserLayout><Aboutpage /></UserLayout>
@@ -39,6 +47,10 @@ const Mainrouter = createBrowserRouter([
   {
     path: '/contact',
     element: <UserLayout><Contact /></UserLayout>
+  },
+  {
+    path: '/cart',
+    element: <UserLayout><Cart /></UserLayout>
   },
   {
     path: '/login',
@@ -63,18 +75,25 @@ const Mainrouter = createBrowserRouter([
     element: <AdminLayout><Categories /></AdminLayout>
   },
   {
+  path: '/admin/Categories/add-Category',
+  element: <AdminLayout><AddCategory /></AdminLayout>
+  },
+  {
+  path: '/admin/categories/edit-Category/:id',
+  element: <AdminLayout><EditCategory /></AdminLayout>
+  },
+  {
     path: '/admin/product',
     element: <AdminLayout><Product /></AdminLayout>
   },
   {
-  path: '/admin/add-product',
+  path: '/admin/product/add-product',
   element: <AdminLayout><AddProduct /></AdminLayout>
-},
+  },
   {
-  path: '/admin/edit-product/:id',
+  path: '/admin/product/edit-product/:id',
   element: <AdminLayout><EditProduct /></AdminLayout>
-},
-
+  },
   {
     path: '/admin/Users',
     element: <AdminLayout><Users /></AdminLayout>

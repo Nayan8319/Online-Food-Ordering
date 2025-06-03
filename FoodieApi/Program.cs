@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.FileProviders;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -114,6 +115,17 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors("AllowReactApp");
+
+// ✅ Enable serving static files from wwwroot
+app.UseStaticFiles(); // This serves wwwroot
+
+// ✅ Optional: If you want to serve from other folders too
+// app.UseStaticFiles(new StaticFileOptions
+// {
+//     FileProvider = new PhysicalFileProvider(
+//         Path.Combine(Directory.GetCurrentDirectory(), "Images")),
+//     RequestPath = "/Images"
+// });
 
 app.UseAuthentication();
 app.UseAuthorization();
