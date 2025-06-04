@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "zQUn0SoQ5er6o8nXETSbhMisDkBM68APf3NpfVQ94RI=",
+  "Hash": "DVGioURJrzRoQiA9sGbI7T9Pb7j4aQpDa0bI+M6kd+M=",
   "Source": "FoodieApi",
   "BasePath": "_content/FoodieApi",
   "Mode": "Default",
@@ -456,6 +456,90 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\MenuImages\\fe233d1b-8040-4068-80b2-e9fcf42290f9.png"
+    },
+    {
+      "Identity": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\0d1a74ab-acc6-454d-a084-84aaea8828ce.png",
+      "SourceId": "FoodieApi",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\",
+      "BasePath": "_content/FoodieApi",
+      "RelativePath": "UserImages/0d1a74ab-acc6-454d-a084-84aaea8828ce#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "objmd0dlts",
+      "Integrity": "VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\UserImages\\0d1a74ab-acc6-454d-a084-84aaea8828ce.png"
+    },
+    {
+      "Identity": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\5f195156-fc27-4e72-b031-bfc21aaf3219.png",
+      "SourceId": "FoodieApi",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\",
+      "BasePath": "_content/FoodieApi",
+      "RelativePath": "UserImages/5f195156-fc27-4e72-b031-bfc21aaf3219#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "objmd0dlts",
+      "Integrity": "VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\UserImages\\5f195156-fc27-4e72-b031-bfc21aaf3219.png"
+    },
+    {
+      "Identity": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\77d3ca64-8e4f-4811-9d97-80827d6f1349.png",
+      "SourceId": "FoodieApi",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\",
+      "BasePath": "_content/FoodieApi",
+      "RelativePath": "UserImages/77d3ca64-8e4f-4811-9d97-80827d6f1349#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "objmd0dlts",
+      "Integrity": "VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\UserImages\\77d3ca64-8e4f-4811-9d97-80827d6f1349.png"
+    },
+    {
+      "Identity": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\9ebaf403-ae20-44c3-91f1-26881c331cc8.png",
+      "SourceId": "FoodieApi",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\",
+      "BasePath": "_content/FoodieApi",
+      "RelativePath": "UserImages/9ebaf403-ae20-44c3-91f1-26881c331cc8#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "baq6jo6na7",
+      "Integrity": "bcJs+7RxWda+h2b4q8+Ml6mmEnuQS/HMtnvAKabaxR8=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\UserImages\\9ebaf403-ae20-44c3-91f1-26881c331cc8.png"
     }
   ],
   "Endpoints": [
@@ -2178,6 +2262,334 @@
         {
           "Name": "integrity",
           "Value": "sha256-adaIv/gYV8fVHc4JGAXAgpMXqWdnoW7OkPn9KuGBKnQ="
+        }
+      ]
+    },
+    {
+      "Route": "UserImages/0d1a74ab-acc6-454d-a084-84aaea8828ce.objmd0dlts.png",
+      "AssetFile": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\0d1a74ab-acc6-454d-a084-84aaea8828ce.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "43545"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 04 Jun 2025 17:01:12 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "objmd0dlts"
+        },
+        {
+          "Name": "label",
+          "Value": "UserImages/0d1a74ab-acc6-454d-a084-84aaea8828ce.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg="
+        }
+      ]
+    },
+    {
+      "Route": "UserImages/0d1a74ab-acc6-454d-a084-84aaea8828ce.png",
+      "AssetFile": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\0d1a74ab-acc6-454d-a084-84aaea8828ce.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "43545"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 04 Jun 2025 17:01:12 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg="
+        }
+      ]
+    },
+    {
+      "Route": "UserImages/5f195156-fc27-4e72-b031-bfc21aaf3219.objmd0dlts.png",
+      "AssetFile": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\5f195156-fc27-4e72-b031-bfc21aaf3219.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "43545"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 04 Jun 2025 16:47:42 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "objmd0dlts"
+        },
+        {
+          "Name": "label",
+          "Value": "UserImages/5f195156-fc27-4e72-b031-bfc21aaf3219.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg="
+        }
+      ]
+    },
+    {
+      "Route": "UserImages/5f195156-fc27-4e72-b031-bfc21aaf3219.png",
+      "AssetFile": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\5f195156-fc27-4e72-b031-bfc21aaf3219.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "43545"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 04 Jun 2025 16:47:42 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg="
+        }
+      ]
+    },
+    {
+      "Route": "UserImages/77d3ca64-8e4f-4811-9d97-80827d6f1349.objmd0dlts.png",
+      "AssetFile": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\77d3ca64-8e4f-4811-9d97-80827d6f1349.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "43545"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 04 Jun 2025 16:43:03 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "objmd0dlts"
+        },
+        {
+          "Name": "label",
+          "Value": "UserImages/77d3ca64-8e4f-4811-9d97-80827d6f1349.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg="
+        }
+      ]
+    },
+    {
+      "Route": "UserImages/77d3ca64-8e4f-4811-9d97-80827d6f1349.png",
+      "AssetFile": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\77d3ca64-8e4f-4811-9d97-80827d6f1349.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "43545"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 04 Jun 2025 16:43:03 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg="
+        }
+      ]
+    },
+    {
+      "Route": "UserImages/9ebaf403-ae20-44c3-91f1-26881c331cc8.baq6jo6na7.png",
+      "AssetFile": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\9ebaf403-ae20-44c3-91f1-26881c331cc8.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "58427"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"bcJs+7RxWda+h2b4q8+Ml6mmEnuQS/HMtnvAKabaxR8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 04 Jun 2025 16:52:16 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "baq6jo6na7"
+        },
+        {
+          "Name": "label",
+          "Value": "UserImages/9ebaf403-ae20-44c3-91f1-26881c331cc8.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-bcJs+7RxWda+h2b4q8+Ml6mmEnuQS/HMtnvAKabaxR8="
+        }
+      ]
+    },
+    {
+      "Route": "UserImages/9ebaf403-ae20-44c3-91f1-26881c331cc8.png",
+      "AssetFile": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\9ebaf403-ae20-44c3-91f1-26881c331cc8.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "58427"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"bcJs+7RxWda+h2b4q8+Ml6mmEnuQS/HMtnvAKabaxR8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 04 Jun 2025 16:52:16 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-bcJs+7RxWda+h2b4q8+Ml6mmEnuQS/HMtnvAKabaxR8="
         }
       ]
     }

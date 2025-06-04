@@ -19,3 +19,7 @@ wwwroot\MenuImages\e443a8c8-65d6-46c1-82cd-448411074d3a.png
 wwwroot\MenuImages\eabb3d13-c106-4440-9afa-6ec552021995.png
 wwwroot\MenuImages\fb302508-816f-4c1a-8713-b2104d5258f7.jpeg
 wwwroot\MenuImages\fe233d1b-8040-4068-80b2-e9fcf42290f9.png
+wwwroot\UserImages\0d1a74ab-acc6-454d-a084-84aaea8828ce.png
+wwwroot\UserImages\5f195156-fc27-4e72-b031-bfc21aaf3219.png
+wwwroot\UserImages\77d3ca64-8e4f-4811-9d97-80827d6f1349.png
+wwwroot\UserImages\9ebaf403-ae20-44c3-91f1-26881c331cc8.png

@@ -34,47 +34,47 @@ const LoginPage = () => {
     return valid;
   };
 
-const handleLogin = async (e) => {
-  e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  if (!validate()) {
-    return;
-  }
-
-  const loginData = { email, password };
-
-  try {
-    const response = await fetch("http://localhost:5110/api/Auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginData),
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data.token) {
-      // Store token and role in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.roleName); // "Admin" or "User"
-      localStorage.setItem("userId", data.userId);
-
-      // Redirect based on role
-      if (data.roleName === "Admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/");
-        window.location.reload(); 
-      }
-    } else {
-      setMessage(data.message || "Invalid email or password");
+    if (!validate()) {
+      return;
     }
-  } catch (err) {
-    console.error("Login error:", err);
-    setMessage("An error occurred while logging in.");
-  }
-};
+
+    const loginData = { email, password };
+
+    try {
+      const response = await fetch("http://localhost:5110/api/Auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.token) {
+        // Store token and role in localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.roleName); // "Admin" or "User"
+        localStorage.setItem("userId", data.userId);
+
+        // Redirect based on role
+        if (data.roleName === "Admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+          window.location.reload();
+        }
+      } else {
+        setMessage(data.message || "Invalid email or password");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setMessage("An error occurred while logging in.");
+    }
+  };
 
   return (
     <section className="book_section layout_padding">
@@ -101,8 +101,9 @@ const handleLogin = async (e) => {
           <div className="col-md-6 d-flex justify-content-center align-items-center">
             <form onSubmit={handleLogin} className="w-100">
               <div className="mb-3">
+                <label className="form-label mb-1">Email</label>
                 <input
-                  type="email"  // Email input type for proper validation
+                  type="email"
                   className="form-control"
                   placeholder="Enter Email"
                   value={email}
@@ -112,7 +113,17 @@ const handleLogin = async (e) => {
                   <small className="text-danger">{errors.email}</small>
                 )}
               </div>
-              <div className="mb-3">
+              <div className="mb-1">
+                <div className="d-flex justify-content-between align-items-center">
+                  <label className="form-label mb-1">Password</label>
+                  <Link
+                    to="/forgot-password"
+                    className="text-danger small"
+                    style={{ textDecoration: "none" }}
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
                 <input
                   type="password"
                   className="form-control"
@@ -124,15 +135,16 @@ const handleLogin = async (e) => {
                   <small className="text-danger">{errors.password}</small>
                 )}
               </div>
-              <div className="btn_box d-flex justify-content-center align-items-center">
+
+              {/* Login + Register on the same line */}
+              <div className="btn_box d-flex justify-content-center align-items-center mb-3">
                 <button
                   type="submit"
-                  className="btn btn-success rounded-pill text-white px-4"
-                  style={{ marginRight: "10px" }}
+                  className="btn btn-success rounded-pill text-white px-4 me-3"
                 >
                   Login
                 </button>
-                <span className="pl-3 text-info">
+                <span className="text-info">
                   New User?{" "}
                   <Link to="/register" className="badge badge-info">
                     Register Here..

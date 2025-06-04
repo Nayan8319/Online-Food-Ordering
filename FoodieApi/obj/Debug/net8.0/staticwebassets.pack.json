@@ -85,6 +85,22 @@
       "PackagePath": "staticwebassets\\MenuImages\\fe233d1b-8040-4068-80b2-e9fcf42290f9.png"
     },
     {
+      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\0d1a74ab-acc6-454d-a084-84aaea8828ce.png",
+      "PackagePath": "staticwebassets\\UserImages\\0d1a74ab-acc6-454d-a084-84aaea8828ce.png"
+    },
+    {
+      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\5f195156-fc27-4e72-b031-bfc21aaf3219.png",
+      "PackagePath": "staticwebassets\\UserImages\\5f195156-fc27-4e72-b031-bfc21aaf3219.png"
+    },
+    {
+      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\77d3ca64-8e4f-4811-9d97-80827d6f1349.png",
+      "PackagePath": "staticwebassets\\UserImages\\77d3ca64-8e4f-4811-9d97-80827d6f1349.png"
+    },
+    {
+      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\UserImages\\9ebaf403-ae20-44c3-91f1-26881c331cc8.png",
+      "PackagePath": "staticwebassets\\UserImages\\9ebaf403-ae20-44c3-91f1-26881c331cc8.png"
+    },
+    {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.FoodieApi.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
     },

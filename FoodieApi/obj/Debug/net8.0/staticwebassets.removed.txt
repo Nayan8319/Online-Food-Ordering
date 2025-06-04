@@ -1,3 +1,0 @@
-F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\7d9152af-f68f-4938-8c94-d9060cb6a276.png
-F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\images\menus\3434bac3-22bb-4970-812f-a96e55a0ac4a.png
-F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\MenuImages\ff7175ca-8b3f-4364-aaa6-c4a9a4428ff6.png

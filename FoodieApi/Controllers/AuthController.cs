@@ -4,6 +4,8 @@ using FoodieApi.Models;
 using FoodieApi.Models.Auth;
 using FoodieApi.Models.Dto;
 using FoodieApi.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -110,26 +112,42 @@ namespace FoodieApi.Controllers
         [HttpPost("resend-otp")]
         public async Task<IActionResult> ResendOtp([FromBody] string email)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == email))
-                return BadRequest("User already registered.");
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-            var otp = GenerateOtp();
-            otpStore[email] = (otp, DateTime.UtcNow);
-            await _emailService.SendOtpEmailAsync(email, otp);
+            if (user == null)
+            {
+                // Resend for registration
+                var otp = GenerateOtp();
+                otpStore[email] = (otp, DateTime.UtcNow);
+                await _emailService.SendOtpEmailAsync(email, otp);
+                return Ok("OTP resent for registration.");
+            }
+            else
+            {
+                // Resend for forgot password
+                if (!user.IsVerified)
+                    return BadRequest("User is not verified yet.");
 
-            return Ok("OTP resent to your email.");
+                var otp = GenerateOtp();
+                otpStore[email] = (otp, DateTime.UtcNow);
+                await _emailService.SendOtpEmailAsync(email, otp);
+                return Ok("OTP resent to reset password.");
+            }
         }
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        public async Task<IActionResult> ForgotPassword([FromBody] Models.Auth.ForgotPasswordRequest model)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (model == null || string.IsNullOrEmpty(model.Email))
+                return BadRequest("Email is required.");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
             if (user == null)
                 return BadRequest("User not found.");
 
             var otp = GenerateOtp();
-            otpStore[email] = (otp, DateTime.UtcNow);
-            await _emailService.SendOtpEmailAsync(email, otp);
+            otpStore[model.Email] = (otp, DateTime.UtcNow);
+            await _emailService.SendOtpEmailAsync(model.Email, otp);
 
             return Ok("OTP sent to reset password.");
         }
@@ -197,5 +215,100 @@ namespace FoodieApi.Controllers
 
             return Ok(userDto);
         }
+
+        [Authorize]
+        [HttpPut("edit-profile")]
+        public async Task<IActionResult> EditProfile([FromForm] UpdateProfileRequest model, IFormFile? imageFile)
+        {
+            var email = User?.FindFirst("email")?.Value ?? User?.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(email))
+                return Unauthorized("User email not found in token.");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                return NotFound("User not found.");
+
+            // Check for duplicate username (except current user)
+            var usernameExists = await _context.Users.AnyAsync(u => u.Username == model.Username && u.Email != email);
+            if (usernameExists)
+                return BadRequest("Username already taken.");
+
+            // Handle image upload
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                // Handle file upload
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UserImages");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(fileStream);
+                }
+
+                // Save relative path to database, e.g., "/UserImages/filename.jpg"
+                user.ImageUrl = "/UserImages/" + uniqueFileName;
+            }
+            else if (!string.IsNullOrEmpty(model.ImageUrl) && IsValidBase64(model.ImageUrl))
+            {
+                // Handle Base64 image string
+                user.ImageUrl = model.ImageUrl;
+            }
+            else if (string.IsNullOrEmpty(model.ImageUrl))
+            {
+                // In case no image is provided (e.g., remove image)
+                user.ImageUrl = null;
+            }
+
+            // Update other fields
+            user.Name = model.Name;
+            user.Username = model.Username;
+            user.Mobile = model.Mobile;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Profile updated successfully.");
+        }
+
+        private bool IsValidBase64(string base64String)
+        {
+            try
+            {
+                var bytes = Convert.FromBase64String(base64String);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model)
+        {
+            var email = User?.FindFirst("email")?.Value;
+            if (string.IsNullOrEmpty(email))
+                email = User?.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(email))
+                return Unauthorized("User email not found in token.");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                return NotFound("User not found.");
+
+            if (!PasswordHelper.VerifyPassword(model.CurrentPassword, user.Password))
+                return BadRequest("Current password is incorrect.");
+
+            user.Password = PasswordHelper.HashPassword(model.NewPassword);
+            await _context.SaveChangesAsync();
+
+            return Ok("Password changed successfully. Please log in again.");
+        }
+
     }
 }
