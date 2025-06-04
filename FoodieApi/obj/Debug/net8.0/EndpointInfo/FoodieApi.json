@@ -889,6 +889,18 @@
         }
       }
     },
+    "/api/Menu/deactivate-out-of-stock": {
+      "post": {
+        "tags": [
+          "Menu"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/UserMenuCategory/allActiveMenus": {
       "get": {
         "tags": [
