@@ -124,7 +124,7 @@ const Cart = () => {
                         </div>
                         <div className="col-md-3">
                           <h6 className="mb-0">{item.menuName}</h6>
-                          <small className="text-muted">${item.pricePerItem.toFixed(2)}</small>
+                          <small className="text-muted">₹{item.pricePerItem.toFixed(2)}</small>
                         </div>
                         <div className="col-md-3 d-flex align-items-center">
                           <button
@@ -152,7 +152,7 @@ const Cart = () => {
                           </button>
                         </div>
                         <div className="col-md-2">
-                          <strong>${item.totalPrice.toFixed(2)}</strong>
+                          <strong>₹{item.totalPrice.toFixed(2)}</strong>
                         </div>
                         <div className="col-md-2 text-end">
                           <button
@@ -179,15 +179,15 @@ const Cart = () => {
                   <ul className="list-group list-group-flush">
                     <li className="list-group-item d-flex justify-content-between">
                       Products ({items.length})
-                      <span>${total.toFixed(2)}</span>
+                      <span>₹{total.toFixed(2)}</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between">
                       Shipping
-                      <span>${shipping.toFixed(2)}</span>
+                      <span>₹{shipping.toFixed(2)}</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between fw-bold">
                       Total
-                      <span>${(total + shipping).toFixed(2)}</span>
+                      <span>₹{(total + shipping).toFixed(2)}</span>
                     </li>
                   </ul>
                   <Link to="/checkout" className="btn btn-dark btn-lg w-100 mt-3">

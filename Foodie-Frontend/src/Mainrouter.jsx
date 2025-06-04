@@ -25,6 +25,10 @@ import AddCategory from './Admin/components/Category/AddCategory';
 import EditCategory from './Admin/components/Category/EditCategory';
 import SingleMenuItem from './Components/SingleMenuItem';
 import Cart from './Pages/Cart';
+import Checkout from './Pages/CheckOut';
+import Userpage from './Pages/Userpage';
+import ForgotPassword from './Components/ForgotPassword';
+import AddressesPage from './Pages/AddressesPage';
 
 const Mainrouter = createBrowserRouter([
   // User routes
@@ -40,6 +44,10 @@ const Mainrouter = createBrowserRouter([
     path: '/menu/:id',             // <-- single menu item route with param id
     element: <UserLayout><SingleMenuItem /></UserLayout>
   },
+    {
+    path: '/checkout',          
+    element: <UserLayout><Checkout/></UserLayout>
+  },
   {
     path: '/about',
     element: <UserLayout><Aboutpage /></UserLayout>
@@ -53,8 +61,20 @@ const Mainrouter = createBrowserRouter([
     element: <UserLayout><Cart /></UserLayout>
   },
   {
+    path: '/profile',
+    element: <UserLayout><Userpage /></UserLayout>
+  },
+  {
+    path: '/addresses',
+    element: <UserLayout><AddressesPage /></UserLayout>
+  },
+  {
     path: '/login',
     element: <UserLayout><LoginPage /></UserLayout>
+  },
+  {
+    path: '/forgot-password',
+    element: <UserLayout><ForgotPassword /></UserLayout>
   },
   {
     path: '/register',
