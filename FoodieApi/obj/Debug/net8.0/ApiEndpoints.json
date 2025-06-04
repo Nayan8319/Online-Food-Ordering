@@ -534,6 +534,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "FoodieApi.Controllers.MenuController",
+    "Method": "DeactivateOutOfStockMenus",
+    "RelativePath": "api/Menu/deactivate-out-of-stock",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "FoodieApi.Controllers.UserMenuCategoryController",
     "Method": "GetActiveCategories",
     "RelativePath": "api/UserMenuCategory/activeCategories",

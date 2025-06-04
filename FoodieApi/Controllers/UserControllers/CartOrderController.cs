@@ -15,6 +15,7 @@ namespace FoodieApi.Controllers.UserControllers
     public class CartOrderController : ControllerBase
     {
         private readonly FoodieOrderningContext _context;
+        private const int MaxQuantityPerItem = 10;
 
         public CartOrderController(FoodieOrderningContext context)
         {
@@ -75,15 +76,22 @@ namespace FoodieApi.Controllers.UserControllers
 
             if (existingCartItem != null)
             {
-                // Only check for new quantity being added
+                int newTotalQuantity = existingCartItem.Quantity + request.Quantity;
+
+                if (newTotalQuantity > MaxQuantityPerItem)
+                    return BadRequest($"You cannot add more than {MaxQuantityPerItem} units of a single item to your cart.");
+
                 if (request.Quantity > stockAvailable)
                     return BadRequest($"Only {stockAvailable} items available in stock.");
 
-                existingCartItem.Quantity += request.Quantity;
+                existingCartItem.Quantity = newTotalQuantity;
                 existingCartItem.TotalPrice = existingCartItem.Quantity * menu.Price;
             }
             else
             {
+                if (request.Quantity > MaxQuantityPerItem)
+                    return BadRequest($"You cannot add more than {MaxQuantityPerItem} units of a single item to your cart.");
+
                 if (request.Quantity > stockAvailable)
                     return BadRequest($"Only {stockAvailable} items available in stock.");
 
@@ -98,7 +106,6 @@ namespace FoodieApi.Controllers.UserControllers
             }
 
             menu.Quantity -= request.Quantity;
-
             await _context.SaveChangesAsync();
 
             var updatedCart = await GetUserCartSummary(userId);
@@ -113,6 +120,9 @@ namespace FoodieApi.Controllers.UserControllers
 
             if (request.Quantity <= 0)
                 return BadRequest("Quantity must be greater than zero.");
+
+            if (request.Quantity > MaxQuantityPerItem)
+                return BadRequest($"You cannot set more than {MaxQuantityPerItem} units of a single item in your cart.");
 
             var cartItem = await _context.Carts
                 .Include(c => c.Menu)
@@ -139,7 +149,7 @@ namespace FoodieApi.Controllers.UserControllers
             }
             else
             {
-                menu.Quantity += -quantityDifference; // Restore stock if decreasing
+                menu.Quantity += -quantityDifference; // Restoring stock
             }
 
             cartItem.Quantity = newQuantity;
