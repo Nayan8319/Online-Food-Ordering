@@ -414,6 +414,42 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\5f195156-fc27-4e72-b031-bfc21aaf3219.png'))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\6a95e3a6-b18e-4d1a-af2d-83fe865393fa.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>FoodieApi</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/FoodieApi</BasePath>
+      <RelativePath>UserImages/6a95e3a6-b18e-4d1a-af2d-83fe865393fa.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>3z33vjwq5m</Fingerprint>
+      <Integrity>32FIBoHi9XVP+RVcf8Gr1trQ700ZSiZXBYgmPtZlyrg=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\6a95e3a6-b18e-4d1a-af2d-83fe865393fa.png'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\6f4cf4f7-dc33-45f0-9ea3-284cfd6ffa58.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>FoodieApi</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/FoodieApi</BasePath>
+      <RelativePath>UserImages/6f4cf4f7-dc33-45f0-9ea3-284cfd6ffa58.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>objmd0dlts</Fingerprint>
+      <Integrity>VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\6f4cf4f7-dc33-45f0-9ea3-284cfd6ffa58.png'))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\77d3ca64-8e4f-4811-9d97-80827d6f1349.png'))">
       <SourceType>Package</SourceType>
       <SourceId>FoodieApi</SourceId>
@@ -449,6 +485,60 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\9ebaf403-ae20-44c3-91f1-26881c331cc8.png'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\bb3989aa-b068-41fc-9b63-db453c1eb6d9.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>FoodieApi</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/FoodieApi</BasePath>
+      <RelativePath>UserImages/bb3989aa-b068-41fc-9b63-db453c1eb6d9.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>63klqwzpad</Fingerprint>
+      <Integrity>8qJvlquwX6EuVBUPgGBHMwvH1zlgPebaZ4nX1otF1rU=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\bb3989aa-b068-41fc-9b63-db453c1eb6d9.png'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\dd875e94-bd70-4d91-b568-b4f2a66b1203.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>FoodieApi</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/FoodieApi</BasePath>
+      <RelativePath>UserImages/dd875e94-bd70-4d91-b568-b4f2a66b1203.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>objmd0dlts</Fingerprint>
+      <Integrity>VEj5L1Eyy68+3ZEYGi/z2WX8c4LOmImmnvU588l5Ueg=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\dd875e94-bd70-4d91-b568-b4f2a66b1203.png'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\e10b75cd-ec49-40c3-86f6-1c475e62b136.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>FoodieApi</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/FoodieApi</BasePath>
+      <RelativePath>UserImages/e10b75cd-ec49-40c3-86f6-1c475e62b136.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>ytppul59bl</Fingerprint>
+      <Integrity>+s5ybDiziwrJzSJZtMjK0WacvvbtQVsnnEkupSP+5FI=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\UserImages\e10b75cd-ec49-40c3-86f6-1c475e62b136.jpg'))</OriginalItemSpec>
     </StaticWebAsset>
   </ItemGroup>
 </Project>

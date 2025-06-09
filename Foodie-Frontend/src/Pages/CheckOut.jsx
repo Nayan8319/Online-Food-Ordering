@@ -1,204 +1,251 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import UserInfoStep from "./CheckOut/UserInfoStep";
+import DeliveryAddressStep from "./CheckOut/DeliveryAddressStep";
+import PaymentStep from "./CheckOut/PaymentStep";
+import OrderSummaryStep from "./CheckOut/OrderSummaryStep";
+import OrderSuccess from "./CheckOut/OrderSuccess";
+import { useNavigate } from "react-router-dom";
+
+const API_BASE_CART = "http://localhost:5110/api/CartOrder";
 
 const CheckoutPage = () => {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
-  const [showAddressForm, setShowAddressForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [orderId, setOrderId] = useState(null);
+
   const [user, setUser] = useState({
-    username: "john_doe",
-    email: "john@example.com",
-    phone: "9876543210",
+    username: "",
+    email: "",
+    phone: "",
   });
 
-  useEffect(() => {
-    // MOCK DATA SIMULATE FETCH
-    const mockCartItems = [
-      {
-        cartId: 1,
-        quantity: 2,
-        totalPrice: 21.98,
-        menu: {
-          menuId: 1,
-          name: "Menu Item 1",
-          price: 10.99,
-          imageUrl: "menu1.jpg",
-        },
-      },
-      {
-        cartId: 2,
-        quantity: 1,
-        totalPrice: 15.49,
-        menu: {
-          menuId: 2,
-          name: "Menu Item 2",
-          price: 15.49,
-          imageUrl: "menu2.jpg",
-        },
-      },
-    ];
+  const [address, setAddress] = useState({
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    type: "Home",
+    addressId: null,
+  });
 
-    setTimeout(() => {
-      setCartItems(mockCartItems);
-      setLoading(false);
-    }, 1000);
+  const [payment, setPayment] = useState({
+    mode: "",
+    cardName: "",
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+  });
+
+  const [paymentDone, setPaymentDone] = useState(
+    localStorage.getItem("paymentDone") === "true"
+  );
+
+  const token = localStorage.getItem("token");
+  const authHeaders = {
+    Authorization: `Bearer ${token}`,
+  };
+
+  const fetchCart = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(API_BASE_CART, { headers: authHeaders });
+
+      const items = response.data.items.map((item) => ({
+        cartId: item.cartId,
+        quantity: item.quantity,
+        totalPrice: item.totalPrice,
+        menu: {
+          menuId: item.menuId,
+          name: item.menuName,
+          price: item.pricePerItem,
+          imageUrl: item.imageUrl,
+        },
+      }));
+
+      if (items.length === 0) {
+        navigate("/menu");
+        return;
+      }
+
+      setCartItems(items);
+    } catch (error) {
+      console.error("Failed to fetch cart:", error);
+      alert("Failed to load cart. Please login again.");
+      navigate("/menu");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!paymentDone) {
+      fetchCart();
+    }
+  }, [paymentDone]);
+
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("paymentDone");
+    };
   }, []);
 
-  if (loading) return <div className="container py-5">Loading cart...</div>;
-
-  const subtotal = cartItems.reduce(
-    (acc, item) => acc + (item.menu.price || 0) * item.quantity,
-    0
-  );
+  const subtotal = cartItems.reduce((acc, item) => acc + item.menu.price * item.quantity, 0);
   const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const shipping = 30.0;
+  const shipping = 0;
   const totalAmount = subtotal + shipping;
+
+  const nextStep = () => {
+    if (paymentDone && currentStep >= 3) return;
+    setCurrentStep((prev) => Math.min(prev + 1, 4));
+  };
+
+  const prevStep = () => {
+    if (paymentDone && currentStep >= 4) return;
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  if (orderId) return <OrderSuccess orderId={orderId} />;
+
+  if (loading)
+    return <div className="container py-5">Loading cart from server...</div>;
 
   return (
     <div className="container py-5">
-      <h1 className="mb-4  mt-4 text-center">Checkout</h1>
+      <h2 className="text-center mb-4 mt-5">Checkout</h2>
+
       <div className="row">
-        {/* Order Summary */}
-        <div className="col-md-4 order-md-last">
-          <div className="card mb-4">
-            <div className="card-header bg-light">
-              <h5>Order Summary</h5>
-            </div>
-            <ul className="list-group list-group-flush">
-              {cartItems.map(({ cartId, menu, quantity }) => (
-                <li
-                  key={cartId}
-                  className="list-group-item d-flex justify-content-between align-items-center"
-                >
-                  {menu.name} x {quantity}
-                  <span>${(menu.price * quantity).toFixed(2)}</span>
-                </li>
-              ))}
-              <li className="list-group-item d-flex justify-content-between">
-                <span>Products ({totalQuantity})</span>
-                <strong>${subtotal.toFixed(2)}</strong>
-              </li>
-              <li className="list-group-item d-flex justify-content-between">
-                <span>Shipping</span>
-                <strong>${shipping.toFixed(2)}</strong>
-              </li>
-              <li className="list-group-item d-flex justify-content-between border-0">
-                <strong>Total Amount</strong>
-                <strong>${totalAmount.toFixed(2)}</strong>
-              </li>
-            </ul>
+        <div className="col-md-8">
+          <div className="d-flex justify-content-between mb-4">
+            {["User Info", "Delivery", "Payment", "Summary"].map((label, index) => (
+              <div
+                key={index}
+                className={`text-center flex-fill ${
+                  currentStep === index + 1 ? "fw-bold text-primary" : ""
+                }`}
+              >
+                {index + 1}. {label}
+              </div>
+            ))}
+          </div>
+
+          {currentStep === 1 && <UserInfoStep user={user} setUser={setUser} />}
+          {currentStep === 2 && !paymentDone && (
+            <DeliveryAddressStep
+              address={address}
+              setAddress={setAddress}
+              onSaveSuccess={(savedId) => {
+                setAddress((prev) => ({ ...prev, addressId: savedId }));
+                nextStep();
+              }}
+            />
+          )}
+          {currentStep === 3 && !paymentDone && (
+            <PaymentStep
+              payment={payment}
+              setPayment={setPayment}
+              addressId={address.addressId}
+              totalAmount={totalAmount}
+              onSuccess={() => {
+                setPaymentDone(true);
+                localStorage.setItem("paymentDone", "true");
+                nextStep();
+              }}
+            />
+          )}
+          {currentStep === 4 && (
+            <OrderSummaryStep
+              cartItems={cartItems}
+              subtotal={subtotal}
+              shipping={shipping}
+              totalQuantity={totalQuantity}
+              payment={payment}
+              addressId={address.addressId}
+              totalAmount={totalAmount}
+              onOrderSuccess={(id) => setOrderId(id)}
+            />
+          )}
+
+          <div className="d-flex justify-content-between mt-4">
+            {currentStep > 1 && (
+              <button className="btn btn-secondary" onClick={prevStep}>
+                Back
+              </button>
+            )}
+            {currentStep < 4 && (
+              <button className="btn btn-primary" onClick={nextStep}>
+                Next
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Billing + Payment */}
-        <div className="col-md-8">
+        <div className="col-md-4">
           <div className="card mb-4">
-            <div className="card-header">
-              <h4>User Information</h4>
+            <div className="card-header bg-light">
+              <h5 className="mb-0 fw-bold">In Your Cart</h5>
             </div>
             <div className="card-body">
-              <p><strong>Username:</strong> {user.username}</p>
-              <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Phone:</strong> {user.phone}</p>
+              <div className="d-flex justify-content-between">
+                <span>Subtotal</span>
+                <span>₹{subtotal.toFixed(2)}</span>
+              </div>
+              <div className="d-flex justify-content-between mt-2">
+                <span>Shipping</span>
+                <span className="text-primary fw-semibold">Free</span>
+              </div>
               <hr />
+              <div className="d-flex justify-content-between fw-bold">
+                <span>Total</span>
+                <span>₹{totalAmount.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-header bg-light">
+              <h5 className="mb-0 fw-bold">You Added These Items</h5>
+            </div>
+            <div className="card-body">
+              {cartItems.map(({ cartId, menu, quantity }) => (
+                <div className="d-flex mb-3" key={cartId}>
+                  <img
+                    src={`http://localhost:5110${menu.imageUrl}`}
+                    alt={menu.name}
+                    style={{
+                      width: "70px",
+                      height: "70px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      marginRight: "10px",
+                    }}
+                  />
+                  <div className="flex-grow-1">
+                    <div className="fw-semibold">{menu.name}</div>
+                    <div className="d-flex justify-content-between mt-1 align-items-center">
+                      <span>{quantity}x</span>
+                      <span>₹{menu.price.toFixed(2)}</span>
+                      <span className="fw-bold">
+                        ₹{(menu.price * quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
               <button
-                className="btn btn-outline-primary mb-3"
-                type="button"
-                onClick={() => setShowAddressForm(!showAddressForm)}
+                className="btn btn-primary w-100 mt-3"
+                onClick={() => {
+                  if (paymentDone) {
+                    alert("You can't modify the cart after placing the order.");
+                  } else {
+                    window.location.href = "/cart";
+                  }
+                }}
               >
-                {showAddressForm ? "Cancel Address" : "Add Address"}
+                Go to Cart to Edit Items
               </button>
-
-              {showAddressForm && (
-                <>
-                  <h5 className="mb-3">Billing Address</h5>
-                  <form>
-                    {/* Address Fields */}
-                    <div className="mb-3">
-                      <label htmlFor="street" className="form-label">Street</label>
-                      <input type="text" id="street" className="form-control" required />
-                    </div>
-                    <div className="row">
-                      <div className="col-md-6 mb-3">
-                        <label htmlFor="city" className="form-label">City</label>
-                        <input type="text" id="city" className="form-control" required />
-                      </div>
-                      <div className="col-md-4 mb-3">
-                        <label htmlFor="state" className="form-label">State</label>
-                        <input type="text" id="state" className="form-control" required />
-                      </div>
-                      <div className="col-md-2 mb-3">
-                        <label htmlFor="zip" className="form-label">Zip</label>
-                        <input type="text" id="zip" className="form-control" required />
-                      </div>
-                    </div>
-
-                    {/* Address Type */}
-                    <div className="mb-3">
-                      <label className="form-label d-block">Address Type</label>
-                      <div className="form-check form-check-inline">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="addressType"
-                          id="home"
-                          value="Home"
-                          defaultChecked
-                        />
-                        <label className="form-check-label" htmlFor="home">Home</label>
-                      </div>
-                      <div className="form-check form-check-inline">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="addressType"
-                          id="other"
-                          value="Other"
-                        />
-                        <label className="form-check-label" htmlFor="other">Other</label>
-                      </div>
-                    </div>
-                    <hr />
-                  </form>
-                </>
-              )}
-
-              <h4 className="mb-3">Payment</h4>
-              <form>
-                <div className="mb-3">
-                  <label htmlFor="paymentMode" className="form-label">Payment Mode</label>
-                  <select id="paymentMode" className="form-select" required>
-                    <option value="">Select Payment Mode</option>
-                    <option value="Credit Card">Credit Card</option>
-                    <option value="Debit Card">Debit Card</option>
-                    <option value="PayPal">PayPal</option>
-                  </select>
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="cardName" className="form-label">Name on Card</label>
-                  <input type="text" id="cardName" className="form-control" required />
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor="cardNumber" className="form-label">Card Number</label>
-                  <input type="text" id="cardNumber" className="form-control" required />
-                </div>
-
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="expiryDate" className="form-label">Expiry Date</label>
-                    <input type="text" id="expiryDate" className="form-control" required />
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label htmlFor="cvv" className="form-label">CVV</label>
-                    <input type="text" id="cvv" className="form-control" required />
-                  </div>
-                </div>
-
-                <button type="submit" className="btn btn-success btn-lg w-100" disabled>
-                  Place Order
-                </button>
-              </form>
             </div>
           </div>
         </div>

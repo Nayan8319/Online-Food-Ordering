@@ -9,7 +9,7 @@ public partial class Category
 
     public string Name { get; set; } = null!;
 
-    public string ImageUrl { get; set; } = null!;
+    public string? ImageUrl { get; set; }
 
     public bool IsActive { get; set; }
 

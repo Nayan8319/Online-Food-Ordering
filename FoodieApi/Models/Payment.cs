@@ -9,8 +9,6 @@ public partial class Payment
 
     public string Name { get; set; } = null!;
 
-    public int CartId { get; set; }
-
     public DateTime ExpiryDate { get; set; }
 
     public int CvvNo { get; set; }
@@ -19,9 +17,11 @@ public partial class Payment
 
     public string PaymentMode { get; set; } = null!;
 
-    public virtual Address Address { get; set; } = null!;
+    public decimal TotalAmount { get; set; }
 
-    public virtual Cart Cart { get; set; } = null!;
+    public DateTime CreatedDate { get; set; }
+
+    public virtual Address Address { get; set; } = null!;
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

@@ -9,10 +9,6 @@ public partial class Order
 
     public string OrderNo { get; set; } = null!;
 
-    public int ProductId { get; set; }
-
-    public int Quantity { get; set; }
-
     public int UserId { get; set; }
 
     public string Status { get; set; } = null!;
@@ -21,9 +17,11 @@ public partial class Order
 
     public DateTime OrderDate { get; set; }
 
-    public virtual Payment Payment { get; set; } = null!;
+    public decimal TotalAmount { get; set; }
 
-    public virtual Menu Product { get; set; } = null!;
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+
+    public virtual Payment Payment { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
 }

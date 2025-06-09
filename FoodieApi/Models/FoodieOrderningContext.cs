@@ -27,6 +27,8 @@ public partial class FoodieOrderningContext : DbContext
 
     public virtual DbSet<Order> Orders { get; set; }
 
+    public virtual DbSet<OrderDetail> OrderDetails { get; set; }
+
     public virtual DbSet<Payment> Payments { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -35,7 +37,7 @@ public partial class FoodieOrderningContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=OPGAMING\\SQLEXPRESS;Initial Catalog=FoodieOrderning;Integrated Security=True;Trust Server Certificate=True");
+        => optionsBuilder.UseSqlServer("Data Source=OPGAMING\\SQLEXPRESS;Initial Catalog=FoodieOrderning;Integrated Security=True;Encrypt=True;Trust Server Certificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -85,9 +87,7 @@ public partial class FoodieOrderningContext : DbContext
             entity.ToTable("Category");
 
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-            entity.Property(e => e.ImageUrl)
-                .HasMaxLength(255)
-                .IsUnicode(false);
+            entity.Property(e => e.ImageUrl).IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -124,9 +124,7 @@ public partial class FoodieOrderningContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
                 .IsUnicode(false);
-            entity.Property(e => e.ImageUrl)
-                .HasMaxLength(255)
-                .IsUnicode(false);
+            entity.Property(e => e.ImageUrl).IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -151,21 +149,34 @@ public partial class FoodieOrderningContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Payment).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.PaymentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Orders__PaymentI__2E1BDC42");
 
-            entity.HasOne(d => d.Product).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__ProductI__2C3393D0");
-
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Orders__UserId__2D27B809");
+        });
+
+        modelBuilder.Entity<OrderDetail>(entity =>
+        {
+            entity.HasKey(e => e.OrderDetailId).HasName("PK__OrderDet__D3B9D36C4316F928");
+
+            entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
+
+            entity.HasOne(d => d.Menu).WithMany(p => p.OrderDetails)
+                .HasForeignKey(d => d.MenuId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__OrderDeta__MenuI__45F365D3");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__OrderDeta__Order__44FF419A");
         });
 
         modelBuilder.Entity<Payment>(entity =>
@@ -174,6 +185,9 @@ public partial class FoodieOrderningContext : DbContext
 
             entity.ToTable("Payment");
 
+            entity.Property(e => e.CreatedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.ExpiryDate).HasColumnType("datetime");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
@@ -181,16 +195,12 @@ public partial class FoodieOrderningContext : DbContext
             entity.Property(e => e.PaymentMode)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Address).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.AddressId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Payment__Address__24927208");
-
-            entity.HasOne(d => d.Cart).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.CartId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payment__CartId__239E4DCF");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -218,9 +228,7 @@ public partial class FoodieOrderningContext : DbContext
             entity.Property(e => e.Email)
                 .HasMaxLength(255)
                 .IsUnicode(false);
-            entity.Property(e => e.ImageUrl)
-                .HasMaxLength(255)
-                .IsUnicode(false);
+            entity.Property(e => e.ImageUrl).IsUnicode(false);
             entity.Property(e => e.Mobile)
                 .HasMaxLength(15)
                 .IsUnicode(false);

@@ -2,15 +2,17 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const Cart = () => {
-  const [cartData, setCartData] = useState(null);
+const Cart = ({ onCartUpdate }) => {
+  const [cartData, setCartData] = useState({ items: [], totalAmount: 0 });
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
 
   const token = localStorage.getItem("token");
 
+  // Fetch cart data from API
   const fetchCart = async () => {
     try {
+      setLoading(true);
       const response = await axios.get("http://localhost:5110/api/CartOrder", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -18,16 +20,24 @@ const Cart = () => {
       });
       setCartData(response.data);
       setErrorMsg("");
+      if (onCartUpdate) onCartUpdate(response.data); // Notify parent
     } catch (error) {
       console.error("Error fetching cart:", error);
       setCartData({ items: [], totalAmount: 0 });
+      setErrorMsg("Failed to load cart. Please try again.");
+      if (onCartUpdate) onCartUpdate({ items: [], totalAmount: 0 }); // Notify parent empty cart
     } finally {
       setLoading(false);
     }
   };
 
+  // Update quantity of a cart item
   const updateQty = async (cartId, newQty, menuId) => {
     try {
+      if (newQty < 1 || newQty > 10) {
+        setErrorMsg("Quantity must be between 1 and 10.");
+        return;
+      }
       setErrorMsg("");
       const response = await axios.put(
         `http://localhost:5110/api/CartOrder/${cartId}`,
@@ -39,6 +49,10 @@ const Cart = () => {
         }
       );
       setCartData(response.data);
+      if (onCartUpdate) onCartUpdate(response.data);
+
+      // Dispatch event so header updates cart count live
+      window.dispatchEvent(new Event("cartUpdated"));
     } catch (error) {
       console.error("Error updating quantity:", error);
       const backendMessage =
@@ -49,8 +63,10 @@ const Cart = () => {
     }
   };
 
+  // Remove an item from cart
   const removeItem = async (cartId) => {
     try {
+      setErrorMsg("");
       const response = await axios.delete(
         `http://localhost:5110/api/CartOrder/${cartId}`,
         {
@@ -60,22 +76,29 @@ const Cart = () => {
         }
       );
       setCartData(response.data);
-      setErrorMsg("");
+      if (onCartUpdate) onCartUpdate(response.data);
+
+      // Dispatch event so header updates cart count live
+      window.dispatchEvent(new Event("cartUpdated"));
     } catch (error) {
       console.error("Error removing item:", error);
       setErrorMsg("Failed to remove item. Please try again.");
     }
   };
 
+  // Generate full image URL with fallback logic
   const getImageSrc = (imageUrl) => {
-    if (!imageUrl) return "";
-    return imageUrl.startsWith("/CategoryImages") ||
+    if (!imageUrl) return "/images/fallback-image.png";
+    if (
+      imageUrl.startsWith("/CategoryImages") ||
       imageUrl.startsWith("/MenuImages")
-      ? `http://localhost:5110${imageUrl}`
-      : `http://localhost:5110/MenuImages/${imageUrl}`;
+    ) {
+      return `http://localhost:5110${imageUrl}`;
+    }
+    return `http://localhost:5110/MenuImages/${imageUrl}`;
   };
 
-  // Clear error message after 3 seconds
+  // Automatically clear error message after 3 seconds
   useEffect(() => {
     if (errorMsg) {
       const timer = setTimeout(() => setErrorMsg(""), 3000);
@@ -83,19 +106,22 @@ const Cart = () => {
     }
   }, [errorMsg]);
 
+  // Initial fetch on component mount
   useEffect(() => {
     fetchCart();
   }, []);
 
-  if (loading) return <div>Loading your cart...</div>;
+  if (loading)
+    return <div className="text-center my-5">Loading your cart...</div>;
 
   const ShowCart = ({ items, total }) => {
-    const shipping = 30.0;
+    const shipping = 0.0; // Free shipping now
 
     return (
       <section className="h-100 gradient-custom">
         <div className="container py-5">
           <div className="row d-flex justify-content-center my-4">
+            {/* Cart Items */}
             <div className="col-md-8">
               <div className="card mb-4">
                 <div className="card-header py-3">
@@ -124,7 +150,9 @@ const Cart = () => {
                         </div>
                         <div className="col-md-3">
                           <h6 className="mb-0">{item.menuName}</h6>
-                          <small className="text-muted">₹{item.pricePerItem.toFixed(2)}</small>
+                          <small className="text-muted">
+                            ₹{item.pricePerItem.toFixed(2)}
+                          </small>
                         </div>
                         <div className="col-md-3 d-flex align-items-center">
                           <button
@@ -135,7 +163,7 @@ const Cart = () => {
                                 : removeItem(item.cartId)
                             }
                           >
-                            -
+                            −
                           </button>
                           <span>{item.quantity}</span>
                           <button
@@ -144,7 +172,9 @@ const Cart = () => {
                               if (item.quantity < 10) {
                                 updateQty(item.cartId, item.quantity + 1, item.menuId);
                               } else {
-                                setErrorMsg("You cannot add more than 10 units of this item.");
+                                setErrorMsg(
+                                  "You cannot add more than 10 units of this item."
+                                );
                               }
                             }}
                           >
@@ -170,6 +200,7 @@ const Cart = () => {
               </div>
             </div>
 
+            {/* Order Summary */}
             <div className="col-md-4">
               <div className="card mb-4">
                 <div className="card-header py-3 bg-light">
@@ -183,7 +214,7 @@ const Cart = () => {
                     </li>
                     <li className="list-group-item d-flex justify-content-between">
                       Shipping
-                      <span>₹{shipping.toFixed(2)}</span>
+                      <span style={{ color: "blue", fontWeight: "bold" }}>Free</span>
                     </li>
                     <li className="list-group-item d-flex justify-content-between fw-bold">
                       Total

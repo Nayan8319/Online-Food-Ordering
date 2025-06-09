@@ -1,6 +1,7 @@
 CREATE DATABASE FoodieOrderning;
 GO
 
+
 USE FoodieOrderning;
 GO
 
@@ -159,4 +160,84 @@ VALUES ('Menu Item 4', 'Description for Menu Item 4', 9.99, 200, 'menu4.jpg', 4,
 
 INSERT INTO Menu (Name, Description, Price, Quantity, ImageUrl, CategoryId, IsActive, CreatedDate)
 VALUES ('Menu Item 5', 'Description for Menu Item 5', 8.49, 150, 'menu5.jpg', 5, 1, GETDATE());
+
+
+SELECT 
+    fk.name AS ForeignKeyName,
+    tp.name AS TableName,
+    cp.name AS ColumnName,
+    tr.name AS ReferencedTableName,
+    cr.name AS ReferencedColumnName
+FROM 
+    sys.foreign_keys fk
+JOIN 
+    sys.foreign_key_columns fkc ON fk.object_id = fkc.constraint_object_id
+JOIN 
+    sys.tables tp ON fkc.parent_object_id = tp.object_id
+JOIN 
+    sys.columns cp ON fkc.parent_object_id = cp.object_id AND fkc.parent_column_id = cp.column_id
+JOIN 
+    sys.tables tr ON fkc.referenced_object_id = tr.object_id
+JOIN 
+    sys.columns cr ON fkc.referenced_object_id = cr.object_id AND fkc.referenced_column_id = cr.column_id
+WHERE 
+    tp.name = 'Payment' AND cp.name = 'CartId';
+
+-- Replace FK_Payment_Cart if you renamed it or used a specific name
+ALTER TABLE Payment
+DROP CONSTRAINT FK__Payment__CartId__239E4DCF;
+
+
+ALTER TABLE Payment
+DROP COLUMN CartId;
+
+
+ALTER TABLE Payment
+ADD TotalAmount DECIMAL(18,2) NOT NULL DEFAULT 0;
+
+SELECT fk.name AS ForeignKeyName
+FROM sys.foreign_keys fk
+JOIN sys.foreign_key_columns fkc ON fk.object_id = fkc.constraint_object_id
+JOIN sys.columns c ON fkc.parent_object_id = c.object_id AND fkc.parent_column_id = c.column_id
+WHERE fk.parent_object_id = OBJECT_ID('Orders')
+AND c.name = 'ProductId';
+
+
+-- Step 1: Drop foreign key constraint on ProductId (replace FK name if different)
+ALTER TABLE Orders DROP CONSTRAINT FK__Orders__ProductI__2C3393D0;
+
+-- Step 2: Drop the columns ProductId and Quantity
+ALTER TABLE Orders
+DROP COLUMN ProductId, Quantity;
+
+
+-- OrderDetails Table
+CREATE TABLE OrderDetails (
+    OrderDetailId INT PRIMARY KEY IDENTITY(1,1),
+    OrderId INT NOT NULL,
+    MenuId INT NOT NULL,
+    Quantity INT NOT NULL,
+    Price DECIMAL(18,2) NOT NULL,
+    FOREIGN KEY (OrderId) REFERENCES Orders(OrderId),
+    FOREIGN KEY (MenuId) REFERENCES Menu(MenuId)
+);
+
+ALTER TABLE Orders
+ADD TotalAmount DECIMAL(18,2) NOT NULL DEFAULT 0;
+
+ALTER TABLE Payment
+ADD CreatedDate DATETIME NOT NULL DEFAULT GETDATE();
+
+
+EXEC sp_help 'Role';
+EXEC sp_help 'User';
+EXEC sp_help 'Category';
+EXEC sp_help 'Menu';
+EXEC sp_help 'Address';
+EXEC sp_help 'Carts';
+EXEC sp_help 'Payment';
+EXEC sp_help 'Orders';
+EXEC sp_help 'OrderDetails';
+EXEC sp_help 'Contact';
+
 

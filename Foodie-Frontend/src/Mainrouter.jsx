@@ -8,9 +8,10 @@ import Contact from './Pages/Contact';
 import LoginPage from './Pages/LoginPage';
 import RegisterPage from './Pages/RegisterPage';
 import VerifyOtpPage from './Pages/VerifyOtpPage';
+import OrderSuccess from './Pages/CheckOut/OrderSuccess';   // Adjust path if needed
+import OrderDetails from './Pages/OrderDetails';             // <-- Import your OrderDetails page
 
 import AdminDashboard from './Admin/pages/AdminDashboard';
-
 
 import UserLayout from './layouts/UserLayout';
 import AdminLayout from './layouts/AdminLayout';
@@ -40,13 +41,21 @@ const Mainrouter = createBrowserRouter([
     path: '/menu',
     element: <UserLayout><MenuPage /></UserLayout>
   },
-    {
+  {
     path: '/menu/:id',             // <-- single menu item route with param id
     element: <UserLayout><SingleMenuItem /></UserLayout>
   },
-    {
+  {
     path: '/checkout',          
     element: <UserLayout><Checkout/></UserLayout>
+  },
+  {
+    path: '/order-success/:orderId',
+    element: <UserLayout><OrderSuccess /></UserLayout>
+  },
+  {
+    path: '/order-details/:orderId',        // <-- NEW order details route
+    element: <UserLayout><OrderDetails /></UserLayout>
   },
   {
     path: '/about',
@@ -95,24 +104,24 @@ const Mainrouter = createBrowserRouter([
     element: <AdminLayout><Categories /></AdminLayout>
   },
   {
-  path: '/admin/Categories/add-Category',
-  element: <AdminLayout><AddCategory /></AdminLayout>
+    path: '/admin/Categories/add-Category',
+    element: <AdminLayout><AddCategory /></AdminLayout>
   },
   {
-  path: '/admin/categories/edit-Category/:id',
-  element: <AdminLayout><EditCategory /></AdminLayout>
+    path: '/admin/categories/edit-Category/:id',
+    element: <AdminLayout><EditCategory /></AdminLayout>
   },
   {
     path: '/admin/product',
     element: <AdminLayout><Product /></AdminLayout>
   },
   {
-  path: '/admin/product/add-product',
-  element: <AdminLayout><AddProduct /></AdminLayout>
+    path: '/admin/product/add-product',
+    element: <AdminLayout><AddProduct /></AdminLayout>
   },
   {
-  path: '/admin/product/edit-product/:id',
-  element: <AdminLayout><EditProduct /></AdminLayout>
+    path: '/admin/product/edit-product/:id',
+    element: <AdminLayout><EditProduct /></AdminLayout>
   },
   {
     path: '/admin/Users',
