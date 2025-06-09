@@ -16,7 +16,10 @@ const Header = ({ bgcolor }) => {
   const fetchCartCount = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!token) {
+        setCartCount(0);
+        return;
+      }
 
       const response = await axios.get("http://localhost:5110/api/CartOrder", {
         headers: {
@@ -29,6 +32,7 @@ const Header = ({ bgcolor }) => {
       setCartCount(totalItems);
     } catch (error) {
       console.error("Error fetching cart count:", error);
+      setCartCount(0); // Reset on error
     }
   };
 
@@ -38,7 +42,17 @@ const Header = ({ bgcolor }) => {
     if (token) fetchCartCount();
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    // Listen for custom 'cartUpdated' event to refresh cart count live
+    const onCartUpdated = () => {
+      if (token) fetchCartCount();
+    };
+    window.addEventListener("cartUpdated", onCartUpdated);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("cartUpdated", onCartUpdated);
+    };
   }, []);
 
   const toggleCollapse = () => {
@@ -48,8 +62,9 @@ const Header = ({ bgcolor }) => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
+    setCartCount(0);
     navigate("/login");
-    window.location.reload(); // Force full page reload after navigation
+    // No need for full reload, as state is updated and react-router will handle navigation
   };
 
   return (
@@ -109,10 +124,7 @@ const Header = ({ bgcolor }) => {
                 </Link>
               )}
 
-              <Link
-                to="/cart"
-                className="cart_link user_link position-relative"
-              >
+              <Link to="/cart" className="cart_link user_link position-relative">
                 <i className="fa fa-shopping-cart"></i>
                 {cartCount > 0 && (
                   <span

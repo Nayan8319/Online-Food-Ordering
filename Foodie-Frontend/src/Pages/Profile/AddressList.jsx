@@ -14,7 +14,7 @@ const AddressList = ({ addresses }) => {
                 </div>
                 <div className="card-body">
                   <p className="mb-1">
-                    <strong>Street:</strong> {addr.street}
+                    <strong>Building & Street:</strong> {addr.street}
                   </p>
                   <p className="mb-1">
                     <strong>City:</strong> {addr.city}

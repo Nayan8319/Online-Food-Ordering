@@ -104,6 +104,10 @@ const SingleMenuItem = () => {
 
       setSuccessMessage(`"${item.name}" added to cart!`);
       setTimeout(() => setSuccessMessage(""), 4000);
+
+      // ** Dispatch cartUpdated event so header/cart count updates live **
+      window.dispatchEvent(new Event("cartUpdated"));
+
     } catch (err) {
       setError(err.message || "Something went wrong");
       setTimeout(() => setError(""), 4000);
