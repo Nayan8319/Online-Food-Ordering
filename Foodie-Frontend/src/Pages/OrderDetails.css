@@ -1,0 +1,104 @@
+/* Stepper container */
+.card-stepper {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+
+/* Stepper list */
+#progressbar-1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  color: #455A64;
+}
+
+/* Step items */
+#progressbar-1 li {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  position: relative;
+  font-weight: bold;
+}
+
+/* Step circle base */
+#progressbar-1 li:before {
+  content: "";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #455A64;
+  color: #fff;
+  font-size: 14px;
+  z-index: 1;
+}
+
+/* Step numbers inside circles */
+/* Step numbers inside circles */
+#progressbar-1 li:nth-child(1):before {
+  content: "1";
+  margin: auto auto 10px auto;
+  margin-left: 30%;
+}
+#progressbar-1 li:nth-child(2):before {
+  content: "2";
+  margin: auto auto 10px auto;
+  margin-left: 30%;
+}
+#progressbar-1 li:nth-child(3):before {
+  content: "3";
+  margin: auto auto 10px auto;
+  margin-left: 30%;
+}
+#progressbar-1 li:nth-child(4):before {
+  content: "4";
+  margin: auto auto 10px auto;
+  margin-left: 30%;
+}
+
+
+/* Connecting lines */
+#progressbar-1 li:after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  height: 2px;
+  width: 100%;
+  background: #455A64;
+  z-index: 0;
+}
+
+/* Prevent line after the last item */
+#progressbar-1 li:last-child:after {
+  display: none;
+}
+
+/* Shrink first half of the line */
+#progressbar-1 li:first-child:after {
+  left: 50%;
+  width: 100%;
+}
+
+/* Active state styling */
+#progressbar-1 li.active:before {
+  background-color: #1266f1;
+}
+
+#progressbar-1 li.active:after {
+  background-color: #1266f1;
+}

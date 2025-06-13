@@ -141,29 +141,35 @@
   {
     "ContainingType": "FoodieApi.Controllers.AdminController",
     "Method": "GetOrdersByUser",
-    "RelativePath": "api/Admin/getOrderByUser",
+    "RelativePath": "api/Admin/getOrdersByUser/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
     "ContainingType": "FoodieApi.Controllers.AdminController",
     "Method": "UpdateOrderStatus",
-    "RelativePath": "api/Admin/update-status/{id}",
+    "RelativePath": "api/Admin/update-status/{orderId}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "orderId",
         "Type": "System.Int32",
         "IsRequired": true
       },
       {
-        "Name": "newStatus",
-        "Type": "System.String",
+        "Name": "statusDto",
+        "Type": "FoodieApi.Models.DTO.UpdateOrderStatusDto",
         "IsRequired": true
       }
     ],
@@ -564,6 +570,26 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FoodieApi.Controllers.DashboardController",
+    "Method": "GetLatestOrders",
+    "RelativePath": "api/Dashboard/latest-orders",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FoodieApi.Controllers.DashboardController",
+    "Method": "GetDashboardStats",
+    "RelativePath": "api/Dashboard/stats",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

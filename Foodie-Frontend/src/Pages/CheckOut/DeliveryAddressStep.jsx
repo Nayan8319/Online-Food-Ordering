@@ -9,33 +9,26 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const API_BASE = "http://localhost:5110/api/address";
+  const token = localStorage.getItem("token");
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
 
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        // Try loading saved addresses from localStorage first
-        const localAddresses = localStorage.getItem("savedAddresses");
-        if (localAddresses) {
-          setSavedAddresses(JSON.parse(localAddresses));
-          setLoading(false);
-          return;
-        }
-
-        // Otherwise fetch from API
-        const token = localStorage.getItem("token");
         const response = await axios.get(`${API_BASE}/allAddress`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers,
         });
         setSavedAddresses(response.data || []);
-        // Save fetched addresses in localStorage
-        localStorage.setItem("savedAddresses", JSON.stringify(response.data || []));
       } catch (err) {
         setError("Failed to fetch addresses");
       } finally {
         setLoading(false);
       }
     };
-
     fetchAddresses();
   }, []);
 
@@ -46,6 +39,7 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
       setIsEditing(true);
       return;
     }
+
     const selected = savedAddresses.find((a) => a.addressId === selectedId);
     if (selected) {
       setAddress({
@@ -61,59 +55,64 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
 
   const handleEditClick = () => setIsEditing(true);
 
-  const handleSaveToLocal = () => {
+  const handleSaveToBackend = async () => {
     const { street, city, state, zip, addressId } = address;
     if (!street || !city || !state || !zip) {
       alert("Please fill all fields.");
       return;
     }
+
     setSaving(true);
-
-    // Save the selectedAddress separately (for checkout or whatever)
-    localStorage.setItem("selectedAddress", JSON.stringify(address));
-
-    // Update savedAddresses list - add new or update existing
-    setSavedAddresses((prev) => {
-      let updated;
+    try {
       if (addressId) {
-        // Update existing address in list
-        updated = prev.map((a) =>
-          a.addressId === addressId
-            ? { ...a, street, city, state, zipCode: zip }
-            : a
+        // UPDATE existing address
+        await axios.put(
+          `${API_BASE}/update/${addressId}`,
+          { street, city, state, zipCode: zip },
+          { headers }
         );
+        alert("Address updated successfully.");
       } else {
-        // Add new address - generate a fake new id here, you can replace with backend id if saved there
-        const newId = prev.length > 0 ? Math.max(...prev.map((a) => a.addressId)) + 1 : 1;
-        updated = [
-          ...prev,
-          { addressId: newId, street, city, state, zipCode: zip }
-        ];
-        // Also update the address with the new id
-        setAddress({ street, city, state, zip, addressId: newId });
+        // CREATE new address
+        const res = await axios.post(
+          `${API_BASE}/add`,
+          { street, city, state, zipCode: zip },
+          { headers }
+        );
+        const newAddress = res.data;
+        setAddress({
+          street: newAddress.street,
+          city: newAddress.city,
+          state: newAddress.state,
+          zip: newAddress.zipCode,
+          addressId: newAddress.addressId,
+        });
+        alert("Address added successfully.");
       }
-      // Save updated list to localStorage
-      localStorage.setItem("savedAddresses", JSON.stringify(updated));
-      return updated;
-    });
 
-    alert("Address saved locally.");
-    setIsEditing(false);
-    onSaveSuccess?.(addressId || 0);
-    setSaving(false);
+      // Refresh the address list
+      const refreshed = await axios.get(`${API_BASE}/allAddress`, { headers });
+      setSavedAddresses(refreshed.data || []);
+
+      // Save selected to localStorage for checkout
+      localStorage.setItem("selectedAddress", JSON.stringify(address));
+      onSaveSuccess?.(address.addressId || 0);
+      setIsEditing(false);
+    } catch (err) {
+      setError("Failed to save address.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSaveSelectedAddress = () => {
     if (!address.addressId) {
-      alert("Please select a saved address or add new.");
+      alert("Please select or add an address.");
       return;
     }
-    setSaving(true);
     localStorage.setItem("selectedAddress", JSON.stringify(address));
     alert("Selected address saved locally.");
-    setIsEditing(false);
     onSaveSuccess?.(address.addressId);
-    setSaving(false);
   };
 
   if (loading) return <p>Loading addresses...</p>;
@@ -206,10 +205,10 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
       <div>
         <button
           className="btn btn-primary"
-          onClick={handleSaveToLocal}
+          onClick={handleSaveToBackend}
           disabled={saving || !isEditing}
         >
-          {saving ? "Saving..." : "Save Address"}
+          {saving ? "Saving..." : address.addressId ? "Update Address" : "Add Address"}
         </button>
       </div>
     </div>

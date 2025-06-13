@@ -6,7 +6,9 @@
         public string MenuName { get; set; } = string.Empty;
         public int Quantity { get; set; }
         public decimal Price { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
     }
+
     public class CreateOrderDetailsDto
     {
         public int MenuId { get; set; }

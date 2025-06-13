@@ -8,8 +8,6 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
-
-      // Get address from localStorage
       const savedAddressJson = localStorage.getItem("selectedAddress");
       const savedAddress = savedAddressJson ? JSON.parse(savedAddressJson) : null;
 
@@ -20,12 +18,11 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
       }
 
       try {
-        // Assuming you still want to fetch cart total amount from API
         const response = await fetch("http://localhost:5110/api/CartOrder", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const cartRes = await response.json();
 
+        const cartRes = await response.json();
         setAddress(savedAddress);
         setTotalAmount(cartRes.totalAmount || 0);
       } catch (error) {
@@ -44,8 +41,7 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
     if (!month || !year || isNaN(month) || isNaN(year)) return null;
 
     const fullYear = parseInt("20" + year);
-    const isoDate = new Date(fullYear, parseInt(month) - 1, 1).toISOString();
-    return isoDate;
+    return new Date(fullYear, parseInt(month) - 1, 1).toISOString();
   };
 
   const handleSubmitPayment = async () => {
@@ -136,7 +132,11 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
 
       <div className="mb-3">
         <label>Total Amount</label>
-        <input className="form-control" value={`₹${totalAmount.toFixed(2)}`} disabled />
+        <input
+          className="form-control"
+          value={`₹${totalAmount.toFixed(2)}`}
+          disabled
+        />
       </div>
 
       <div className="mb-3">
@@ -179,7 +179,9 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
             placeholder="MM/YY"
             maxLength={5}
             value={payment.expiryDate}
-            onChange={(e) => setPayment({ ...payment, expiryDate: e.target.value })}
+            onChange={(e) =>
+              setPayment({ ...payment, expiryDate: e.target.value })
+            }
           />
         </div>
         <div className="col-md-6 mb-3">

@@ -3,21 +3,25 @@ using FoodieApi.Models;
 using FoodieApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.FileProviders;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// ✅ Add services to the container
 builder.Services.AddControllers();
 
 // ✅ Swagger configuration with JWT Bearer Auth
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Foodie API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Foodie API",
+        Version = "v1"
+    });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -45,26 +49,26 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// ✅ Database context
+// ✅ Database context configuration
 builder.Services.AddDbContext<FoodieOrderningContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ✅ JWT & Email Services
+// ✅ Register custom services
 builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddScoped<EmailService>();
 
-// ✅ CORS policy for React frontend
+// ✅ Enable CORS for React frontend
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", builder =>
+    options.AddPolicy("AllowReactApp", policy =>
     {
-        builder.WithOrigins("http://localhost:3000")
-               .AllowAnyHeader()
-               .AllowAnyMethod();
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
-// ✅ JWT Authentication with error handling
+// ✅ JWT Authentication with custom error handling
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -76,11 +80,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
 
-        // ✅ Custom JSON error for unauthorized or forbidden access
         options.Events = new JwtBearerEvents
         {
             OnChallenge = context =>
@@ -106,33 +108,47 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin"));
 });
 
+// ✅ Optional: Register background services (e.g., order auto-delivery)
+// builder.Services.AddHostedService<OrderAutoDeliveryService>();
+
 var app = builder.Build();
 
 // ✅ Middleware pipeline
-app.UseDeveloperExceptionPage();
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
 
+// ✅ Enable Swagger and Swagger UI
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Foodie API v1");
+    c.RoutePrefix = "swagger"; // visit: http://localhost:5110/swagger
+});
 
+// ✅ Enable CORS
 app.UseCors("AllowReactApp");
 
-// ✅ Enable serving static files from wwwroot
-app.UseStaticFiles(); // This serves wwwroot
+// ✅ Serve static files from wwwroot
+app.UseStaticFiles();
 
-// ✅ Optional: If you want to serve from other folders too
+// ✅ Optional: Serve images or other folders
 // app.UseStaticFiles(new StaticFileOptions
 // {
 //     FileProvider = new PhysicalFileProvider(
-//         Path.Combine(Directory.GetCurrentDirectory(), "Images")),
-//     RequestPath = "/Images"
+//         Path.Combine(Directory.GetCurrentDirectory(), "UserImages")),
+//     RequestPath = "/UserImages"
 // });
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+// ✅ Map controller endpoints
 app.MapControllers();
 
-// ✅ App URL for local testing
+// ✅ Set app URL
 app.Urls.Add("http://localhost:5110");
 
+// ✅ Run the application
 app.Run();

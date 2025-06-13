@@ -1,0 +1,41 @@
+.stat-card {
+  border: none;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Gradients based on your image */
+.gradient-green {
+  background: linear-gradient(135deg, #00c851, #33b5e5);
+}
+
+.gradient-pink {
+  background: linear-gradient(135deg, #ff6ec4, #7873f5);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, #42a5f5, #478ed1);
+}
+
+.gradient-yellow {
+  background: linear-gradient(135deg, #ffb300, #fdd835);
+}
+
+.stat-card h2 {
+  margin: 0;
+  font-weight: 700;
+}
+
+.stat-card h6 {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+}
