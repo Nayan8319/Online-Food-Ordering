@@ -12,7 +12,7 @@ namespace FoodieApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User,Admin")]
     public class OrdersController : ControllerBase
     {
         private readonly FoodieOrderningContext _context;
@@ -45,7 +45,11 @@ namespace FoodieApi.Controllers
             if (cartItems.Count == 0)
                 return BadRequest("Cart is empty");
 
-            decimal totalAmount = payment.TotalAmount;
+            decimal totalAmount = 0;
+            foreach (var item in cartItems)
+            {
+                totalAmount += item.Menu.Price * item.Quantity;
+            }
 
             var order = new Order
             {
@@ -66,7 +70,7 @@ namespace FoodieApi.Controllers
                     OrderId = order.OrderId,
                     MenuId = cartItem.MenuId,
                     Quantity = cartItem.Quantity,
-                    Price = cartItem.TotalPrice
+                    Price = cartItem.Menu.Price // ✅ Unit price from Menu
                 };
                 _context.OrderDetails.Add(orderDetail);
             }
@@ -115,7 +119,8 @@ namespace FoodieApi.Controllers
                     MenuId = od.MenuId,
                     MenuName = od.Menu.Name,
                     Quantity = od.Quantity,
-                    Price = od.Price
+                    Price = od.Price,
+                    ImageUrl = od.Menu.ImageUrl
                 }).ToList()
             };
 
@@ -149,7 +154,8 @@ namespace FoodieApi.Controllers
                     MenuId = od.MenuId,
                     MenuName = od.Menu.Name,
                     Quantity = od.Quantity,
-                    Price = od.Price
+                    Price = od.Price,
+                    ImageUrl = od.Menu.ImageUrl
                 }).ToList()
             }).ToList();
 
@@ -175,7 +181,8 @@ namespace FoodieApi.Controllers
                 MenuId = od.MenuId,
                 MenuName = od.Menu.Name,
                 Quantity = od.Quantity,
-                Price = od.Price
+                Price = od.Price,
+                ImageUrl = od.Menu.ImageUrl
             }).ToList();
 
             return Ok(detailDtos);
@@ -201,7 +208,8 @@ namespace FoodieApi.Controllers
                 MenuId = od.MenuId,
                 MenuName = od.Menu.Name,
                 Quantity = od.Quantity,
-                Price = od.Price
+                Price = od.Price,
+                ImageUrl = od.Menu.ImageUrl
             }).ToList();
 
             return Ok(detailsDto);
@@ -222,7 +230,6 @@ namespace FoodieApi.Controllers
             if (order.Status == "Cancelled")
                 return BadRequest("Order is already cancelled");
 
-            // Update order status
             order.Status = "Cancelled";
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
@@ -234,6 +241,5 @@ namespace FoodieApi.Controllers
                 Status = order.Status
             });
         }
-
     }
 }

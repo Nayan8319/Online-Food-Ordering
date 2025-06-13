@@ -27,7 +27,6 @@ const Header = ({ bgcolor }) => {
         },
       });
 
-      // Count only the number of cart items (not quantity)
       const totalItems = response.data.items.length;
       setCartCount(totalItems);
     } catch (error) {
@@ -43,8 +42,9 @@ const Header = ({ bgcolor }) => {
 
     window.addEventListener("scroll", handleScroll);
 
-    // Listen for custom 'cartUpdated' event to refresh cart count live
+    // Custom event listener for cart updates
     const onCartUpdated = () => {
+      const token = localStorage.getItem("token");
       if (token) fetchCartCount();
     };
     window.addEventListener("cartUpdated", onCartUpdated);
@@ -64,14 +64,11 @@ const Header = ({ bgcolor }) => {
     setIsLoggedIn(false);
     setCartCount(0);
     navigate("/login");
-    // No need for full reload, as state is updated and react-router will handle navigation
   };
 
   return (
     <header
-      className={`header_section fixed-top ${
-        isHeaderActive ? "headeractive" : ""
-      }`}
+      className={`header_section fixed-top ${isHeaderActive ? "headeractive" : ""}`}
       style={{ backgroundColor: bgcolor }}
     >
       <div className="container">

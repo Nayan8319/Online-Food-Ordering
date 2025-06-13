@@ -17,7 +17,7 @@
     public class OrderDto
     {
         public int OrderId { get; set; }
-        public int UserId { get; set; } // ✅ Add this line
+        public int UserId { get; set; }
         public string OrderNo { get; set; } = string.Empty;
         public int PaymentId { get; set; }
         public string Status { get; set; } = string.Empty;
@@ -25,6 +25,7 @@
         public decimal TotalAmount { get; set; }
         public List<OrderDetailsDto> OrderDetails { get; set; } = new();
     }
+
     public class CreateOrderDto
     {
         public int PaymentId { get; set; }

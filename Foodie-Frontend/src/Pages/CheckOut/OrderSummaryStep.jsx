@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const OrderSummaryStep = ({
-  cartItems,
-  subtotal,
-  shipping,
-  totalQuantity,
-}) => {
+const OrderSummaryStep = ({ cartItems, subtotal, shipping, totalQuantity }) => {
   const [user, setUser] = useState({});
   const [address, setAddress] = useState({});
   const [payment, setPayment] = useState({});
@@ -17,45 +12,49 @@ const OrderSummaryStep = ({
   const totalAmount = subtotal + shipping;
 
   useEffect(() => {
-    const fetchDetails = async () => {
+    const fetchSummaryData = async () => {
       const token = localStorage.getItem("token");
-      const addressId = localStorage.getItem("selectedAddressId");
       const paymentId = localStorage.getItem("lastPaymentId");
 
+      if (!token || !paymentId) {
+        alert("⚠️ Missing details. Please complete previous steps.");
+        navigate("/checkout");
+        return;
+      }
+
       try {
-        const [userRes, addressRes, paymentRes] = await Promise.all([
-          axios.get("http://localhost:5110/api/Auth/profile", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`http://localhost:5110/api/address/${addressId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`http://localhost:5110/api/payment/getPaymentById/${paymentId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+        const headers = { Authorization: `Bearer ${token}` };
+
+        // Fetch user and payment in parallel
+        const [userRes, paymentRes] = await Promise.all([
+          axios.get("http://localhost:5110/api/Auth/profile", { headers }),
+          axios.get(`http://localhost:5110/api/payment/getPaymentById/${paymentId}`, { headers }),
         ]);
 
+        const paymentData = paymentRes.data;
         setUser(userRes.data);
+        setPayment(paymentData);
+
+        // Fetch address using AddressId from payment
+        const addressRes = await axios.get(`http://localhost:5110/api/address/${paymentData.addressId}`, { headers });
         setAddress(addressRes.data);
-        setPayment(paymentRes.data);
       } catch (err) {
-        console.error("Failed to fetch summary data:", err);
-        alert("⚠️ Failed to load order summary. Please try again.");
+        console.error("Failed to fetch order summary:", err);
+        alert("❌ Failed to load order summary. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDetails();
-  }, []);
+    fetchSummaryData();
+  }, [navigate]);
 
   const handlePlaceOrder = async () => {
     const token = localStorage.getItem("token");
-    const addressId = localStorage.getItem("selectedAddressId");
     const paymentId = localStorage.getItem("lastPaymentId");
 
-    if (!addressId || !paymentId) {
-      alert("⚠️ Address or Payment missing. Please complete all steps.");
+    if (!paymentId || !payment?.addressId) {
+      alert("⚠️ Address or Payment ID missing. Cannot place order.");
       return;
     }
 
@@ -63,7 +62,7 @@ const OrderSummaryStep = ({
       const response = await axios.post(
         "http://localhost:5110/api/Orders/placeOrder",
         {
-          addressId: parseInt(addressId),
+          addressId: payment.addressId,
           paymentId: parseInt(paymentId),
         },
         {
@@ -75,10 +74,15 @@ const OrderSummaryStep = ({
       );
 
       const newOrderId = response.data.orderId;
+
+      // 🔁 Refresh cart count in header after placing order
+      window.dispatchEvent(new Event("cartUpdated"));
+      localStorage.removeItem("lastPaymentId");
+
       navigate(`/order-success/${newOrderId}`);
     } catch (error) {
-      console.error("Order placement failed:", error);
-      alert(error?.response?.data?.message || "❌ Failed to place order. Try again.");
+      console.error("Order placement error:", error);
+      alert(error?.response?.data?.message || "❌ Order placement failed.");
     }
   };
 
@@ -101,14 +105,14 @@ const OrderSummaryStep = ({
       </div>
 
       <div className="mb-3">
-        <h5>Payment Summary</h5>
+        <h5>Payment Details</h5>
         <p><strong>Payment Mode:</strong> {payment.paymentMode}</p>
         <p><strong>Name on Card:</strong> {payment.name}</p>
         <p><strong>Total Paid:</strong> ₹{payment.totalAmount?.toFixed(2)}</p>
       </div>
 
       <div className="mb-3">
-        <h5>Items</h5>
+        <h5>Cart Items</h5>
         <ul className="list-group list-group-flush">
           {cartItems.map(({ cartId, menu, quantity }) => (
             <li key={cartId} className="list-group-item d-flex justify-content-between">

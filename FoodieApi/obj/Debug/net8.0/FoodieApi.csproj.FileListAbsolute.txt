@@ -175,6 +175,7 @@ F:\ICT\Sem 2\Project\FoodieApi\bin\Debug\net8.0\BCrypt.Net-Next.dll
 F:\ICT\Sem 2\Project\FoodieApi\bin\Debug\net8.0\jose-jwt.dll
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\bin\Debug\net8.0\appsettings.Development.json
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\bin\Debug\net8.0\appsettings.json
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\bin\Debug\net8.0\FoodieApi.staticwebassets.runtime.json
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\bin\Debug\net8.0\FoodieApi.staticwebassets.endpoints.json
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\bin\Debug\net8.0\FoodieApi.exe
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\bin\Debug\net8.0\FoodieApi.deps.json
@@ -342,11 +343,10 @@ F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\staticwebassets\
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.FoodieApi.props
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.FoodieApi.props
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\staticwebassets.pack.json
-F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\FoodieApi.csproj.Up2Date
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\FoodieApi.dll
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\refint\FoodieApi.dll
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\FoodieApi.pdb
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\FoodieApi.genruntimeconfig.cache
 F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\ref\FoodieApi.dll
-F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\bin\Debug\net8.0\FoodieApi.staticwebassets.runtime.json
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

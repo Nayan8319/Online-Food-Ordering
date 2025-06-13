@@ -1,4 +1,5 @@
-﻿using FoodieApi.Models;
+﻿using FoodieApi.Helpers;
+using FoodieApi.Models;
 using FoodieApi.Models.Dto;
 using FoodieApi.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,7 @@ namespace FoodieApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
         private readonly FoodieOrderningContext _context;
@@ -19,7 +21,7 @@ namespace FoodieApi.Controllers
             _context = context;
         }
 
-        [Authorize(Roles = "Admin")]
+        // ✅ GET: All users with roles
         [HttpGet("allUsers")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
         {
@@ -42,7 +44,7 @@ namespace FoodieApi.Controllers
             return Ok(users);
         }
 
-        [Authorize(Roles = "Admin")]
+        // ✅ PUT: Verify or unverify user
         [HttpPut("verify/{userId}")]
         public async Task<IActionResult> SetUserVerificationStatus(int userId, [FromQuery] bool isVerified)
         {
@@ -53,24 +55,60 @@ namespace FoodieApi.Controllers
             user.IsVerified = isVerified;
             await _context.SaveChangesAsync();
 
-            return Ok($"User verification status set to {isVerified}.");
+            return Ok(new
+            {
+                Message = $"User verification status updated to {isVerified}",
+                UserId = user.UserId,
+                IsVerified = user.IsVerified
+            });
         }
 
-
-        [HttpGet("getOrderByUser")]
-        public async Task<IActionResult> GetOrdersByUser()
+        // ✅ GET: All orders (admin access)
+        [HttpGet("getAllOrders")]
+        public async Task<IActionResult> GetAllOrders()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
             var orders = await _context.Orders
+                .Include(o => o.User)
                 .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.Menu)
+                    .ThenInclude(od => od.Menu)
+                .Include(o => o.Payment)
+                .ToListAsync();
+
+            var orderDtos = orders.Select(order => new OrderDto
+            {
+                OrderId = order.OrderId,
+                UserId = order.UserId,
+                OrderNo = order.OrderNo,
+                PaymentId = order.PaymentId,
+                Status = order.Status,
+                OrderDate = order.OrderDate,
+                TotalAmount = order.TotalAmount,
+                OrderDetails = order.OrderDetails.Select(od => new OrderDetailsDto
+                {
+                    MenuId = od.MenuId,
+                    MenuName = od.Menu.Name,
+                    Quantity = od.Quantity,
+                    Price = od.Price,
+                    ImageUrl = od.Menu.ImageUrl
+                }).ToList()
+            }).ToList();
+
+            return Ok(orderDtos);
+        }
+
+        // ✅ GET: Orders by specific user (admin action)
+        [HttpGet("getOrdersByUser/{userId}")]
+        public async Task<IActionResult> GetOrdersByUser(int userId)
+        {
+            var orders = await _context.Orders
+                .Include(o => o.OrderDetails).ThenInclude(od => od.Menu)
                 .Where(o => o.UserId == userId)
                 .ToListAsync();
 
             var orderDtos = orders.Select(order => new OrderDto
             {
                 OrderId = order.OrderId,
+                UserId = order.UserId,
                 OrderNo = order.OrderNo,
                 PaymentId = order.PaymentId,
                 Status = order.Status,
@@ -81,56 +119,41 @@ namespace FoodieApi.Controllers
                     MenuId = od.MenuId,
                     MenuName = od.Menu.Name,
                     Quantity = od.Quantity,
-                    Price = od.Price
+                    Price = od.Price,
+                    ImageUrl = od.Menu.ImageUrl
                 }).ToList()
             }).ToList();
 
             return Ok(orderDtos);
         }
 
-        [HttpGet("getAllOrders")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllOrders()
+        [HttpPut("update-status/{orderId}")]
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] UpdateOrderStatusDto statusDto)
         {
-            var orders = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.Menu)
-                .Include(o => o.User)
-                .ToListAsync();
+            string newStatus = statusDto.NewStatus.ToString(); // convert enum to string
 
-            var orderDtos = orders.Select(order => new OrderDto
+            if (!OrderStatuses.All.Contains(newStatus))
             {
-                OrderId = order.OrderId,
-                OrderNo = order.OrderNo,
-                PaymentId = order.PaymentId,
-                Status = order.Status,
-                OrderDate = order.OrderDate,
-                TotalAmount = order.TotalAmount,
-                OrderDetails = order.OrderDetails.Select(od => new OrderDetailsDto
+                return BadRequest(new
                 {
-                    MenuId = od.MenuId,
-                    MenuName = od.Menu.Name,
-                    Quantity = od.Quantity,
-                    Price = od.Price
-                }).ToList()
-            }).ToList();
+                    Message = $"Invalid status. Allowed values: {string.Join(", ", OrderStatuses.All)}"
+                });
+            }
 
-            return Ok(orderDtos);
-        }
-
-        [HttpPut("update-status/{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] string newStatus)
-        {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders.FindAsync(orderId);
             if (order == null)
-                return NotFound("Order not found");
+                return NotFound(new { Message = "Order not found." });
 
             order.Status = newStatus;
+            _context.Orders.Update(order);
             await _context.SaveChangesAsync();
 
-            return Ok(new { Message = "Order status updated", Status = newStatus });
+            return Ok(new
+            {
+                Message = "Order status updated successfully",
+                OrderId = order.OrderId,
+                NewStatus = order.Status
+            });
         }
     }
 }
-

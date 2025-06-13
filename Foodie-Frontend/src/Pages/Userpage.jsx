@@ -5,6 +5,7 @@ import Tabs from "./Profile/Tabs";
 import PasswordChangeModal from "./Profile/PasswordChangeModal";
 import ProfileEditModal from "./Profile/ProfileEditModal";
 import AddressList from "./Profile/AddressList";
+import OrderHistory from "./Profile/OrderHistory"; // ✅ Import OrderHistory component
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("basicInfo");
@@ -102,9 +103,7 @@ const UserProfile = () => {
         setShowPasswordModal(false);
       })
       .catch((err) => {
-        setPasswordError(
-          err.response?.data || "Failed to change password."
-        );
+        setPasswordError(err.response?.data || "Failed to change password.");
       });
   };
 
@@ -112,7 +111,6 @@ const UserProfile = () => {
     setEditLoading(true);
     setEditError("");
     try {
-      let res;
       const formData = new FormData();
       formData.append("name", editForm.name);
       formData.append("username", editForm.username);
@@ -123,12 +121,16 @@ const UserProfile = () => {
         formData.append("imageUrl", editForm.imageUrl);
       }
 
-      res = await axios.put("http://localhost:5110/api/Auth/edit-profile", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const res = await axios.put(
+        "http://localhost:5110/api/Auth/edit-profile",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       alert(res.data || "Profile updated successfully.");
       setUserData((prev) => ({
@@ -213,10 +215,10 @@ const UserProfile = () => {
               <AddressList addresses={addresses} />
             </div>
           )}
+
           {activeTab === "orderHistory" && (
             <div className="tab-pane fade show active">
-              <h3>Order History</h3>
-              <p>No orders found.</p>
+              <OrderHistory token={token} />
             </div>
           )}
         </div>
@@ -231,20 +233,20 @@ const UserProfile = () => {
         handlePasswordChange={handlePasswordChange}
       />
 
-<ProfileEditModal
-  showEditModal={showEditModal}
-  setShowEditModal={setShowEditModal}
-  editForm={editForm}
-  setEditForm={setEditForm}
-  selectedFile={selectedFile}
-  setSelectedFile={setSelectedFile}
-  previewUrl={previewUrl}
-  setPreviewUrl={setPreviewUrl}
-  handleProfileUpdate={handleProfileUpdate}
-  editLoading={editLoading}
-  editError={editError}
-  userData={userData} // Pass user data here
-/>
+      <ProfileEditModal
+        showEditModal={showEditModal}
+        setShowEditModal={setShowEditModal}
+        editForm={editForm}
+        setEditForm={setEditForm}
+        selectedFile={selectedFile}
+        setSelectedFile={setSelectedFile}
+        previewUrl={previewUrl}
+        setPreviewUrl={setPreviewUrl}
+        handleProfileUpdate={handleProfileUpdate}
+        editLoading={editLoading}
+        editError={editError}
+        userData={userData}
+      />
     </section>
   );
 };
