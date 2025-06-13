@@ -214,7 +214,7 @@ const OrderDetails = () => {
                 <div>
                   <button
                     className="btn btn-outline-light me-2"
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate("/profile")}
                   >
                     Back
                   </button>

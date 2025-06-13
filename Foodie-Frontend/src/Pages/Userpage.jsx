@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+
 import UserInformation from "./Profile/UserInformation";
 import Tabs from "./Profile/Tabs";
 import PasswordChangeModal from "./Profile/PasswordChangeModal";
 import ProfileEditModal from "./Profile/ProfileEditModal";
 import AddressList from "./Profile/AddressList";
-import OrderHistory from "./Profile/OrderHistory"; // ✅ Import OrderHistory component
+import OrderHistory from "./Profile/OrderHistory";
 
 const UserProfile = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("basicInfo");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -97,10 +101,17 @@ const UserProfile = () => {
         }
       )
       .then((res) => {
-        alert(res.data || "Password changed successfully!");
-        setPasswordForm({ current: "", new: "", confirm: "" });
-        setPasswordError("");
-        setShowPasswordModal(false);
+        Swal.fire({
+          icon: "success",
+          title: "Password Changed",
+          text: "You will be logged out now.",
+          timer: 2500,
+          showConfirmButton: false,
+        }).then(() => {
+          localStorage.removeItem("token");
+          navigate("/login");
+          window.location.reload();
+        });
       })
       .catch((err) => {
         setPasswordError(err.response?.data || "Failed to change password.");
@@ -132,15 +143,13 @@ const UserProfile = () => {
         }
       );
 
-      alert(res.data || "Profile updated successfully.");
-      setUserData((prev) => ({
-        ...prev,
-        name: editForm.name,
-        username: editForm.username,
-        mobile: editForm.mobile,
-        imageUrl: previewUrl || prev.imageUrl,
-      }));
-      setShowEditModal(false);
+      Swal.fire({
+        icon: "success",
+        title: "Profile Updated",
+        text: res.data || "Your profile has been updated.",
+        timer: 2000,
+        showConfirmButton: false,
+      }).then(() => window.location.reload());
     } catch (error) {
       setEditError(error.response?.data || "Failed to update profile.");
     } finally {
