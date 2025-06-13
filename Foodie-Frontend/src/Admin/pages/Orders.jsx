@@ -5,10 +5,10 @@ import {
   Button, TextField, MenuItem, Chip
 } from "@mui/material";
 import Swal from "sweetalert2";
+import { CSVLink } from "react-csv";
 
-// Match your backend enum
 const statusOptions = [
-  // { label: "Placed", value: 0 },
+
   { label: "Confirmed", value: 1 },
   { label: "OutForDelivery", value: 2 },
   { label: "Delivered", value: 3 }
@@ -17,6 +17,7 @@ const statusOptions = [
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
+  const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortKey, setSortKey] = useState("");
@@ -26,8 +27,8 @@ export default function Orders() {
   }, []);
 
   useEffect(() => {
-    handleSort();
-  }, [sortKey, orders]);
+    filterAndSortOrders();
+  }, [sortKey, orders, searchText]);
 
   const fetchOrders = async () => {
     try {
@@ -55,14 +56,33 @@ export default function Orders() {
     }, 5 * 60 * 1000); // 5 minutes
   };
 
-  const handleSort = () => {
-    let sorted = [...orders];
-    if (sortKey === "amount") {
-      sorted.sort((a, b) => b.totalAmount - a.totalAmount);
-    } else if (sortKey === "date") {
-      sorted.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+  const filterAndSortOrders = () => {
+    let result = [...orders];
+
+    // Search filter
+    if (searchText.trim() !== "") {
+      result = result.filter(order =>
+        order.orderNo.toLowerCase().includes(searchText.toLowerCase()) ||
+        order.status.toLowerCase().includes(searchText.toLowerCase())
+      );
     }
-    setFilteredOrders(sorted);
+
+    // Sort logic
+    switch (sortKey) {
+      case "amount":
+        result.sort((a, b) => b.totalAmount - a.totalAmount);
+        break;
+      case "date":
+        result.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+        break;
+      case "status":
+        result.sort((a, b) => a.status.localeCompare(b.status));
+        break;
+      default:
+        break;
+    }
+
+    setFilteredOrders(result);
     setPage(0);
   };
 
@@ -143,18 +163,35 @@ export default function Orders() {
       </Typography>
       <Divider />
 
-      <Stack direction="row" spacing={2} sx={{ mt: 2, mb: 2 }}>
-        <TextField
-          select
-          label="Sort by"
-          size="small"
-          value={sortKey}
-          onChange={(e) => setSortKey(e.target.value)}
-        >
-          <MenuItem value="">None</MenuItem>
-          <MenuItem value="amount">Amount</MenuItem>
-          <MenuItem value="date">Date</MenuItem>
-        </TextField>
+      <Stack direction="row" spacing={2} sx={{ mt: 2, mb: 2 }} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+        <Stack direction="row" spacing={2}>
+          <TextField
+            label="Search"
+            size="small"
+            variant="outlined"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+          <TextField
+            select
+            label="Sort by"
+            size="small"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value)}
+          >
+            <MenuItem value="">None</MenuItem>
+            <MenuItem value="amount">Amount</MenuItem>
+            <MenuItem value="date">Date</MenuItem>
+            <MenuItem value="status">Status</MenuItem>
+          </TextField>
+        </Stack>
+        {filteredOrders.length > 0 && (
+          <CSVLink data={filteredOrders} filename="all_orders.csv">
+            <Button variant="contained" color="secondary">
+              Export CSV
+            </Button>
+          </CSVLink>
+        )}
       </Stack>
 
       <TableContainer>
@@ -184,9 +221,7 @@ export default function Orders() {
                   <TableRow key={order.orderId}>
                     <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell>{order.orderNo}</TableCell>
-                    <TableCell>
-                      {new Date(order.orderDate).toLocaleDateString()}
-                    </TableCell>
+                    <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Chip
                         label={order.status}
@@ -211,9 +246,7 @@ export default function Orders() {
                         <Button
                           variant="outlined"
                           size="small"
-                          onClick={() =>
-                            handleChangeStatus(order.orderId, order.status)
-                          }
+                          onClick={() => handleChangeStatus(order.orderId, order.status)}
                         >
                           Change Status
                         </Button>

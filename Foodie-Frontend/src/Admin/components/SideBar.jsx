@@ -111,7 +111,7 @@ const Sidebar = ({ collapsed: initialCollapsed }) => {
             <BsFillArchiveFill size={24} className={collapsed ? "" : "me-2"} />
             {!collapsed && (
               <>
-                <span>Products</span>
+                <span>Menus</span>
                 <span className="ms-auto">{productDropdownOpen ? <BsChevronUp /> : <BsChevronDown />}</span>
               </>
             )}
@@ -126,7 +126,7 @@ const Sidebar = ({ collapsed: initialCollapsed }) => {
                     `text-decoration-none text-dark d-block py-1 px-2 ${isActive ? "active" : ""}`
                   }
                 >
-                  List Product
+                  List Menu
                 </NavLink>
               </li>
               <li>
@@ -136,7 +136,7 @@ const Sidebar = ({ collapsed: initialCollapsed }) => {
                     `text-decoration-none text-dark d-block py-1 px-2 ${isActive ? "active" : ""}`
                   }
                 >
-                  Add Product
+                  Add Menu
                 </NavLink>
               </li>
             </ul>
@@ -232,20 +232,6 @@ const Sidebar = ({ collapsed: initialCollapsed }) => {
           </NavLink>
         </li>
 
-        <li className="mb-3 w-100">
-          <NavLink
-            to="/admin/settings"
-            className={({ isActive }) =>
-              `d-flex align-items-center text-decoration-none text-dark px-2 py-1 w-100 ${
-                isActive ? "active" : ""
-              }`
-            }
-            style={{ justifyContent: collapsed ? "center" : "flex-start" }}
-          >
-            <BsFillGearFill size={24} className={collapsed ? "" : "me-2"} />
-            {!collapsed && "Settings"}
-          </NavLink>
-        </li>
       </ul>
 
       <ul className="list-unstyled p-0 m-0 w-100">

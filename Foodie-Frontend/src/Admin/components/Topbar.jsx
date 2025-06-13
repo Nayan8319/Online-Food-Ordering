@@ -1,15 +1,7 @@
 import React from "react";
 import { Navbar } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 
-const Topbar = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
+const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
   return (
     <Navbar
       expand="lg"
@@ -21,15 +13,19 @@ const Topbar = () => {
       }}
       variant="dark"
     >
-      {/* Brand / Title */}
+      {/* Toggle button for Sidebar (optional) */}
+      <button
+        className="btn btn-outline-light me-2 d-lg-none"
+        onClick={onToggleSidebar}
+      >
+        <i className="fas fa-bars"></i>
+      </button>
+
+      {/* Brand */}
       <span className="text-warning fw-bold fs-4 me-auto">FoodieAdmin</span>
 
-      {/* Home + User dropdown (desktop only) */}
-      <div className="d-none d-lg-flex align-items-center">
-        <a href="/admin/dashboard" className="nav-link text-white me-3">
-          <i className="fas fa-home me-1"></i> Home
-        </a>
-
+      {/* User Dropdown */}
+      <div className="d-flex align-items-center">
         <div className="dropdown">
           <button
             className="btn text-white dropdown-toggle"
@@ -43,18 +39,12 @@ const Topbar = () => {
           </button>
           <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
             <li>
-              <a className="dropdown-item" href="#">
+              <button className="dropdown-item" onClick={onEditProfileClick}>
                 Edit Profile
-              </a>
+              </button>
             </li>
             <li>
-              <a className="dropdown-item" href="#">
-                Change Password
-              </a>
-            </li>
-            <li><hr className="dropdown-divider" /></li>
-            <li>
-              <button className="dropdown-item text-danger" onClick={handleLogout}>
+              <button className="dropdown-item text-danger" onClick={onLogout}>
                 <i className="fas fa-sign-out-alt me-2" /> Logout
               </button>
             </li>

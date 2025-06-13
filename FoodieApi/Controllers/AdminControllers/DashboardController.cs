@@ -119,5 +119,79 @@ namespace FoodieApi.Controllers
 
             return Ok(chartData);
         }
+
+        [HttpGet("today-orders")]
+        public async Task<IActionResult> GetTodayOrdersForCsv()
+        {
+            var today = DateTime.Today;
+
+            var orders = await _context.Orders
+                .Where(o => o.OrderDate.Date == today)
+                .Include(o => o.User)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Menu)
+                .ToListAsync();
+
+            var exportData = orders.SelectMany(order => order.OrderDetails.Select(detail => new
+            {
+                OrderId = order.OrderId,
+                OrderNo = order.OrderNo,
+                Username = order.User.Username,
+                OrderDate = order.OrderDate.ToString("yyyy-MM-dd HH:mm"),
+                Status = order.Status,
+                TotalAmount = order.TotalAmount,
+                OrderDetails = order.OrderDetails.Select(detail => new
+                {
+                    MenuId = detail.MenuId,
+                    MenuName = detail.Menu.Name,
+                    Quantity = detail.Quantity,
+                    Price = detail.Price,
+                    ImageUrl = detail.Menu.ImageUrl
+                }).ToList()
+
+            })).ToList();
+
+            return Ok(exportData);
+        }
+
+        [HttpGet("orders-by-date")]
+        public async Task<IActionResult> GetOrdersByDate([FromQuery] string date)
+        {
+            if (!DateTime.TryParse(date, out DateTime parsedDate))
+            {
+                return BadRequest(new { message = "Invalid date format. Please use a recognizable date format like yyyy-MM-dd or yyyy/MM/dd." });
+            }
+
+            var orders = await _context.Orders
+                .Where(o => o.OrderDate.Date == parsedDate.Date)
+                .Include(o => o.User)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Menu)
+                .ToListAsync();
+
+            var response = orders.Select(order => new
+            {
+                order.OrderId,
+                UserId = order.UserId,
+                UserName = order.User.Username, // or FullName if preferred
+                order.OrderNo,
+                order.PaymentId,
+                order.Status,
+                order.OrderDate,
+                order.TotalAmount,
+                OrderDetails = order.OrderDetails.Select(detail => new
+                {
+                    MenuId = detail.MenuId,
+                    MenuName = detail.Menu.Name,
+                    Quantity = detail.Quantity,
+                    Price = detail.Price,
+                    ImageUrl = detail.Menu.ImageUrl
+                }).ToList()
+            });
+
+            return Ok(response);
+        }
+
+
     }
 }

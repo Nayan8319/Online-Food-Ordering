@@ -135,7 +135,7 @@ export default function ProductList() {
 
     const csv = Papa.unparse(dataToExport);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    saveAs(blob, "products.csv");
+    saveAs(blob, "Menus.csv");
   };
 
   const deleteProduct = async (id) => {
@@ -221,7 +221,7 @@ export default function ProductList() {
   return (
     <Paper sx={{ width: "98%", overflow: "hidden", padding: "12px" }}>
       <Typography gutterBottom variant="h5" sx={{ padding: "20px" }}>
-        Products List
+        Menus List
       </Typography>
       <Divider />
 
