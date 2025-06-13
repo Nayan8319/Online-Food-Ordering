@@ -584,6 +584,22 @@
   },
   {
     "ContainingType": "FoodieApi.Controllers.DashboardController",
+    "Method": "GetSalesChart",
+    "RelativePath": "api/Dashboard/sales-chart",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "range",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FoodieApi.Controllers.DashboardController",
     "Method": "GetDashboardStats",
     "RelativePath": "api/Dashboard/stats",
     "HttpMethod": "GET",
