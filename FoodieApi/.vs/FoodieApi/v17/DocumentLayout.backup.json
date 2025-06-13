@@ -228,7 +228,7 @@
               "RelativeDocumentMoniker": "Controllers\\AdminControllers\\DashboardController.cs",
               "ToolTip": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\Controllers\\AdminControllers\\DashboardController.cs",
               "RelativeToolTip": "Controllers\\AdminControllers\\DashboardController.cs",
-              "ViewState": "AgIAABkAAAAAAAAAAAAIwEIAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAF8AAAAAAAAAAAAwwHsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-13T06:44:38.773Z",
               "EditorCaption": ""
@@ -243,8 +243,7 @@
               "RelativeToolTip": "Models\\DTO\\DashboardDto.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-06-13T06:43:51.506Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-13T06:43:51.506Z"
             },
             {
               "$type": "Document",
@@ -328,8 +327,7 @@
               "RelativeToolTip": "Controllers\\AdminControllers\\UserDetailsController.cs",
               "ViewState": "AgIAAIMAAAAAAAAAAAAwwJ8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-29T08:03:58.141Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-29T08:03:58.141Z"
             },
             {
               "$type": "Document",

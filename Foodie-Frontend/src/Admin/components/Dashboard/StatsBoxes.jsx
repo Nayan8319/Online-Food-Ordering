@@ -43,7 +43,7 @@ const StatsBoxes = () => {
 
   return (
     <Row className="g-4">
-      <Col md={3}>
+      <Col md={6}>
         <Card className="stat-card gradient-green text-white">
           <div className="d-flex justify-content-between align-items-center">
             <div>
@@ -56,7 +56,7 @@ const StatsBoxes = () => {
         </Card>
       </Col>
 
-      <Col md={3}>
+      <Col md={6}>
         <Card className="stat-card gradient-pink text-white">
           <div className="d-flex justify-content-between align-items-center">
             <div>
@@ -69,7 +69,7 @@ const StatsBoxes = () => {
         </Card>
       </Col>
 
-      <Col md={3}>
+      <Col md={6}>
         <Card className="stat-card gradient-blue text-white">
           <div className="d-flex justify-content-between align-items-center">
             <div>
@@ -82,7 +82,7 @@ const StatsBoxes = () => {
         </Card>
       </Col>
 
-      <Col md={3}>
+      <Col md={6}>
         <Card className="stat-card gradient-yellow text-white">
           <div className="d-flex justify-content-between align-items-center">
             <div>

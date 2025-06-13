@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import StatsBoxes from "../components/Dashboard/StatsBoxes";
-// import SalesPieChart from "../components/Dashboard/SalesPieChart";
+import SalesPieChart from "../components/Dashboard/SalesPieChart";
 import SalesOverviewChart from "../components/Dashboard/SalesOverviewChart";
 import RecentOrders from "../components/Dashboard/RecentOrders";
 import ProductTable from "../components/Dashboard/ProductTable";
@@ -54,14 +54,21 @@ const AdminDashboard = () => {
   return (
     <Container fluid className="p-4">
       <Row className="mb-4">
-        <StatsBoxes />
-        <Col md={6}>
-          {/* <SalesPieChart data={salesData.monthly} totalSales={totalSales} /> */}
+        <Col md={8}>
+          <StatsBoxes />
+        </Col>
+        <Col md={4}>
+          <SalesPieChart data={salesData.monthly} totalSales={totalSales} />
         </Col>
       </Row>
+
       <Row className="mb-4">
         <Col md={6}>
-          <SalesOverviewChart timeRange={timeRange} setTimeRange={setTimeRange} data={salesData[timeRange]} />
+          <SalesOverviewChart
+            timeRange={timeRange}
+            setTimeRange={setTimeRange}
+            data={salesData[timeRange]}
+          />
         </Col>
         <Col md={6}>
           <RecentOrders orders={recentOrders} />

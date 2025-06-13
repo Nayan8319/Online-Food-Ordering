@@ -1,17 +1,24 @@
+/* Card Container */
 .stat-card {
   border: none;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  transition: transform 0.2s ease;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 140px;
 }
 
+/* Hover Effect */
 .stat-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.15);
 }
 
-/* Gradients based on your image */
+/* Gradients - modern and clean */
 .gradient-green {
   background: linear-gradient(135deg, #00c851, #33b5e5);
 }
@@ -28,14 +35,30 @@
   background: linear-gradient(135deg, #ffb300, #fdd835);
 }
 
-.stat-card h2 {
-  margin: 0;
-  font-weight: 700;
-}
-
+/* Headings & Typography */
 .stat-card h6 {
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
   font-size: 13px;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+.stat-card h2 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 26px;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* Responsive icon size and alignment */
+.stat-card svg {
+  margin-left: 10px;
+  opacity: 0.9;
 }
