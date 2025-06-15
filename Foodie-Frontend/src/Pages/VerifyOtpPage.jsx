@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import OtpInput from "react-otp-input";
+import Swal from "sweetalert2";
 import {
   Avatar,
   Button,
@@ -18,6 +19,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 const VerifyOtpPage = () => {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
+  const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -28,11 +30,37 @@ const VerifyOtpPage = () => {
     if (localStorage.getItem("token")) {
       navigate("/", { replace: true });
     }
+
+    const savedExpire = localStorage.getItem("otpCooldownExpire");
+    const remaining = savedExpire ? Math.floor((+savedExpire - Date.now()) / 1000) : 0;
+    if (remaining > 0) {
+      setCountdown(remaining);
+    }
   }, [navigate]);
+
+  useEffect(() => {
+    let timer;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            localStorage.removeItem("otpCooldownExpire");
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [countdown]);
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
-    if (!otp) return setError("Please enter OTP");
+    if (!otp) {
+      setError("Please enter OTP");
+      return;
+    }
 
     const verifyData = { ...pendingUser, otp };
 
@@ -44,15 +72,30 @@ const VerifyOtpPage = () => {
       });
 
       if (response.ok) {
-        alert("Registration successful!");
+        Swal.fire({
+          icon: "success",
+          title: "Registration Successful!",
+          text: "Your account has been verified.",
+          confirmButtonColor: "#3085d6",
+        });
         localStorage.removeItem("pendingUser");
         navigate("/login");
       } else {
         const data = await response.text();
         setError(data || "OTP verification failed");
+        Swal.fire({
+          icon: "error",
+          title: "Verification Failed",
+          text: data || "Invalid OTP. Please try again.",
+        });
       }
     } catch (err) {
       setError("Error verifying OTP");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred during OTP verification. Try again.",
+      });
     }
   };
 
@@ -63,7 +106,8 @@ const VerifyOtpPage = () => {
 
   const handleResendOtp = async () => {
     if (!pendingUser || !pendingUser.email) {
-      return setError("Email not found. Please register again.");
+      setError("Email not found. Please register again.");
+      return;
     }
 
     try {
@@ -74,13 +118,30 @@ const VerifyOtpPage = () => {
       });
 
       if (response.ok) {
-        alert("OTP resent to your email.");
+        Swal.fire({
+          icon: "success",
+          title: "OTP Sent",
+          text: "A new OTP has been sent to your email.",
+        });
+        const expireTime = Date.now() + 30000;
+        localStorage.setItem("otpCooldownExpire", expireTime.toString());
+        setCountdown(30);
       } else {
         const data = await response.json();
         setError(data.errors?.email || "Failed to resend OTP.");
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Resend",
+          text: data.errors?.email || "Try again later.",
+        });
       }
     } catch (error) {
       setError("An error occurred while resending OTP.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Unable to resend OTP. Please try again.",
+      });
     }
   };
 
@@ -173,16 +234,25 @@ const VerifyOtpPage = () => {
                   Cancel
                 </Button>
               </Box>
+
+              {/* ✅ Countdown display below buttons */}
+              {countdown > 0 && (
+                <Typography sx={{ mt: 2 }} color="textSecondary">
+                  Resend OTP in {countdown}s
+                </Typography>
+              )}
             </form>
           </Grid>
 
           <Grid item xs={12} sx={{ mt: 2 }}>
-            <Typography variant="body2">
-              Didn't receive OTP?{" "}
-              <Button size="small" color="primary" onClick={handleResendOtp}>
-                Resend OTP
-              </Button>
-            </Typography>
+            {!countdown && (
+              <Typography variant="body2">
+                Didn't receive OTP?{" "}
+                <Button size="small" color="primary" onClick={handleResendOtp}>
+                  Resend OTP
+                </Button>
+              </Typography>
+            )}
           </Grid>
         </Grid>
       </Box>

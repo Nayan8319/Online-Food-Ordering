@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 const PaymentStep = ({ payment, setPayment, onSuccess }) => {
   const [address, setAddress] = useState(null);
@@ -12,7 +13,7 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
       const savedAddress = savedAddressJson ? JSON.parse(savedAddressJson) : null;
 
       if (!token || !savedAddress) {
-        alert("Missing token or selected address. Please complete previous steps.");
+        Swal.fire("Error", "Missing token or selected address. Please complete previous steps.", "error");
         setLoading(false);
         return;
       }
@@ -27,7 +28,7 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
         setTotalAmount(cartRes.totalAmount || 0);
       } catch (error) {
         console.error("Error fetching cart:", error);
-        alert("Failed to fetch cart data. Please try again.");
+        Swal.fire("Error", "Failed to fetch cart data. Please try again.", "error");
       } finally {
         setLoading(false);
       }
@@ -44,42 +45,59 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
     return new Date(fullYear, parseInt(month) - 1, 1).toISOString();
   };
 
-  const handleSubmitPayment = async () => {
-    const savedAddressJson = localStorage.getItem("selectedAddress");
-    const selectedAddress = savedAddressJson ? JSON.parse(savedAddressJson) : null;
+  const validateInputs = () => {
+    const { cardName, cardNumber, expiryDate, cvv, mode } = payment;
 
-    if (
-      !payment.mode ||
-      !payment.cardName ||
-      !payment.cardNumber ||
-      !payment.expiryDate ||
-      !payment.cvv
-    ) {
-      alert("Please fill in all payment fields.");
-      return;
+    if (!mode || !cardName || !cardNumber || !expiryDate || !cvv) {
+      Swal.fire("Warning", "Please fill in all payment fields.", "warning");
+      return false;
     }
 
-    const expiryDateISO = convertExpiryDate(payment.expiryDate);
-    if (!expiryDateISO) {
-      alert("Invalid expiry date format. Use MM/YY.");
-      return;
+    if (!/^\d{16}$/.test(cardNumber)) {
+      Swal.fire("Error", "Card number must be exactly 16 digits.", "error");
+      return false;
     }
 
-    if (!selectedAddress || !selectedAddress.addressId) {
-      alert("No delivery address selected.");
-      return;
+    if (!/^\d{3,4}$/.test(cvv)) {
+      Swal.fire("Error", "CVV must be 3 or 4 digits.", "error");
+      return false;
+    }
+
+    if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+      Swal.fire("Error", "Expiry date must be in MM/YY format.", "error");
+      return false;
+    }
+
+    const now = new Date();
+    const expiry = convertExpiryDate(expiryDate);
+    if (!expiry || new Date(expiry) < now) {
+      Swal.fire("Error", "Expiry date is invalid or in the past.", "error");
+      return false;
+    }
+
+    if (!address || !address.addressId) {
+      Swal.fire("Error", "No delivery address selected.", "error");
+      return false;
     }
 
     if (totalAmount <= 0) {
-      alert("Cart total amount is zero or invalid.");
-      return;
+      Swal.fire("Error", "Cart total amount is zero or invalid.", "error");
+      return false;
     }
+
+    return true;
+  };
+
+  const handleSubmitPayment = async () => {
+    if (!validateInputs()) return;
+
+    const expiryDateISO = convertExpiryDate(payment.expiryDate);
 
     const payload = {
       name: payment.cardName,
       expiryDate: expiryDateISO,
       cvvNo: parseInt(payment.cvv),
-      addressId: selectedAddress.addressId,
+      addressId: address.addressId,
       paymentMode: payment.mode,
       totalAmount: parseFloat(totalAmount),
     };
@@ -103,11 +121,11 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
       const data = await response.json();
       localStorage.setItem("lastPaymentId", data.paymentId);
 
-      alert("✅ Payment saved successfully!");
+      Swal.fire("Success", "✅ Payment saved successfully!", "success");
       if (onSuccess) onSuccess(data.paymentId);
     } catch (error) {
       console.error("Payment saving failed:", error);
-      alert(error.message || "❌ Failed to save payment. Please try again.");
+      Swal.fire("Error", error.message || "❌ Failed to save payment. Please try again.", "error");
     }
   };
 
@@ -166,8 +184,13 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
         <label>Card Number</label>
         <input
           className="form-control"
+          maxLength={16}
+          inputMode="numeric"
           value={payment.cardNumber}
-          onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })}
+          onChange={(e) => {
+            const onlyDigits = e.target.value.replace(/\D/g, "");
+            setPayment({ ...payment, cardNumber: onlyDigits });
+          }}
         />
       </div>
 
@@ -178,10 +201,15 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
             className="form-control"
             placeholder="MM/YY"
             maxLength={5}
+            inputMode="numeric"
             value={payment.expiryDate}
-            onChange={(e) =>
-              setPayment({ ...payment, expiryDate: e.target.value })
-            }
+            onChange={(e) => {
+              let val = e.target.value.replace(/[^0-9/]/g, "");
+              if (val.length === 2 && !val.includes("/")) {
+                val += "/";
+              }
+              setPayment({ ...payment, expiryDate: val });
+            }}
           />
         </div>
         <div className="col-md-6 mb-3">
@@ -189,9 +217,13 @@ const PaymentStep = ({ payment, setPayment, onSuccess }) => {
           <input
             className="form-control"
             type="password"
+            inputMode="numeric"
             maxLength={4}
             value={payment.cvv}
-            onChange={(e) => setPayment({ ...payment, cvv: e.target.value })}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "");
+              setPayment({ ...payment, cvv: digits });
+            }}
           />
         </div>
       </div>

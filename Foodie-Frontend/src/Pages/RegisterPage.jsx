@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -8,10 +9,12 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  // Handle Image Upload and Preview
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -23,38 +26,42 @@ const RegisterPage = () => {
     }
   };
 
-  // Validate form fields
   const validateForm = () => {
-    if (!name || !username || !mobile || !email || !password) {
-      setErrorMessage("All fields are required");
-      return false;
+    let validationErrors = {};
+    if (!name) validationErrors.name = "Name is required";
+    if (!username) validationErrors.username = "Username is required";
+
+    if (!mobile) {
+      validationErrors.mobile = "Mobile number is required";
+    } else if (!/^[0-9]{10}$/.test(mobile)) {
+      validationErrors.mobile = "Enter a valid 10-digit mobile number";
     }
 
-    // Validate email format
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(email)) {
-      setErrorMessage("Please enter a valid email address");
-      return false;
+    if (!email) {
+      validationErrors.email = "Email is required";
+    } else if (
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+    ) {
+      validationErrors.email = "Enter a valid email address";
     }
 
-    // Validate mobile number format (simple validation for 10 digits)
-    const mobileRegex = /^[0-9]{10}$/;
-    if (!mobileRegex.test(mobile)) {
-      setErrorMessage("Please enter a valid 10-digit mobile number");
-      return false;
+    if (!password) {
+      validationErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      validationErrors.password = "Password must be at least 8 characters";
     }
 
-    return true;
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Validate form fields before submitting
-    if (!validateForm()) {
-      return;
-    }
-  
+
+    if (!validateForm()) return;
+
+    setLoading(true);
+
     try {
       const response = await fetch("http://localhost:5110/api/Auth/register", {
         method: "POST",
@@ -67,41 +74,54 @@ const RegisterPage = () => {
           mobile,
           email,
           password,
-          imageUrl, // Include image URL if set
+          imageUrl,
         }),
       });
-  
+
       if (response.ok) {
         localStorage.setItem(
           "pendingUser",
           JSON.stringify({ name, username, mobile, email, password, imageUrl })
         );
-        alert("OTP sent to your email. Please verify to complete registration.");
+
+        await Swal.fire({
+          icon: "success",
+          title: "Registration Successful",
+          text: "OTP sent to your email. Please verify to complete registration.",
+        });
+
         navigate("/verify-otp");
       } else {
         const data = await response.text();
-        setErrorMessage(data || "Registration failed. Please try again.");
+        await Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: data || "Something went wrong.",
+        });
       }
     } catch (error) {
-      setErrorMessage("An error occurred while sending OTP. Please try again.");
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred while sending OTP. Please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   return (
     <section className="book_section layout_padding">
       <div className="container">
         <div className="heading_container text-center">
           <h2>User Registration</h2>
-          {errorMessage && (
-            <div className="alert alert-danger text-center">{errorMessage}</div>
-          )}
         </div>
 
         <div className="row justify-content-center">
           <div className="col-md-6">
             <form onSubmit={handleSubmit} className="form_container">
               <div className="mb-3">
+                {errors.name && <div className="text-danger">{errors.name}</div>}
                 <input
                   type="text"
                   className="form-control"
@@ -112,6 +132,9 @@ const RegisterPage = () => {
               </div>
 
               <div className="mb-3">
+                {errors.username && (
+                  <div className="text-danger">{errors.username}</div>
+                )}
                 <input
                   type="text"
                   className="form-control"
@@ -122,6 +145,9 @@ const RegisterPage = () => {
               </div>
 
               <div className="mb-3">
+                {errors.mobile && (
+                  <div className="text-danger">{errors.mobile}</div>
+                )}
                 <input
                   type="text"
                   className="form-control"
@@ -132,6 +158,9 @@ const RegisterPage = () => {
               </div>
 
               <div className="mb-3">
+                {errors.email && (
+                  <div className="text-danger">{errors.email}</div>
+                )}
                 <input
                   type="email"
                   className="form-control"
@@ -142,6 +171,9 @@ const RegisterPage = () => {
               </div>
 
               <div className="mb-3">
+                {errors.password && (
+                  <div className="text-danger">{errors.password}</div>
+                )}
                 <input
                   type="password"
                   className="form-control"
@@ -163,6 +195,7 @@ const RegisterPage = () => {
                     alt="Preview"
                     width="100"
                     height="100"
+                    className="mt-2"
                   />
                 )}
               </div>
@@ -171,9 +204,10 @@ const RegisterPage = () => {
                 <button
                   type="submit"
                   className="btn btn-success rounded-pill px-4"
+                  disabled={loading}
                   style={{ marginRight: "10px" }}
                 >
-                  Register
+                  {loading ? "Registering..." : "Register"}
                 </button>
                 <span className="pl-3">
                   Already registered?{" "}

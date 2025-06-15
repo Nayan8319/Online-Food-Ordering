@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import OtpInput from "react-otp-input";
+import Swal from "sweetalert2";
 import {
   Avatar,
   Button,
@@ -21,23 +22,32 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: Reset Password
+  const [step, setStep] = useState(1);
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // States to control password visibility
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [newPassError, setNewPassError] = useState("");
+  const [confirmPassError, setConfirmPassError] = useState("");
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
+  const showAlert = (type, text) => {
+    Swal.fire({
+      icon: type,
+      title: text,
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  };
+
   const handleEmailSubmit = async () => {
-    setMessage("");
     setLoading(true);
     try {
       const res = await fetch("http://localhost:5110/api/Auth/forgot-password", {
@@ -48,19 +58,18 @@ const ForgotPassword = () => {
 
       const data = await res.text();
       if (res.ok) {
-        setMessage("OTP sent to your email.");
+        showAlert("success", "OTP sent to your email.");
         setStep(2);
       } else {
-        setMessage(data || "Failed to send OTP.");
+        showAlert("error", data || "Failed to send OTP.");
       }
-    } catch (error) {
-      setMessage("Something went wrong.");
+    } catch {
+      showAlert("error", "Something went wrong.");
     }
     setLoading(false);
   };
 
   const handleResendOtp = async () => {
-    setMessage("");
     setLoading(true);
     try {
       const response = await fetch("http://localhost:5110/api/Auth/resend-otp", {
@@ -71,18 +80,17 @@ const ForgotPassword = () => {
 
       const data = await response.text();
       if (response.ok) {
-        setMessage("OTP resent to your email.");
+        showAlert("success", "OTP resent to your email.");
       } else {
-        setMessage(data || "Failed to resend OTP.");
+        showAlert("error", data || "Failed to resend OTP.");
       }
     } catch {
-      setMessage("Error resending OTP.");
+      showAlert("error", "Error resending OTP.");
     }
     setLoading(false);
   };
 
   const handleOtpSubmit = async () => {
-    setMessage("");
     setLoading(true);
     try {
       const res = await fetch("http://localhost:5110/api/Auth/verify-forgot-otp", {
@@ -93,24 +101,38 @@ const ForgotPassword = () => {
 
       const data = await res.text();
       if (res.ok) {
-        setMessage("OTP verified. You can now reset your password.");
+        showAlert("success", "OTP verified successfully.");
         setStep(3);
       } else {
-        setMessage(data || "Invalid OTP.");
+        showAlert("error", data || "Invalid OTP.");
       }
-    } catch (error) {
-      setMessage("Error verifying OTP.");
+    } catch {
+      showAlert("error", "Error verifying OTP.");
     }
     setLoading(false);
   };
 
-  const handleResetPassword = async () => {
-    if (newPassword !== confirmPassword) {
-      setMessage("Passwords do not match.");
-      return;
+  const validatePasswords = () => {
+    let valid = true;
+    setNewPassError("");
+    setConfirmPassError("");
+
+    if (newPassword.length < 8) {
+      setNewPassError("Password must be at least 8 characters.");
+      valid = false;
     }
 
-    setMessage("");
+    if (confirmPassword !== newPassword) {
+      setConfirmPassError("Passwords do not match.");
+      valid = false;
+    }
+
+    return valid;
+  };
+
+  const handleResetPassword = async () => {
+    if (!validatePasswords()) return;
+
     setLoading(true);
     try {
       const res = await fetch("http://localhost:5110/api/Auth/reset-password", {
@@ -121,13 +143,13 @@ const ForgotPassword = () => {
 
       const data = await res.text();
       if (res.ok) {
-        setMessage("Password reset successfully. Redirecting to login...");
+        showAlert("success", "Password reset successfully.");
         setTimeout(() => navigate("/login"), 2000);
       } else {
-        setMessage(data || "Failed to reset password.");
+        showAlert("error", data || "Failed to reset password.");
       }
-    } catch (error) {
-      setMessage("Error resetting password.");
+    } catch {
+      showAlert("error", "Error resetting password.");
     }
     setLoading(false);
   };
@@ -137,9 +159,9 @@ const ForgotPassword = () => {
       <Box
         sx={{
           marginTop: 20,
-          marginBottom: 20, // Added bottom padding/margin
+          marginBottom: 20,
           paddingTop: 4,
-          paddingBottom: 4, // Added padding top and bottom
+          paddingBottom: 4,
           paddingX: 4,
           backgroundColor: "#f5f5f5",
           borderRadius: 2,
@@ -157,20 +179,6 @@ const ForgotPassword = () => {
               Forgot Password
             </Typography>
           </Grid>
-          {message && (
-            <Grid item xs={12}>
-              <Paper
-                sx={{
-                  backgroundColor: "#fdecea",
-                  color: "#b71c1c",
-                  p: 2,
-                  textAlign: "center",
-                }}
-              >
-                {message}
-              </Paper>
-            </Grid>
-          )}
 
           {step === 1 && (
             <Grid item xs={12} width="100%">
@@ -267,11 +275,12 @@ const ForgotPassword = () => {
                 margin="normal"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                error={!!newPassError}
+                helperText={newPassError}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        aria-label="toggle new password visibility"
                         onClick={() => setShowNewPassword(!showNewPassword)}
                         edge="end"
                       >
@@ -288,11 +297,12 @@ const ForgotPassword = () => {
                 margin="normal"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                error={!!confirmPassError}
+                helperText={confirmPassError}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        aria-label="toggle confirm password visibility"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         edge="end"
                       >
@@ -308,7 +318,7 @@ const ForgotPassword = () => {
                 fullWidth
                 sx={{ mt: 2 }}
                 onClick={handleResetPassword}
-                disabled={loading || !newPassword || !confirmPassword}
+                disabled={loading}
               >
                 {loading ? "Resetting..." : "Reset Password"}
               </Button>

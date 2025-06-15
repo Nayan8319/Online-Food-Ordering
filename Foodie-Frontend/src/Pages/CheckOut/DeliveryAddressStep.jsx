@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
   const [savedAddresses, setSavedAddresses] = useState([]);
@@ -19,12 +20,15 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const response = await axios.get(`${API_BASE}/allAddress`, {
-          headers,
-        });
-        setSavedAddresses(response.data || []);
+        const response = await axios.get(`${API_BASE}/allAddress`, { headers });
+        const addresses = response.data || [];
+        setSavedAddresses(addresses);
+        if (addresses.length === 0) {
+          setIsEditing(true); // no address => enable form
+        }
       } catch (err) {
         setError("Failed to fetch addresses");
+        Swal.fire("Error", "Could not fetch saved addresses", "error");
       } finally {
         setLoading(false);
       }
@@ -55,25 +59,33 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
 
   const handleEditClick = () => setIsEditing(true);
 
+  const validateZip = (zip) => /^\d{6}$/.test(zip);
+
   const handleSaveToBackend = async () => {
     const { street, city, state, zip, addressId } = address;
+
     if (!street || !city || !state || !zip) {
-      alert("Please fill all fields.");
+      Swal.fire("Missing Fields", "Please fill all the fields.", "warning");
+      return;
+    }
+
+    if (!validateZip(zip)) {
+      Swal.fire("Invalid Zip", "Zip code must be a 6-digit number.", "error");
       return;
     }
 
     setSaving(true);
     try {
       if (addressId) {
-        // UPDATE existing address
+        // UPDATE
         await axios.put(
           `${API_BASE}/update/${addressId}`,
           { street, city, state, zipCode: zip },
           { headers }
         );
-        alert("Address updated successfully.");
+        Swal.fire("Updated", "Address updated successfully!", "success");
       } else {
-        // CREATE new address
+        // CREATE
         const res = await axios.post(
           `${API_BASE}/add`,
           { street, city, state, zipCode: zip },
@@ -87,19 +99,18 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
           zip: newAddress.zipCode,
           addressId: newAddress.addressId,
         });
-        alert("Address added successfully.");
+        Swal.fire("Saved", "Address added successfully!", "success");
       }
 
-      // Refresh the address list
+      // Refresh list
       const refreshed = await axios.get(`${API_BASE}/allAddress`, { headers });
       setSavedAddresses(refreshed.data || []);
 
-      // Save selected to localStorage for checkout
       localStorage.setItem("selectedAddress", JSON.stringify(address));
       onSaveSuccess?.(address.addressId || 0);
       setIsEditing(false);
     } catch (err) {
-      setError("Failed to save address.");
+      Swal.fire("Error", "Failed to save address. Please try again.", "error");
     } finally {
       setSaving(false);
     }
@@ -107,11 +118,12 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
 
   const handleSaveSelectedAddress = () => {
     if (!address.addressId) {
-      alert("Please select or add an address.");
+      Swal.fire("No Address Selected", "Please select or add an address.", "info");
       return;
     }
+
     localStorage.setItem("selectedAddress", JSON.stringify(address));
-    alert("Selected address saved locally.");
+    Swal.fire("Saved", "Selected address saved for checkout.", "success");
     onSaveSuccess?.(address.addressId);
   };
 
@@ -163,8 +175,9 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
         </>
       )}
 
+      {/* Address Form */}
       <div className="mb-3">
-        <label className="form-label">Street</label>
+        <label className="form-label">Building & Street</label>
         <input
           className="form-control"
           value={address.street}
@@ -198,6 +211,7 @@ const DeliveryAddressStep = ({ address, setAddress, onSaveSuccess }) => {
             value={address.zip}
             onChange={(e) => setAddress({ ...address, zip: e.target.value })}
             readOnly={!isEditing}
+            maxLength={6}
           />
         </div>
       </div>

@@ -109,8 +109,9 @@ const UserProfile = () => {
           showConfirmButton: false,
         }).then(() => {
           localStorage.removeItem("token");
-          navigate("/login");
           window.location.reload();
+          navigate("/login");
+
         });
       })
       .catch((err) => {

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -13,18 +15,16 @@ const AddProduct = () => {
     quantity: "",
     categoryId: "",
     isActive: true,
-    imageUrl: "", // URL or Base64 string
+    imageUrl: "",
   });
 
   const [categories, setCategories] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
 
-  // Utility: check if string is a base64 image string
   const isBase64 = (str) =>
     /^data:image\/(png|jpeg|jpg|gif|bmp);base64,/.test(str);
 
-  // Utility: check if string is a valid URL (http or https)
   const isValidImageUrl = (url) => {
     try {
       const u = new URL(url);
@@ -34,7 +34,6 @@ const AddProduct = () => {
     }
   };
 
-  // Convert Base64 string to File object
   const base64toFile = (base64String, filename) => {
     const arr = base64String.split(",");
     const mimeMatch = arr[0].match(/:(.*?);/);
@@ -48,7 +47,6 @@ const AddProduct = () => {
     return new File([u8arr], filename, { type: mime });
   };
 
-  // Fetch categories on mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -58,20 +56,17 @@ const AddProduct = () => {
         });
         setCategories(response.data);
       } catch (error) {
-        console.error("Failed to fetch categories:", error);
-        alert("Failed to load categories. Please refresh.");
+        Swal.fire("Error", "Failed to load categories. Please refresh.", "error");
       }
     };
 
     fetchCategories();
   }, []);
 
-  // Update image preview when imageFile or form.imageUrl changes
   useEffect(() => {
     if (imageFile) {
       const objectUrl = URL.createObjectURL(imageFile);
       setImagePreviewUrl(objectUrl);
-
       return () => URL.revokeObjectURL(objectUrl);
     } else if (
       form.imageUrl &&
@@ -83,7 +78,6 @@ const AddProduct = () => {
     }
   }, [imageFile, form.imageUrl]);
 
-  // Handle input changes for all form fields
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
@@ -96,7 +90,6 @@ const AddProduct = () => {
     }
   };
 
-  // Handle image file upload input
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -105,29 +98,35 @@ const AddProduct = () => {
     }
   };
 
-  // Submit form handler
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!form.name.trim()) {
-      alert("Product name is required.");
+      Swal.fire("Validation Error", "Product name is required.", "warning");
       return;
     }
+
     if (!form.price || isNaN(form.price) || Number(form.price) <= 0) {
-      alert("Valid product price is required.");
+      Swal.fire("Validation Error", "Valid product price is required.", "warning");
       return;
     }
+
     if (!form.quantity || isNaN(form.quantity) || Number(form.quantity) < 0) {
-      alert("Valid product quantity is required.");
+      Swal.fire("Validation Error", "Valid product quantity is required.", "warning");
       return;
     }
+
     if (!form.categoryId) {
-      alert("Please select a category.");
+      Swal.fire("Validation Error", "Please select a category.", "warning");
       return;
     }
+
     if (!imageFile && !form.imageUrl.trim()) {
-      alert("Please upload an image file or provide an online image URL or Base64 string.");
+      Swal.fire(
+        "Validation Error",
+        "Please upload an image file or provide a valid image URL or Base64 string.",
+        "warning"
+      );
       return;
     }
 
@@ -137,7 +136,6 @@ const AddProduct = () => {
       let headers;
 
       if (imageFile) {
-        // Use FormData for image file upload
         payload = new FormData();
         payload.append("name", form.name);
         payload.append("description", form.description);
@@ -152,7 +150,6 @@ const AddProduct = () => {
           "Content-Type": "multipart/form-data",
         };
       } else if (isBase64(form.imageUrl)) {
-        // Convert Base64 to File then FormData
         const fileFromBase64 = base64toFile(form.imageUrl, "imageFromBase64.png");
         payload = new FormData();
         payload.append("name", form.name);
@@ -168,7 +165,6 @@ const AddProduct = () => {
           "Content-Type": "multipart/form-data",
         };
       } else if (isValidImageUrl(form.imageUrl)) {
-        // Send JSON with imageUrl only
         payload = {
           name: form.name,
           description: form.description,
@@ -184,20 +180,24 @@ const AddProduct = () => {
           "Content-Type": "application/json",
         };
       } else {
-        alert(
-          "Invalid image input. Please upload a file, provide a valid URL, or Base64 image."
+        Swal.fire(
+          "Validation Error",
+          "Invalid image input. Please upload a valid file, URL or Base64.",
+          "warning"
         );
         return;
       }
 
       await axios.post("http://localhost:5110/api/Menu", payload, { headers });
 
-      alert("Product created successfully!");
-      navigate("/admin/Product");
+      Swal.fire("Success", "Product created successfully!", "success").then(() => {
+        navigate("/admin/Product");
+      });
     } catch (error) {
-      console.error("Error creating product:", error);
-      alert(
-        error.response?.data?.message || "Failed to create product. Please try again."
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "Failed to create product. Please try again.",
+        "error"
       );
     }
   };
@@ -205,14 +205,14 @@ const AddProduct = () => {
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Add new product</h2>
+        <h2>Add new Menu</h2>
         <button
           type="submit"
           form="productForm"
           className="btn btn-dark"
           disabled={!form.name.trim()}
         >
-          Publish product
+          Publish Menu
         </button>
       </div>
 
@@ -222,18 +222,16 @@ const AddProduct = () => {
         className="row g-4"
         encType="multipart/form-data"
       >
-        {/* Left column: Basic info */}
         <div className="col-md-6">
           <h5>Basic information</h5>
 
-          <label className="form-label">Product Name</label>
+          <label className="form-label">Menu item Name</label>
           <input
             type="text"
             className="form-control"
             name="name"
             value={form.name}
             onChange={handleChange}
-            placeholder="Enter product name"
             required
           />
 
@@ -243,7 +241,6 @@ const AddProduct = () => {
             name="description"
             value={form.description}
             onChange={handleChange}
-            placeholder="Enter product description"
             rows={3}
           />
 
@@ -254,7 +251,6 @@ const AddProduct = () => {
             name="price"
             value={form.price}
             onChange={handleChange}
-            placeholder="Enter price"
             min="0"
             step="0.01"
             required
@@ -267,7 +263,6 @@ const AddProduct = () => {
             name="quantity"
             value={form.quantity}
             onChange={handleChange}
-            placeholder="Enter quantity"
             min="0"
             required
           />
@@ -303,9 +298,8 @@ const AddProduct = () => {
           </div>
         </div>
 
-        {/* Right column: Image upload & URL */}
         <div className="col-md-6">
-          <h5>Product image</h5>
+          <h5>Menu image</h5>
           <div
             className="border border-secondary rounded p-4 text-center"
             style={{ minHeight: "300px" }}
@@ -338,7 +332,7 @@ const AddProduct = () => {
                   style={{ maxHeight: "200px" }}
                   onError={(e) => {
                     e.target.style.display = "none";
-                    alert("Invalid image URL/Base64. Please check and try again.");
+                    Swal.fire("Error", "Invalid image URL or Base64", "error");
                   }}
                 />
               </div>
@@ -347,13 +341,12 @@ const AddProduct = () => {
             <hr />
 
             <label htmlFor="onlineImageUrl" className="form-label mt-3">
-              Or enter online image URL or Base64 image string
+              Or enter online image URL or Base64 string
             </label>
             <textarea
               id="onlineImageUrl"
               name="imageUrl"
               className="form-control"
-              placeholder="Paste image URL or Base64 string here"
               value={form.imageUrl}
               onChange={handleChange}
               rows={4}

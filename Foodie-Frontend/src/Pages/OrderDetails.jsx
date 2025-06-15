@@ -12,39 +12,52 @@ import {
   MDBRow,
   MDBTypography,
 } from "mdb-react-ui-kit";
-import "./OrderDetails.css";
 import jsPDF from "jspdf";
+import "./OrderDetails.css";
 
-const API_BASE = "http://localhost:5110/api/Orders";
+const ORDER_API = "http://localhost:5110/api/Orders";
+const PROFILE_API = "http://localhost:5110/api/Auth/profile";
 const fallbackImage = "/fallback-image.png";
 
 const OrderDetails = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
+  const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchOrder = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchOrderAndProfile = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${API_BASE}/getOrderById/${orderId}`,
-          {
+        const [orderRes, profileRes] = await Promise.all([
+          axios.get(`${ORDER_API}/getOrderById/${orderId}`, {
             headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setOrder(response.data);
+          }),
+          axios.get(PROFILE_API, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        setOrder(orderRes.data);
+        setUserName(profileRes.data.name || profileRes.data.username);
       } catch (err) {
-        setError(err.response?.data || "Failed to load order details.");
+        setError(
+          err.response?.data?.message || "Failed to load order or profile."
+        );
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrder();
-  }, [orderId]);
+    fetchOrderAndProfile();
+  }, [orderId, navigate]);
 
   const generateInvoice = () => {
     const doc = new jsPDF();
@@ -53,7 +66,7 @@ const OrderDetails = () => {
 
     doc.setFontSize(12);
     doc.text(`Order No: ${order.orderNo}`, 20, 30);
-    doc.text(`User: ${order.userName}`, 20, 40);
+    doc.text(`User: ${userName}`, 20, 40);
     doc.text(`Date: ${new Date(order.orderDate).toLocaleDateString()}`, 20, 50);
 
     let y = 70;
@@ -62,9 +75,7 @@ const OrderDetails = () => {
 
     order.orderDetails.forEach((item, index) => {
       doc.text(
-        `${index + 1}. ${item.menuName} - Qty: ${
-          item.quantity
-        }, Price: ₹${item.price.toFixed(2)}`,
+        `${index + 1}. ${item.menuName} - Qty: ${item.quantity}, Price: ₹${item.price.toFixed(2)}`,
         20,
         y
       );
@@ -92,12 +103,10 @@ const OrderDetails = () => {
     );
   }
 
-  if (error) {
+  if (error || !order) {
     return (
       <div className="container py-5 text-danger text-center">
-        <h4>
-          Error: {typeof error === "string" ? error : JSON.stringify(error)}
-        </h4>
+        <h4>Error: {typeof error === "string" ? error : "Unable to fetch order"}</h4>
         <button className="btn btn-dark mt-3" onClick={() => navigate(-1)}>
           Go Back
         </button>
@@ -114,7 +123,7 @@ const OrderDetails = () => {
               <MDBCardHeader className="bg-warning-subtle px-4 py-4">
                 <MDBTypography tag="h5" className="text-dark fw-bold mb-0">
                   🎉 Thanks for your order,{" "}
-                  <span className="text-primary">{order.UserId}</span>!
+                  <span className="text-primary">{userName}</span>!
                 </MDBTypography>
               </MDBCardHeader>
 
@@ -136,10 +145,7 @@ const OrderDetails = () => {
 
                 {/* Order Items */}
                 {order.orderDetails.map((item) => (
-                  <MDBCard
-                    key={item.menuId}
-                    className="shadow-sm mb-4 border-0"
-                  >
+                  <MDBCard key={item.menuId} className="shadow-sm mb-4 border-0">
                     <MDBCardBody>
                       <MDBRow className="align-items-center">
                         <MDBCol md="2">

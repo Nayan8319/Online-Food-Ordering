@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Paper, Table, TableBody, TableCell, TableContainer, TableHead,
   TablePagination, TableRow, Typography, Divider, Stack,
@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 import { CSVLink } from "react-csv";
 
 const statusOptions = [
-
   { label: "Confirmed", value: 1 },
   { label: "OutForDelivery", value: 2 },
   { label: "Delivered", value: 3 }
@@ -21,6 +20,7 @@ export default function Orders() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortKey, setSortKey] = useState("");
+  const deliveryTimers = useRef({}); // store active timers
 
   useEffect(() => {
     fetchOrders();
@@ -41,7 +41,7 @@ export default function Orders() {
       setFilteredOrders(data);
 
       data.forEach(order => {
-        if (order.status === "OutForDelivery") {
+        if (order.status === "OutForDelivery" && !deliveryTimers.current[order.orderId]) {
           setAutoDelivery(order.orderId);
         }
       });
@@ -51,15 +51,18 @@ export default function Orders() {
   };
 
   const setAutoDelivery = (orderId) => {
-    setTimeout(() => {
+    // Set a timeout to auto-update status after 5 minutes
+    const timer = setTimeout(() => {
       updateOrderStatus(orderId, 3);
-    }, 5 * 60 * 1000); // 5 minutes
+      delete deliveryTimers.current[orderId]; // cleanup after status update
+    }, 5 * 60 * 1000);
+
+    deliveryTimers.current[orderId] = timer;
   };
 
   const filterAndSortOrders = () => {
     let result = [...orders];
 
-    // Search filter
     if (searchText.trim() !== "") {
       result = result.filter(order =>
         order.orderNo.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -67,7 +70,6 @@ export default function Orders() {
       );
     }
 
-    // Sort logic
     switch (sortKey) {
       case "amount":
         result.sort((a, b) => b.totalAmount - a.totalAmount);
@@ -121,15 +123,21 @@ export default function Orders() {
       });
 
       const result = await res.json();
-      fetchOrders();
-
       if (newStatus !== 3) {
         Swal.fire("Updated", result.message || "Status updated", "success");
+      }
+
+      // Clear existing timer if any
+      if (deliveryTimers.current[orderId]) {
+        clearTimeout(deliveryTimers.current[orderId]);
+        delete deliveryTimers.current[orderId];
       }
 
       if (newStatus === 2) {
         setAutoDelivery(orderId);
       }
+
+      fetchOrders();
     } catch (err) {
       Swal.fire("Error", "Failed to update status", "error");
     }
