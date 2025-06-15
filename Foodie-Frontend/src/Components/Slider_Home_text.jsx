@@ -15,9 +15,9 @@ const Slider = () => {
                             nihil ducimus libero ipsam.
                         </p>
                         <div className="btn-box">
-                            <Link to="#" className="btn1">
-                                Order Now
-                            </Link>
+               <Link to="/menu" className="btn1">
+                  Order Now
+                </Link>
                         </div>
                     </div>
                 </div>

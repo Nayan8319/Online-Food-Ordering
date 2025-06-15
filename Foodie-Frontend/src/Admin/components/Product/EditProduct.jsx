@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const EditProduct = () => {
-  const { id } = useParams(); // product id
+const EditMenu = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -24,11 +25,11 @@ const EditProduct = () => {
   const [imageUrlError, setImageUrlError] = useState("");
 
   useEffect(() => {
-    const fetchProductAndCategories = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
 
-        const [productRes, categoryRes] = await Promise.all([
+        const [menuRes, categoryRes] = await Promise.all([
           axios.get(`http://localhost:5110/api/Menu/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
@@ -38,24 +39,24 @@ const EditProduct = () => {
         ]);
 
         setForm({
-          name: productRes.data.name,
-          description: productRes.data.description,
-          price: productRes.data.price,
-          quantity: productRes.data.quantity,
-          categoryId: productRes.data.categoryId,
-          isActive: productRes.data.isActive,
-          imageUrl: productRes.data.imageUrl || "",
+          name: menuRes.data.name,
+          description: menuRes.data.description,
+          price: menuRes.data.price,
+          quantity: menuRes.data.quantity,
+          categoryId: menuRes.data.categoryId,
+          isActive: menuRes.data.isActive,
+          imageUrl: menuRes.data.imageUrl || "",
         });
 
         setCategories(categoryRes.data);
         setLoading(false);
-      } catch (error) {
-        alert("Failed to load product or categories.");
-        navigate("/admin/Products");
+      } catch (err) {
+        Swal.fire("Error", "Failed to load menu or categories", "error");
+        navigate("/admin/Menu");
       }
     };
 
-    fetchProductAndCategories();
+    fetchData();
   }, [id, navigate]);
 
   useEffect(() => {
@@ -74,20 +75,19 @@ const EditProduct = () => {
     }
   }, [imageFile, form.imageUrl]);
 
-  function isBase64(str) {
-    return /^data:image\/(png|jpeg|jpg|gif|bmp);base64,/.test(str);
-  }
+  const isBase64 = (str) =>
+    /^data:image\/(png|jpeg|jpg|gif|bmp);base64,/.test(str);
 
-  function isValidImageUrl(url) {
+  const isValidImageUrl = (url) => {
     try {
       const u = new URL(url);
       return u.protocol === "http:" || u.protocol === "https:";
     } catch {
       return false;
     }
-  }
+  };
 
-  function isValidImageInput(input) {
+  const isValidImageInput = (input) => {
     if (!input) return false;
     input = input.trim();
     return (
@@ -95,7 +95,18 @@ const EditProduct = () => {
       isValidImageUrl(input) ||
       isBase64(input)
     );
-  }
+  };
+
+  const base64toFile = (base64String, filename) => {
+    const arr = base64String.split(",");
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : "image/png";
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    return new File([u8arr], filename, { type: mime });
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -106,12 +117,11 @@ const EditProduct = () => {
 
     if (name === "imageUrl") {
       setImageFile(null);
-
       if (value.trim() === "" || isValidImageInput(value)) {
         setImageUrlError("");
       } else {
         setImageUrlError(
-          "Invalid input: must be a relative path (/MenuImages/...), full URL, or Base64 image."
+          "Invalid input: must be /MenuImages/, URL, or Base64 image."
         );
       }
     }
@@ -124,36 +134,25 @@ const EditProduct = () => {
     setImageUrlError("");
   };
 
-  function base64toFile(base64String, filename) {
-    const arr = base64String.split(",");
-    const mimeMatch = arr[0].match(/:(.*?);/);
-    const mime = mimeMatch ? mimeMatch[1] : "image/png";
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const trimmedImageUrl = form.imageUrl.trim();
+    const { name, price, quantity, categoryId, imageUrl } = form;
 
-    if (!form.name.trim() || !form.price || !form.quantity || !form.categoryId) {
-      alert("All fields are required.");
+    if (!name.trim() || !price || !quantity || !categoryId) {
+      Swal.fire("Validation Error", "All fields are required.", "warning");
       return;
     }
 
+    const trimmedImageUrl = imageUrl.trim();
+
     if (!imageFile && !trimmedImageUrl) {
-      alert("Please provide an image.");
+      Swal.fire("Validation Error", "Please provide an image.", "warning");
       return;
     }
 
     if (trimmedImageUrl && !isValidImageInput(trimmedImageUrl)) {
-      alert("Invalid image input.");
+      Swal.fire("Validation Error", "Invalid image input.", "error");
       return;
     }
 
@@ -162,36 +161,29 @@ const EditProduct = () => {
       let payload;
       let headers;
 
-      if (imageFile) {
+      if (imageFile || isBase64(trimmedImageUrl)) {
+        const imageToUpload = imageFile
+          ? imageFile
+          : base64toFile(trimmedImageUrl, "menuImage.png");
+
         payload = new FormData();
-        payload.append("Name", form.name);
+        payload.append("Name", name);
         payload.append("Description", form.description);
-        payload.append("Price", form.price);
-        payload.append("Quantity", form.quantity);
-        payload.append("CategoryId", form.categoryId);
+        payload.append("Price", price);
+        payload.append("Quantity", quantity);
+        payload.append("CategoryId", categoryId);
         payload.append("IsActive", form.isActive.toString());
         payload.append("ImageUrl", "");
-        payload.append("image", imageFile);
-        headers = { Authorization: `Bearer ${token}` };
-      } else if (isBase64(trimmedImageUrl)) {
-        const fileFromBase64 = base64toFile(trimmedImageUrl, "image.png");
-        payload = new FormData();
-        payload.append("Name", form.name);
-        payload.append("Description", form.description);
-        payload.append("Price", form.price);
-        payload.append("Quantity", form.quantity);
-        payload.append("CategoryId", form.categoryId);
-        payload.append("IsActive", form.isActive.toString());
-        payload.append("ImageUrl", "");
-        payload.append("image", fileFromBase64);
+        payload.append("image", imageToUpload);
+
         headers = { Authorization: `Bearer ${token}` };
       } else {
         payload = {
-          Name: form.name,
+          Name: name,
           Description: form.description,
-          Price: form.price,
-          Quantity: form.quantity,
-          CategoryId: form.categoryId,
+          Price: price,
+          Quantity: quantity,
+          CategoryId: categoryId,
           IsActive: form.isActive,
           ImageUrl: trimmedImageUrl,
         };
@@ -205,38 +197,45 @@ const EditProduct = () => {
         headers,
       });
 
-      alert("Product updated successfully!");
-      navigate("/admin/Product");
+      Swal.fire("Success", "Menu updated successfully!", "success").then(() =>
+        navigate("/admin/Product")
+      );
     } catch (error) {
-      console.error("Error updating product:", error);
-      alert(error.response?.data || "Failed to update product.");
+      console.error("Update Error:", error);
+      Swal.fire(
+        "Error",
+        error.response?.data || "Failed to update menu.",
+        "error"
+      );
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="text-center mt-5">Loading...</div>;
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Edit Product</h2>
+        <h2>Edit Menu</h2>
         <button
           type="submit"
-          form="productForm"
+          form="menuForm"
           className="btn btn-dark"
           disabled={!form.name.trim() || imageUrlError !== ""}
         >
-          Update Product
+          Update Menu
         </button>
       </div>
 
       <form
-        id="productForm"
+        id="menuForm"
         className="row g-4"
         onSubmit={handleSubmit}
         encType="multipart/form-data"
       >
+        {/* Left Column */}
         <div className="col-md-6">
-          <h5>Product Info</h5>
+          <h5>Menu Info</h5>
+
           <label className="form-label">Name</label>
           <input
             type="text"
@@ -308,17 +307,14 @@ const EditProduct = () => {
           </div>
         </div>
 
+        {/* Right Column - Image */}
         <div className="col-md-6">
-          <h5>Product Image</h5>
+          <h5>Menu Image</h5>
           <div
             className="border border-secondary rounded p-4 text-center"
             style={{ minHeight: "300px" }}
           >
-            <label
-              htmlFor="uploadImg"
-              className="d-block mb-2"
-              style={{ cursor: "pointer" }}
-            >
+            <label htmlFor="uploadImg" className="d-block mb-2" style={{ cursor: "pointer" }}>
               <i className="bi bi-cloud-arrow-up" style={{ fontSize: "2rem" }}></i>
               <br />
               <strong>Click to upload</strong> or drag and drop
@@ -363,4 +359,4 @@ const EditProduct = () => {
   );
 };
 
-export default EditProduct;
+export default EditMenu;

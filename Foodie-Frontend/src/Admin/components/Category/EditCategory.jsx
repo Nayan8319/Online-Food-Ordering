@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const EditCategory = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // category id from URL
+  const { id } = useParams();
 
   const [form, setForm] = useState({
     name: "",
@@ -19,7 +20,6 @@ const EditCategory = () => {
   const [imageUrlError, setImageUrlError] = useState("");
 
   useEffect(() => {
-    // Load category data by id
     const fetchCategory = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -33,7 +33,7 @@ const EditCategory = () => {
         });
         setLoading(false);
       } catch (error) {
-        alert("Failed to load category data.");
+        Swal.fire("Error", "Failed to load category data.", "error");
         navigate("/admin/Categories");
       }
     };
@@ -50,7 +50,6 @@ const EditCategory = () => {
     } else if (form.imageUrl && isValidImageUrl(form.imageUrl)) {
       setImagePreviewUrl(form.imageUrl);
     } else if (form.imageUrl && form.imageUrl.startsWith("/CategoryImages/")) {
-      // Prepend backend origin for preview
       setImagePreviewUrl(`http://localhost:5110${form.imageUrl}`);
     } else {
       setImagePreviewUrl(null);
@@ -88,8 +87,7 @@ const EditCategory = () => {
     }));
 
     if (name === "imageUrl") {
-      setImageFile(null); // clear image file if URL/Base64 typed manually
-
+      setImageFile(null);
       if (value.trim() === "" || isValidImageInput(value)) {
         setImageUrlError("");
       } else {
@@ -126,20 +124,24 @@ const EditCategory = () => {
     const trimmedImageUrl = form.imageUrl.trim();
 
     if (!form.name.trim()) {
-      alert("Category name is required.");
+      Swal.fire("Validation Error", "Category name is required.", "warning");
       return;
     }
 
     if (!imageFile && !trimmedImageUrl) {
-      alert(
-        "Please upload an image file or provide an online image URL or Base64 string."
+      Swal.fire(
+        "Validation Error",
+        "Please upload an image file or provide a valid image URL/Base64.",
+        "warning"
       );
       return;
     }
 
     if (trimmedImageUrl && !isValidImageInput(trimmedImageUrl)) {
-      alert(
-        "Invalid image input. Must be a relative path (/CategoryImages/...), full URL, or Base64 image."
+      Swal.fire(
+        "Validation Error",
+        "Invalid image input. Provide a relative path, full URL, or Base64 image.",
+        "warning"
       );
       return;
     }
@@ -150,19 +152,14 @@ const EditCategory = () => {
       let headers;
 
       if (imageFile) {
-        // Send multipart/form-data with file upload
         payload = new FormData();
         payload.append("Name", form.name);
         payload.append("IsActive", form.isActive.toString());
-        payload.append("ImageUrl", ""); // empty because image file sent
+        payload.append("ImageUrl", "");
         payload.append("image", imageFile);
 
-        headers = {
-          Authorization: `Bearer ${token}`,
-          // Do NOT set Content-Type manually for multipart/form-data; let axios handle it
-        };
+        headers = { Authorization: `Bearer ${token}` };
       } else if (isBase64(trimmedImageUrl)) {
-        // Convert base64 to file and send as multipart/form-data
         const fileFromBase64 = base64toFile(trimmedImageUrl, "imageFromBase64.png");
         payload = new FormData();
         payload.append("Name", form.name);
@@ -170,11 +167,8 @@ const EditCategory = () => {
         payload.append("ImageUrl", "");
         payload.append("image", fileFromBase64);
 
-        headers = {
-          Authorization: `Bearer ${token}`,
-        };
-      } else if (trimmedImageUrl) {
-        // Send JSON payload with image URL or relative path
+        headers = { Authorization: `Bearer ${token}` };
+      } else {
         payload = {
           Name: form.name,
           IsActive: form.isActive,
@@ -184,26 +178,30 @@ const EditCategory = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         };
-      } else {
-        alert(
-          "Invalid image input. Please upload a file, provide a valid URL, or Base64 image."
-        );
-        return;
       }
 
       await axios.put(`http://localhost:5110/api/Category/${id}`, payload, {
         headers,
       });
 
-      alert("Category updated successfully!");
-      navigate("/admin/Categories");
+      Swal.fire("Success", "Category updated successfully!", "success").then(() =>
+        navigate("/admin/Categories")
+      );
     } catch (error) {
       console.error("Error updating category", error);
-      alert(error.response?.data || "Failed to update category. Please try again.");
+      Swal.fire("Error", error.response?.data || "Failed to update category.", "error");
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return Swal.fire({
+      title: "Loading...",
+      didOpen: () => {
+        Swal.showLoading();
+      },
+      allowOutsideClick: false,
+    });
+  }
 
   return (
     <div className="container mt-4">

@@ -584,6 +584,22 @@
   },
   {
     "ContainingType": "FoodieApi.Controllers.DashboardController",
+    "Method": "GetOrdersByDate",
+    "RelativePath": "api/Dashboard/orders-by-date",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "date",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FoodieApi.Controllers.DashboardController",
     "Method": "GetSalesChart",
     "RelativePath": "api/Dashboard/sales-chart",
     "HttpMethod": "GET",
@@ -602,6 +618,16 @@
     "ContainingType": "FoodieApi.Controllers.DashboardController",
     "Method": "GetDashboardStats",
     "RelativePath": "api/Dashboard/stats",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FoodieApi.Controllers.DashboardController",
+    "Method": "GetTodayOrdersForCsv",
+    "RelativePath": "api/Dashboard/today-orders",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

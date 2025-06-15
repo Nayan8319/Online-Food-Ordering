@@ -1,45 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the user is already logged in (token exists in localStorage)
     if (localStorage.getItem("token")) {
-      // If logged in, redirect to home page (or any page you want)
       navigate("/", { replace: true });
     }
   }, [navigate]);
 
   const validate = () => {
     const errorMessages = { email: "", password: "" };
-    let valid = true;
+    let isValid = true;
 
     if (!email) {
       errorMessages.email = "Email is required";
-      valid = false;
+      isValid = false;
     }
 
     if (!password) {
       errorMessages.password = "Password is required";
-      valid = false;
+      isValid = false;
     }
 
     setErrors(errorMessages);
-    return valid;
+    return isValid;
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!validate()) {
-      return;
-    }
+    if (!validate()) return;
 
     const loginData = { email, password };
 
@@ -55,12 +54,10 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok && data.token) {
-        // Store token and role in localStorage
         localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.roleName); // "Admin" or "User"
+        localStorage.setItem("role", data.roleName);
         localStorage.setItem("userId", data.userId);
 
-        // Redirect based on role
         if (data.roleName === "Admin") {
           navigate("/admin/dashboard");
         } else {
@@ -104,15 +101,16 @@ const LoginPage = () => {
                 <label className="form-label mb-1">Email</label>
                 <input
                   type="email"
-                  className="form-control"
+                  className={`form-control ${errors.email && "is-invalid"}`}
                   placeholder="Enter Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 {errors.email && (
-                  <small className="text-danger">{errors.email}</small>
+                  <div className="invalid-feedback">{errors.email}</div>
                 )}
               </div>
+
               <div className="mb-1">
                 <div className="d-flex justify-content-between align-items-center">
                   <label className="form-label mb-1">Password</label>
@@ -124,20 +122,34 @@ const LoginPage = () => {
                     Forgot Password?
                   </Link>
                 </div>
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="Enter Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="input-group">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className={`form-control ${errors.password && "is-invalid"}`}
+                    placeholder="Enter Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <span
+                    className="input-group-text bg-white"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                  >
+                    {showPassword ? (
+                      <VisibilityOff fontSize="small" />
+                    ) : (
+                      <Visibility fontSize="small" />
+                    )}
+                  </span>
+                </div>
                 {errors.password && (
-                  <small className="text-danger">{errors.password}</small>
+                  <div className="invalid-feedback d-block">
+                    {errors.password}
+                  </div>
                 )}
               </div>
 
-              {/* Login + Register on the same line */}
-              <div className="btn_box d-flex justify-content-center align-items-center mb-3">
+              <div className="btn_box d-flex justify-content-center align-items-center mb-3 mt-3">
                 <button
                   type="submit"
                   className="btn btn-success rounded-pill text-white px-4 me-3"

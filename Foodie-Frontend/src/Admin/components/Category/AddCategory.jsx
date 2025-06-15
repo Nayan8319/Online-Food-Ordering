@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2"; // ✅ Import SweetAlert2
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const AddCategory = () => {
@@ -9,7 +10,7 @@ const AddCategory = () => {
   const [form, setForm] = useState({
     name: "",
     isActive: true,
-    imageUrl: "", // can be URL or Base64 string
+    imageUrl: "",
   });
 
   const [imageFile, setImageFile] = useState(null);
@@ -29,12 +30,10 @@ const AddCategory = () => {
     }
   }, [imageFile, form.imageUrl]);
 
-  // Utility: check if string is a base64 image string
   function isBase64(str) {
     return /^data:image\/(png|jpeg|jpg|gif|bmp);base64,/.test(str);
   }
 
-  // Utility: check if string is a URL (http or https)
   function isValidImageUrl(url) {
     try {
       const u = new URL(url);
@@ -44,7 +43,6 @@ const AddCategory = () => {
     }
   }
 
-  // Convert Base64 string to File object
   function base64toFile(base64String, filename) {
     const arr = base64String.split(",");
     const mimeMatch = arr[0].match(/:(.*?);/);
@@ -64,7 +62,6 @@ const AddCategory = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-    // Clear file if user types URL or base64 manually
     if (name === "imageUrl" && value) {
       setImageFile(null);
     }
@@ -80,13 +77,15 @@ const AddCategory = () => {
     e.preventDefault();
 
     if (!form.name.trim()) {
-      alert("Category name is required.");
-      return;
+      return Swal.fire("Missing Name", "Category name is required.", "warning");
     }
 
     if (!imageFile && !form.imageUrl.trim()) {
-      alert("Please upload an image file or provide an online image URL or Base64 string.");
-      return;
+      return Swal.fire(
+        "Image Required",
+        "Please upload an image file or provide an online image URL or Base64 string.",
+        "warning"
+      );
     }
 
     try {
@@ -95,7 +94,6 @@ const AddCategory = () => {
       let headers;
 
       if (imageFile) {
-        // If a file is uploaded directly
         payload = new FormData();
         payload.append("name", form.name);
         payload.append("isActive", form.isActive.toString());
@@ -106,7 +104,6 @@ const AddCategory = () => {
           "Content-Type": "multipart/form-data",
         };
       } else if (isBase64(form.imageUrl)) {
-        // Convert base64 string to file and send as multipart/form-data
         const fileFromBase64 = base64toFile(form.imageUrl, "imageFromBase64.png");
         payload = new FormData();
         payload.append("name", form.name);
@@ -118,7 +115,6 @@ const AddCategory = () => {
           "Content-Type": "multipart/form-data",
         };
       } else if (isValidImageUrl(form.imageUrl)) {
-        // Send JSON with URL string
         payload = {
           name: form.name,
           isActive: form.isActive,
@@ -129,18 +125,23 @@ const AddCategory = () => {
           "Content-Type": "application/json",
         };
       } else {
-        alert("Invalid image input. Please upload a file, provide a valid URL, or Base64 image.");
-        return;
+        return Swal.fire(
+          "Invalid Image",
+          "Invalid image input. Please upload a file, provide a valid URL, or Base64 image.",
+          "error"
+        );
       }
 
       await axios.post("http://localhost:5110/api/Category", payload, { headers });
 
-      alert("Category created successfully!");
+      await Swal.fire("Success", "Category created successfully!", "success");
       navigate("/admin/Categories");
     } catch (error) {
       console.error("Error creating category", error);
-      alert(
-        error.response?.data?.message || "Failed to create category. Please try again."
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "Failed to create category. Please try again.",
+        "error"
       );
     }
   };
@@ -165,7 +166,7 @@ const AddCategory = () => {
         className="row g-4"
         encType="multipart/form-data"
       >
-        {/* Left side: Basic info */}
+        {/* Left side */}
         <div className="col-md-6">
           <h5>Basic information</h5>
 
@@ -195,7 +196,7 @@ const AddCategory = () => {
           </div>
         </div>
 
-        {/* Right side: Image upload/preview */}
+        {/* Right side */}
         <div className="col-md-6">
           <h5>Category image</h5>
           <div
@@ -230,7 +231,7 @@ const AddCategory = () => {
                   style={{ maxHeight: "200px" }}
                   onError={(e) => {
                     e.target.style.display = "none";
-                    alert("Invalid image URL/Base64. Please check and try again.");
+                    Swal.fire("Error", "Invalid image URL/Base64. Please check and try again.", "error");
                   }}
                 />
               </div>

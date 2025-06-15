@@ -130,7 +130,7 @@ const OrderSummaryStep = ({ cartItems, subtotal, shipping, totalQuantity }) => {
         </li>
         <li className="list-group-item d-flex justify-content-between">
           <span>Shipping</span>
-          <strong>₹{shipping.toFixed(2)}</strong>
+          <strong style={{ color: "blue", fontWeight: "bold" }}>Free</strong>
         </li>
         <li className="list-group-item d-flex justify-content-between border-0">
           <strong>Total Amount</strong>

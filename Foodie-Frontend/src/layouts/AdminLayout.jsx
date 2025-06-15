@@ -6,11 +6,13 @@ import Topbar from "../Admin/components/Topbar";
 import Sidebar from "../Admin/components/SideBar";
 import ProfileEditModal from "../Pages/Profile/ProfileEditModal";
 import { isAdmin, getToken } from "../utils/auth";
+import LoadingPage from "../Admin/pages/LoadingPage"; // ✅ Import
 
 const AdminLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true); // ✅ Loading state
 
   const [editForm, setEditForm] = useState({
     name: "",
@@ -36,6 +38,7 @@ const AdminLayout = ({ children }) => {
 
   const fetchUserData = async () => {
     try {
+      setLoading(true); // ✅ Start loading
       const token = getToken();
       const res = await fetch("http://localhost:5110/api/Auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
@@ -55,6 +58,8 @@ const AdminLayout = ({ children }) => {
       });
     } catch (error) {
       console.error("Failed to load profile data", error);
+    } finally {
+      setLoading(false); // ✅ End loading
     }
   };
 
@@ -105,7 +110,7 @@ const AdminLayout = ({ children }) => {
       if (contentType && contentType.includes("application/json")) {
         result = await res.json();
       } else {
-        result = await res.text(); // fallback for plain text
+        result = await res.text();
       }
 
       if (res.ok) {
@@ -116,7 +121,7 @@ const AdminLayout = ({ children }) => {
           confirmButtonText: "OK",
         });
 
-        await fetchUserData(); // refresh the data
+        await fetchUserData();
         setShowEditModal(false);
         setSelectedFile(null);
         setPreviewUrl(null);
@@ -130,6 +135,11 @@ const AdminLayout = ({ children }) => {
       setEditLoading(false);
     }
   };
+
+  // ✅ Show loading until userData is fetched
+  if (loading || !userData) {
+    return <LoadingPage />;
+  }
 
   return (
     <div className="admin-layout">

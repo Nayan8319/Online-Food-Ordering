@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
 const AddressPage = () => {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const [newAddress, setNewAddress] = useState({
-    street: "", // Building and Street
+    street: "",
     city: "",
     state: "",
     zipCode: "",
@@ -20,16 +20,14 @@ const AddressPage = () => {
 
   useEffect(() => {
     if (!token) {
-      setError("User is not logged in.");
+      Swal.fire("Error", "User is not logged in.", "error");
       setLoading(false);
       return;
     }
 
     axios
       .get("http://localhost:5110/api/address/allAddress", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
         setAddresses(res.data);
@@ -37,50 +35,55 @@ const AddressPage = () => {
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to load addresses.");
+        Swal.fire("Error", "Failed to load addresses.", "error");
         setLoading(false);
       });
   }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "zipCode") {
+      // Allow only digits
+      if (!/^\d*$/.test(value)) return;
+    }
+
     setNewAddress((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAddOrUpdateAddress = () => {
     const { street, city, state, zipCode } = newAddress;
     if (!street || !city || !state || !zipCode) {
-      setError("Please fill all fields.");
+      Swal.fire("Warning", "Please fill all fields.", "warning");
+      return;
+    }
+
+    if (zipCode.length < 5 || zipCode.length > 6) {
+      Swal.fire("Warning", "Zip Code must be 5 or 6 digits.", "warning");
       return;
     }
 
     if (editingId === null) {
-      // Add new address
       axios
         .post("http://localhost:5110/api/address/add", newAddress, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
           setAddresses((prev) => [...prev, res.data]);
           setNewAddress({ street: "", city: "", state: "", zipCode: "" });
-          setError("");
+          Swal.fire("Success", "✅ Address added successfully!", "success");
         })
         .catch((err) => {
           console.error(err);
-          setError("Failed to add address.");
+          Swal.fire("Error", "❌ Failed to add address.", "error");
         });
     } else {
-      // Update existing address
       axios
         .put(
           `http://localhost:5110/api/address/update/${editingId}`,
           newAddress,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         )
         .then(() => {
@@ -91,37 +94,45 @@ const AddressPage = () => {
           );
           setNewAddress({ street: "", city: "", state: "", zipCode: "" });
           setEditingId(null);
-          setError("");
+          Swal.fire("Success", "✅ Address updated successfully!", "success");
         })
         .catch((err) => {
           console.error(err);
-          setError("Failed to update address.");
+          Swal.fire("Error", "❌ Failed to update address.", "error");
         });
     }
   };
 
   const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this address?"))
-      return;
-
-    axios
-      .delete(`http://localhost:5110/api/address/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(() => {
-        setAddresses((prev) => prev.filter((addr) => addr.addressId !== id));
-        if (editingId === id) {
-          setNewAddress({ street: "", city: "", state: "", zipCode: "" });
-          setEditingId(null);
-        }
-        setError("");
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to delete address.");
-      });
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This address will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:5110/api/address/delete/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then(() => {
+            setAddresses((prev) =>
+              prev.filter((addr) => addr.addressId !== id)
+            );
+            if (editingId === id) {
+              setNewAddress({ street: "", city: "", state: "", zipCode: "" });
+              setEditingId(null);
+            }
+            Swal.fire("Deleted!", "✅ Address has been deleted.", "success");
+          })
+          .catch((err) => {
+            console.error(err);
+            Swal.fire("Error", "❌ Failed to delete address.", "error");
+          });
+      }
+    });
   };
 
   const handleEdit = (addr) => {
@@ -132,13 +143,11 @@ const AddressPage = () => {
       zipCode: addr.zipCode,
     });
     setEditingId(addr.addressId);
-    setError("");
   };
 
   const handleCancelEdit = () => {
     setNewAddress({ street: "", city: "", state: "", zipCode: "" });
     setEditingId(null);
-    setError("");
   };
 
   if (loading)
@@ -150,25 +159,20 @@ const AddressPage = () => {
         <h2 className="mb-4">Manage Addresses</h2>
         <button
           className="btn btn-outline-primary mb-3"
-          onClick={() => navigate("/profile")} // Replace '/profile' with your actual profile route
+          onClick={() => navigate("/profile")}
         >
           ← Back to Profile
         </button>
 
-        {error && <div className="alert alert-danger">{error}</div>}
-
-        {/* Add/Edit Address Form - on top */}
+        {/* Address Form */}
         <div className="card p-4 mb-4">
           <h4>{editingId === null ? "Add New Address" : "Update Address"}</h4>
           <div className="row g-3">
             <div className="col-md-6">
-              <label htmlFor="street" className="form-label">
-                Building & Street
-              </label>
+              <label className="form-label">Building & Street</label>
               <input
                 type="text"
                 className="form-control"
-                id="street"
                 name="street"
                 placeholder="Enter building and street"
                 value={newAddress.street}
@@ -176,13 +180,10 @@ const AddressPage = () => {
               />
             </div>
             <div className="col-md-3">
-              <label htmlFor="city" className="form-label">
-                City
-              </label>
+              <label className="form-label">City</label>
               <input
                 type="text"
                 className="form-control"
-                id="city"
                 name="city"
                 placeholder="City"
                 value={newAddress.city}
@@ -190,13 +191,10 @@ const AddressPage = () => {
               />
             </div>
             <div className="col-md-3">
-              <label htmlFor="state" className="form-label">
-                State
-              </label>
+              <label className="form-label">State</label>
               <input
                 type="text"
                 className="form-control"
-                id="state"
                 name="state"
                 placeholder="State"
                 value={newAddress.state}
@@ -204,15 +202,13 @@ const AddressPage = () => {
               />
             </div>
             <div className="col-md-3">
-              <label htmlFor="zipCode" className="form-label">
-                Zip Code
-              </label>
+              <label className="form-label">Zip Code</label>
               <input
                 type="text"
                 className="form-control"
-                id="zipCode"
                 name="zipCode"
                 placeholder="Zip Code"
+                maxLength={6}
                 value={newAddress.zipCode}
                 onChange={handleChange}
               />
@@ -234,7 +230,7 @@ const AddressPage = () => {
           </div>
         </div>
 
-        {/* Existing Addresses */}
+        {/* Address List */}
         {addresses.length === 0 ? (
           <p>No addresses found.</p>
         ) : (

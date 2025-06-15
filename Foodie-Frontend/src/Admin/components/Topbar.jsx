@@ -1,7 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navbar } from "react-bootstrap";
+import axios from "axios";
 
 const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
+  const [profileImage, setProfileImage] = useState("");
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token"); // or sessionStorage
+        const res = await axios.get("http://localhost:5110/api/Auth/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const imageUrl = res.data.imageUrl;
+        setProfileImage(imageUrl);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   return (
     <Navbar
       expand="lg"
@@ -13,7 +35,7 @@ const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
       }}
       variant="dark"
     >
-      {/* Toggle button for Sidebar (optional) */}
+      {/* Sidebar Toggle Button */}
       <button
         className="btn btn-outline-light me-2 d-lg-none"
         onClick={onToggleSidebar}
@@ -24,18 +46,29 @@ const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
       {/* Brand */}
       <span className="text-warning fw-bold fs-4 me-auto">FoodieAdmin</span>
 
-      {/* User Dropdown */}
+      {/* Profile Dropdown */}
       <div className="d-flex align-items-center">
         <div className="dropdown">
           <button
-            className="btn text-white dropdown-toggle"
+            className="btn dropdown-toggle p-0 border-0"
             type="button"
             id="userDropdown"
             data-bs-toggle="dropdown"
             aria-expanded="false"
-            style={{ background: "none", border: "none" }}
+            style={{ background: "none" }}
           >
-            <i className="fas fa-user fa-fw"></i>
+            <img
+              src={
+                profileImage?.startsWith("/UserImages")
+                  ? `http://localhost:5110${profileImage}`
+                  : profileImage || "/default-user.png"
+              }
+              alt="Profile"
+              className="rounded-circle "
+              width="40"
+              height="40"
+              style={{ objectFit: "cover" }}
+            />
           </button>
           <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
             <li>

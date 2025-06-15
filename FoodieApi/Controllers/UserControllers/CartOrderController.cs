@@ -82,7 +82,7 @@ namespace FoodieApi.Controllers.UserControllers
                     return BadRequest($"You cannot add more than {MaxQuantityPerItem} units of a single item to your cart.");
 
                 if (request.Quantity > stockAvailable)
-                    return BadRequest($"Only {stockAvailable} items available in stock.");
+                    return BadRequest($" {stockAvailable} items available in stock.");
 
                 existingCartItem.Quantity = newTotalQuantity;
                 existingCartItem.TotalPrice = existingCartItem.Quantity * menu.Price;
@@ -93,7 +93,7 @@ namespace FoodieApi.Controllers.UserControllers
                     return BadRequest($"You cannot add more than {MaxQuantityPerItem} units of a single item to your cart.");
 
                 if (request.Quantity > stockAvailable)
-                    return BadRequest($"Only {stockAvailable} items available in stock.");
+                    return BadRequest($" {stockAvailable} items available in stock.");
 
                 var newCart = new Cart
                 {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import Skeleton from "react-loading-skeleton";
+import Swal from "sweetalert2";
 
 const SingleMenuItem = () => {
   const { id } = useParams();
@@ -10,8 +11,6 @@ const SingleMenuItem = () => {
   const [similarMenus, setSimilarMenus] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingSimilar, setLoadingSimilar] = useState(true);
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
   const [categoryName, setCategoryName] = useState("");
   const [quantity, setQuantity] = useState(1);
 
@@ -20,8 +19,6 @@ const SingleMenuItem = () => {
   const fetchMenuDetails = async () => {
     try {
       setLoading(true);
-      setError(null);
-      setSuccessMessage("");
 
       const res = await fetch(`http://localhost:5110/api/UserMenuCategory/menu/${id}`);
       if (!res.ok) throw new Error(`Failed to fetch menu item with id ${id}`);
@@ -29,7 +26,6 @@ const SingleMenuItem = () => {
       setMenuItem(data);
 
       const catRes = await fetch(`http://localhost:5110/api/UserMenuCategory/activeCategories`);
-      if (!catRes.ok) throw new Error("Failed to fetch categories");
       const categories = await catRes.json();
       const matched = categories.find(c => c.categoryId === data.categoryId);
       setCategoryName(matched?.name || "Category");
@@ -38,12 +34,11 @@ const SingleMenuItem = () => {
 
       setLoadingSimilar(true);
       const similarRes = await fetch(`http://localhost:5110/api/UserMenuCategory/category/${data.categoryId}/menus`);
-      if (!similarRes.ok) throw new Error("Failed to fetch similar items");
       const similarData = await similarRes.json();
       setSimilarMenus(similarData.filter(item => item.menuId !== data.menuId));
       setLoadingSimilar(false);
     } catch (err) {
-      setError(err.message || "Error loading menu item");
+      Swal.fire("Error", err.message || "Failed to load data", "error");
       setLoading(false);
       setLoadingSimilar(false);
     }
@@ -58,19 +53,18 @@ const SingleMenuItem = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Please login to add items to cart.");
+        Swal.fire({
+          title: "Login Required",
+          text: "Please login to add items to cart.",
+          icon: "warning",
+          confirmButtonText: "OK",
+        });
         return;
       }
 
-      // Step 1: Fetch current cart
       const cartRes = await fetch("http://localhost:5110/api/CartOrder", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!cartRes.ok) throw new Error("Failed to fetch cart");
-
       const cartJson = await cartRes.json();
       const cartItems = Array.isArray(cartJson) ? cartJson : cartJson.items || [];
 
@@ -79,22 +73,24 @@ const SingleMenuItem = () => {
       const newTotalQty = existingQty + quantity;
 
       if (newTotalQty > 10) {
-        setError(`You can't add more than 10 units of "${item.name}" to your cart.`);
-        setTimeout(() => setError(""), 4000);
+        Swal.fire({
+          title: "Limit Exceeded",
+          text: `You can't add more than 10 units of "${item.name}" to your cart.`,
+          icon: "info",
+        });
         return;
       }
 
-      // Step 2: Add to cart
       const response = await fetch("http://localhost:5110/api/CartOrder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           menuId: item.menuId,
-          quantity: quantity
-        })
+          quantity: quantity,
+        }),
       });
 
       if (!response.ok) {
@@ -102,15 +98,18 @@ const SingleMenuItem = () => {
         throw new Error(errText || "Failed to add to cart");
       }
 
-      setSuccessMessage(`"${item.name}" added to cart!`);
-      setTimeout(() => setSuccessMessage(""), 4000);
+      Swal.fire({
+        title: "Added!",
+        text: `"${item.name}" has been added to your cart.`,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
 
-      // ** Dispatch cartUpdated event so header/cart count updates live **
       window.dispatchEvent(new Event("cartUpdated"));
 
     } catch (err) {
-      setError(err.message || "Something went wrong");
-      setTimeout(() => setError(""), 4000);
+      Swal.fire("Error", err.message || "Something went wrong", "error");
     }
   };
 
@@ -139,9 +138,6 @@ const SingleMenuItem = () => {
 
   return (
     <div className="container pt-5 mt-4">
-      {error && <div className="alert alert-danger my-4">{error}</div>}
-      {successMessage && <div className="alert alert-success my-4">{successMessage}</div>}
-
       <div className="row">
         {loading ? (
           renderSkeleton()

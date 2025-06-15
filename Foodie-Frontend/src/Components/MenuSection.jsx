@@ -1,25 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MenuCard from '../Components/MenuCard';
 import axios from 'axios';
-import { Link } from 'react-router-dom';  // <-- Import Link here
-import './MenuSection.css'; // Ensure correct path
+import { Link } from 'react-router-dom';
+import './MenuSection.css';
 
 const MenuSection = () => {
-  const gridItems = useRef(null);
   const [menus, setMenus] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filter, setFilter] = useState(null); // No default "All"
-  const [isCardVisible, setIsCardVisible] = useState(false); // Show limited by default
-  const [displayedMenus, setDisplayedMenus] = useState([]);
+  const [filterCategory, setFilterCategory] = useState(null);
+  const [sortOption, setSortOption] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   useEffect(() => {
     fetchCategories();
     fetchMenus();
   }, []);
-
-  useEffect(() => {
-    filterMenus();
-  }, [menus, filter, isCardVisible]);
 
   const fetchMenus = async () => {
     try {
@@ -39,22 +35,42 @@ const MenuSection = () => {
     }
   };
 
-  const filterMenus = () => {
-    const filtered = filter
-      ? menus.filter(menu => menu.categoryId === filter)
-      : menus;
-    setDisplayedMenus(isCardVisible ? filtered : filtered.slice(0, 6));
-  };
-
-  const handleViewMore = () => {
-    setIsCardVisible(prev => !prev);
-  };
-
   const getImageSrc = (imageUrl) => {
     if (!imageUrl) return '';
     return imageUrl.startsWith('/CategoryImages')
       ? `http://localhost:5110${imageUrl}`
       : `http://localhost:5110/CategoryImages/${imageUrl}`;
+  };
+
+  const handleSortChange = (e) => {
+    setSortOption(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const sortMenus = (menuList) => {
+    switch (sortOption) {
+      case 'name':
+        return [...menuList].sort((a, b) => a.name.localeCompare(b.name));
+      case 'price':
+        return [...menuList].sort((a, b) => a.price - b.price);
+      case 'quantity':
+        return [...menuList].sort((a, b) => a.quantity - b.quantity);
+      default:
+        return menuList;
+    }
+  };
+
+  const filteredMenus = filterCategory
+    ? menus.filter(menu => menu.categoryId === filterCategory)
+    : menus;
+
+  const sortedMenus = sortMenus(filteredMenus);
+
+  const totalPages = Math.ceil(sortedMenus.length / itemsPerPage);
+  const paginatedMenus = sortedMenus.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   return (
@@ -68,19 +84,15 @@ const MenuSection = () => {
         </div>
 
         {/* Category Filter */}
-        <div className="explore-menu-list mb-4">
+        <div className="explore-menu-list mb-3">
           {categories.map((category) => (
             <div
               key={category.categoryId}
-              onClick={() =>
-                setFilter((prev) =>
-                  prev === category.categoryId ? null : category.categoryId
-                )
-              }
+              onClick={() => setFilterCategory(prev => prev === category.categoryId ? null : category.categoryId)}
               className="explore-menu-list-item"
             >
               <img
-                className={filter === category.categoryId ? 'active' : ''}
+                className={filterCategory === category.categoryId ? 'active' : ''}
                 src={getImageSrc(category.imageUrl)}
                 alt={category.name}
               />
@@ -88,41 +100,63 @@ const MenuSection = () => {
             </div>
           ))}
         </div>
+
+        {/* Sort Dropdown */}
+        <div className="d-flex justify-content-end mb-4">
+          <select onChange={handleSortChange} value={sortOption} className="form-select w-auto">
+            <option value="">Sort By</option>
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+            <option value="quantity">Quantity</option>
+          </select>
+        </div>
+
         <hr />
 
         {/* Menu Cards */}
-        <div className="row grid" ref={gridItems}>
-          {displayedMenus.map((menu) => (
-            <div
-              key={menu.menuId}
-              className="col-sm-6 col-lg-4 wow fadeInUp"
-              data-filter={menu.categoryId}
-            >
-              {/* Wrap MenuCard inside Link for navigation */}
-              <Link to={`/menu/${menu.menuId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <MenuCard
-                  menuId={menu.menuId}
-                  imgsrc={menu.imageUrl ? `http://localhost:5110${menu.imageUrl}` : ''}
-                  heading={menu.name}
-                  description={menu.description}
-                  price={menu.price}
-                />
-              </Link>
+        <div className="row grid">
+          {paginatedMenus.length > 0 ? (
+            paginatedMenus.map((menu) => (
+              <div
+                key={menu.menuId}
+                className="col-sm-6 col-lg-4 wow fadeInUp"
+                data-filter={menu.categoryId}
+              >
+                <Link
+                  to={`/menu/${menu.menuId}`}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  <MenuCard
+                    menuId={menu.menuId}
+                    imgsrc={menu.imageUrl ? `http://localhost:5110${menu.imageUrl}` : ''}
+                    heading={menu.name}
+                    description={menu.description}
+                    price={menu.price}
+                    quantity={menu.quantity}
+                  />
+                </Link>
+              </div>
+            ))
+          ) : (
+            <div className="text-center mt-4 mb-5">
+              <h5>There are no menu items available in this category. We’ll update it soon!</h5>
             </div>
-          ))}
+          )}
         </div>
 
-        {/* View More / View Less Button */}
-        {(
-          filter
-            ? menus.filter(menu => menu.categoryId === filter).length
-            : menus.length
-        ) > 6 && (
-          <div className="btn-box mt-4">
-            <a onClick={handleViewMore} style={{ cursor: 'pointer' }}>
-              {isCardVisible ? 'View Less' : 'View More'}
-            </a>
-          </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <nav className="mt-4 d-flex justify-content-center">
+            <ul className="pagination">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                  <button className="page-link" onClick={() => handlePageChange(page)}>
+                    {page}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
         )}
       </div>
     </section>

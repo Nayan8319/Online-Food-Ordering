@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
 
 const PasswordChangeModal = ({
   showPasswordModal,
@@ -8,6 +11,22 @@ const PasswordChangeModal = ({
   passwordError,
   handlePasswordChange,
 }) => {
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [validationError, setValidationError] = useState("");
+
+  const handleChange = (field, value) => {
+    setPasswordForm({ ...passwordForm, [field]: value });
+
+    if (field === "new") {
+      if (value.length > 0 && value.length < 8) {
+        setValidationError("New password must be at least 8 characters.");
+      } else {
+        setValidationError("");
+      }
+    }
+  };
+
   return (
     showPasswordModal && (
       <div
@@ -30,34 +49,70 @@ const PasswordChangeModal = ({
               {passwordError && (
                 <div className="alert alert-danger">{passwordError}</div>
               )}
-              <input
-                type="password"
-                className="form-control mb-2"
-                placeholder="Current Password"
-                value={passwordForm.current}
-                onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, current: e.target.value })
-                }
-              />
-              <input
-                type="password"
-                className="form-control mb-2"
-                placeholder="New Password"
-                value={passwordForm.new}
-                onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, new: e.target.value })
-                }
-              />
-              <input
-                type="password"
-                className="form-control"
-                placeholder="Confirm New Password"
-                value={passwordForm.confirm}
-                onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, confirm: e.target.value })
-                }
-              />
+              {validationError && (
+                <div className="alert alert-warning">{validationError}</div>
+              )}
+              {/* Current Password */}
+              <div className="mb-2">
+                <label className="form-label">Current Password</label>
+                <div className="input-group">
+                  <input
+                    type={showCurrent ? "text" : "password"}
+                    className="form-control"
+                    placeholder="Current Password"
+                    value={passwordForm.current}
+                    onChange={(e) =>
+                      handleChange("current", e.target.value)
+                    }
+                  />
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowCurrent(!showCurrent)}
+                      edge="end"
+                    >
+                      {showCurrent ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                </div>
+              </div>
+
+              {/* New Password */}
+              <div className="mb-2">
+                <label className="form-label">New Password</label>
+                <div className="input-group">
+                  <input
+                    type={showNew ? "text" : "password"}
+                    className="form-control"
+                    placeholder="New Password"
+                    value={passwordForm.new}
+                    onChange={(e) => handleChange("new", e.target.value)}
+                  />
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowNew(!showNew)}
+                      edge="end"
+                    >
+                      {showNew ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <label className="form-label">Confirm New Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Confirm New Password"
+                  value={passwordForm.confirm}
+                  onChange={(e) =>
+                    handleChange("confirm", e.target.value)
+                  }
+                />
+              </div>
             </div>
+
             <div className="modal-footer">
               <button
                 type="button"
@@ -70,6 +125,7 @@ const PasswordChangeModal = ({
                 type="button"
                 className="btn btn-primary"
                 onClick={handlePasswordChange}
+                disabled={passwordForm.new.length < 8}
               >
                 Save
               </button>
