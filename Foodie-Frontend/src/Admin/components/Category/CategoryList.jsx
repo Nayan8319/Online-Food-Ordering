@@ -215,7 +215,7 @@ export default function CategoryList() {
         <Button
           variant="contained"
           endIcon={<AddCircleIcon />}
-          onClick={() => navigate("/admin/Categories/add-category")}
+          onClick={() => navigate("/admin/categories/add-category")}
         >
           Add
         </Button>
@@ -301,7 +301,7 @@ export default function CategoryList() {
                         sx={{ mr: 1 }}
                         onClick={() =>
                           navigate(
-                            `/admin/Categories/edit-category/${row.categoryId}`
+                            `/admin/categories/edit-category/${row.categoryId}`
                           )
                         }
                       >
@@ -339,11 +339,10 @@ export default function CategoryList() {
             justifyContent: "space-between",
             alignItems: "center",
           },
-          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
-            {
-              margin: 0,
-              whiteSpace: "nowrap",
-            },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+            margin: 0,
+            whiteSpace: "nowrap",
+          },
           "& .MuiTablePagination-select": {
             marginRight: 2,
           },

@@ -23,6 +23,7 @@ const EditMenu = () => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imageUrlError, setImageUrlError] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,8 +42,8 @@ const EditMenu = () => {
         setForm({
           name: menuRes.data.name,
           description: menuRes.data.description,
-          price: menuRes.data.price,
-          quantity: menuRes.data.quantity,
+          price: parseFloat(menuRes.data.price).toFixed(2),
+          quantity: menuRes.data.quantity.toString(),
           categoryId: menuRes.data.categoryId,
           isActive: menuRes.data.isActive,
           imageUrl: menuRes.data.imageUrl || "",
@@ -110,6 +111,19 @@ const EditMenu = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    if ((name === "price" || name === "quantity") && value !== "") {
+      const numericValue = parseFloat(value);
+      if (isNaN(numericValue) || numericValue < 0) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          [name]: `${name.charAt(0).toUpperCase() + name.slice(1)} must be 0 or more`,
+        }));
+      } else {
+        setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+      }
+    }
+
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -139,8 +153,16 @@ const EditMenu = () => {
 
     const { name, price, quantity, categoryId, imageUrl } = form;
 
-    if (!name.trim() || !price || !quantity || !categoryId) {
+    if (!name.trim() || price === "" || quantity === "" || categoryId === "") {
       Swal.fire("Validation Error", "All fields are required.", "warning");
+      return;
+    }
+
+    const numericPrice = parseFloat(price);
+    const numericQuantity = parseInt(quantity);
+
+    if (isNaN(numericPrice) || numericPrice < 0 || numericQuantity < 0) {
+      Swal.fire("Validation Error", "Price and quantity must be non-negative.", "error");
       return;
     }
 
@@ -169,8 +191,8 @@ const EditMenu = () => {
         payload = new FormData();
         payload.append("Name", name);
         payload.append("Description", form.description);
-        payload.append("Price", price);
-        payload.append("Quantity", quantity);
+        payload.append("Price", numericPrice);
+        payload.append("Quantity", numericQuantity);
         payload.append("CategoryId", categoryId);
         payload.append("IsActive", form.isActive.toString());
         payload.append("ImageUrl", "");
@@ -181,8 +203,8 @@ const EditMenu = () => {
         payload = {
           Name: name,
           Description: form.description,
-          Price: price,
-          Quantity: quantity,
+          Price: numericPrice,
+          Quantity: numericQuantity,
           CategoryId: categoryId,
           IsActive: form.isActive,
           ImageUrl: trimmedImageUrl,
@@ -198,7 +220,7 @@ const EditMenu = () => {
       });
 
       Swal.fire("Success", "Menu updated successfully!", "success").then(() =>
-        navigate("/admin/Product")
+        navigate("/admin/menu")
       );
     } catch (error) {
       console.error("Update Error:", error);
@@ -220,7 +242,12 @@ const EditMenu = () => {
           type="submit"
           form="menuForm"
           className="btn btn-dark"
-          disabled={!form.name.trim() || imageUrlError !== ""}
+          disabled={
+            !form.name.trim() ||
+            imageUrlError !== "" ||
+            validationErrors.price ||
+            validationErrors.quantity
+          }
         >
           Update Menu
         </button>
@@ -232,7 +259,6 @@ const EditMenu = () => {
         onSubmit={handleSubmit}
         encType="multipart/form-data"
       >
-        {/* Left Column */}
         <div className="col-md-6">
           <h5>Menu Info</h5>
 
@@ -261,20 +287,29 @@ const EditMenu = () => {
             type="number"
             name="price"
             className="form-control"
+            min="0"
+            step="0.01"
             value={form.price}
             onChange={handleChange}
             required
           />
+          {validationErrors.price && (
+            <small className="text-danger">{validationErrors.price}</small>
+          )}
 
           <label className="form-label mt-3">Quantity</label>
           <input
             type="number"
             name="quantity"
             className="form-control"
+            min="0"
             value={form.quantity}
             onChange={handleChange}
             required
           />
+          {validationErrors.quantity && (
+            <small className="text-danger">{validationErrors.quantity}</small>
+          )}
 
           <label className="form-label mt-3">Category</label>
           <select
@@ -307,7 +342,6 @@ const EditMenu = () => {
           </div>
         </div>
 
-        {/* Right Column - Image */}
         <div className="col-md-6">
           <h5>Menu Image</h5>
           <div

@@ -64,7 +64,7 @@ const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
                   : profileImage || "/default-user.png"
               }
               alt="Profile"
-              className="rounded-circle "
+              className="rounded-circle"
               width="40"
               height="40"
               style={{ objectFit: "cover" }}

@@ -90,10 +90,10 @@ export default function ProductList() {
       } else {
         setRows([]);
         setFilteredRows([]);
-        setMessage("No valid product data found.");
+        setMessage("No valid Menu Item data found.");
       }
     } catch (error) {
-      setMessage(error.message || "Error fetching products");
+      setMessage(error.message || "Error fetching Menu Items");
     }
   };
 
@@ -158,11 +158,11 @@ export default function ProductList() {
             Authorization: `Bearer ${token}`,
           },
         });
-        Swal.fire("Deleted!", "Product has been deleted.", "success");
+        Swal.fire("Deleted!", "Menu Item has been deleted.", "success");
         const updated = rows.filter((r) => r.menuId !== id);
         setRows(updated);
       } catch (error) {
-        Swal.fire("Error!", "Failed to delete product", "error");
+        Swal.fire("Error!", "Failed to delete Menu Item", "error");
       }
     }
   };
@@ -268,7 +268,7 @@ export default function ProductList() {
         <Button
           variant="contained"
           endIcon={<AddCircleIcon />}
-          onClick={() => navigate("/admin/product/add-product")}
+          onClick={() => navigate("/admin/menu/add-menu-item")}
         >
           Add
         </Button>
@@ -295,7 +295,7 @@ export default function ProductList() {
             {filteredRows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={9} align="center">
-                  No products found.
+                  No Menu Item found.
                 </TableCell>
               </TableRow>
             ) : (
@@ -369,7 +369,7 @@ export default function ProductList() {
                         startIcon={<EditIcon />}
                         sx={{ mr: 1 }}
                         onClick={() =>
-                          navigate(`/admin/product/edit-product/${row.menuId}`)
+                          navigate(`/admin/menu/edit-menu/${row.menuId}`)
                         }
                       >
                         Edit
@@ -407,11 +407,10 @@ export default function ProductList() {
             justifyContent: "space-between",
             alignItems: "center",
           },
-          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
-            {
-              margin: 0,
-              whiteSpace: "nowrap",
-            },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+            margin: 0,
+            whiteSpace: "nowrap",
+          },
           "& .MuiTablePagination-select": {
             marginRight: 2,
           },
