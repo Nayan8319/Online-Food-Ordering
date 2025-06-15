@@ -108,19 +108,19 @@ const Mainrouter = createBrowserRouter([
     element: <AdminLayout><AddCategory /></AdminLayout>
   },
   {
-    path: '/admin/categories/edit-Category/:id',
+    path: '/admin/Categories/edit-Category/:id',
     element: <AdminLayout><EditCategory /></AdminLayout>
   },
   {
-    path: '/admin/product',
+    path: '/admin/menu',
     element: <AdminLayout><Product /></AdminLayout>
   },
   {
-    path: '/admin/product/add-product',
+    path: '/admin/menu/add-menu-item',
     element: <AdminLayout><AddProduct /></AdminLayout>
   },
   {
-    path: '/admin/product/edit-product/:id',
+    path: '/admin/menu/edit-menu/:id',
     element: <AdminLayout><EditProduct /></AdminLayout>
   },
   {

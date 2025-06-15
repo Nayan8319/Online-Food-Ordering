@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "sweetalert2/dist/sweetalert2.min.css";
 
-const AddProduct = () => {
+const AddMenu = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -21,6 +20,40 @@ const AddProduct = () => {
   const [categories, setCategories] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+  const [imageUrlError, setImageUrlError] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get("http://localhost:5110/api/Category", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setCategories(res.data);
+      } catch (err) {
+        Swal.fire("Error", "Failed to load categories", "error");
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    if (imageFile) {
+      const objectUrl = URL.createObjectURL(imageFile);
+      setImagePreviewUrl(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    } else if (form.imageUrl && isBase64(form.imageUrl)) {
+      setImagePreviewUrl(form.imageUrl);
+    } else if (form.imageUrl && isValidImageUrl(form.imageUrl)) {
+      setImagePreviewUrl(form.imageUrl);
+    } else if (form.imageUrl && form.imageUrl.startsWith("/MenuImages/")) {
+      setImagePreviewUrl(`http://localhost:5110${form.imageUrl}`);
+    } else {
+      setImagePreviewUrl(null);
+    }
+  }, [imageFile, form.imageUrl]);
 
   const isBase64 = (str) =>
     /^data:image\/(png|jpeg|jpg|gif|bmp);base64,/.test(str);
@@ -34,6 +67,16 @@ const AddProduct = () => {
     }
   };
 
+  const isValidImageInput = (input) => {
+    if (!input) return false;
+    input = input.trim();
+    return (
+      input.startsWith("/MenuImages/") ||
+      isValidImageUrl(input) ||
+      isBase64(input)
+    );
+  };
+
   const base64toFile = (base64String, filename) => {
     const arr = base64String.split(",");
     const mimeMatch = arr[0].match(/:(.*?);/);
@@ -41,92 +84,76 @@ const AddProduct = () => {
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
     return new File([u8arr], filename, { type: mime });
   };
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5110/api/Category", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setCategories(response.data);
-      } catch (error) {
-        Swal.fire("Error", "Failed to load categories. Please refresh.", "error");
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    if (imageFile) {
-      const objectUrl = URL.createObjectURL(imageFile);
-      setImagePreviewUrl(objectUrl);
-      return () => URL.revokeObjectURL(objectUrl);
-    } else if (
-      form.imageUrl &&
-      (isValidImageUrl(form.imageUrl) || isBase64(form.imageUrl))
-    ) {
-      setImagePreviewUrl(form.imageUrl);
-    } else {
-      setImagePreviewUrl(null);
-    }
-  }, [imageFile, form.imageUrl]);
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    if ((name === "price" || name === "quantity") && value !== "") {
+      const numericValue = parseFloat(value);
+      if (isNaN(numericValue) || numericValue < 0) {
+        setValidationErrors((prev) => ({
+          ...prev,
+          [name]: `${name.charAt(0).toUpperCase() + name.slice(1)} must be 0 or more`,
+        }));
+      } else {
+        setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+      }
+    }
+
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    if (name === "imageUrl" && value) {
+    if (name === "imageUrl") {
       setImageFile(null);
+      if (value.trim() === "" || isValidImageInput(value)) {
+        setImageUrlError("");
+      } else {
+        setImageUrlError(
+          "Invalid input: must be /MenuImages/, URL, or Base64 image."
+        );
+      }
     }
   };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setForm((prev) => ({ ...prev, imageUrl: "" }));
-    }
+    setImageFile(file);
+    setForm((prev) => ({ ...prev, imageUrl: "" }));
+    setImageUrlError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.name.trim()) {
-      Swal.fire("Validation Error", "Product name is required.", "warning");
+    const { name, price, quantity, categoryId, imageUrl } = form;
+
+    if (!name.trim() || price === "" || quantity === "" || categoryId === "") {
+      Swal.fire("Validation Error", "All fields are required.", "warning");
       return;
     }
 
-    if (!form.price || isNaN(form.price) || Number(form.price) <= 0) {
-      Swal.fire("Validation Error", "Valid product price is required.", "warning");
+    const numericPrice = parseFloat(price);
+    const numericQuantity = parseInt(quantity);
+
+    if (isNaN(numericPrice) || numericPrice < 0 || numericQuantity < 0) {
+      Swal.fire("Validation Error", "Price and quantity must be non-negative.", "error");
       return;
     }
 
-    if (!form.quantity || isNaN(form.quantity) || Number(form.quantity) < 0) {
-      Swal.fire("Validation Error", "Valid product quantity is required.", "warning");
+    const trimmedImageUrl = imageUrl.trim();
+
+    if (!imageFile && !trimmedImageUrl) {
+      Swal.fire("Validation Error", "Please provide an image.", "warning");
       return;
     }
 
-    if (!form.categoryId) {
-      Swal.fire("Validation Error", "Please select a category.", "warning");
-      return;
-    }
-
-    if (!imageFile && !form.imageUrl.trim()) {
-      Swal.fire(
-        "Validation Error",
-        "Please upload an image file or provide a valid image URL or Base64 string.",
-        "warning"
-      );
+    if (trimmedImageUrl && !isValidImageInput(trimmedImageUrl)) {
+      Swal.fire("Validation Error", "Invalid image input.", "error");
       return;
     }
 
@@ -135,68 +162,50 @@ const AddProduct = () => {
       let payload;
       let headers;
 
-      if (imageFile) {
+      if (imageFile || isBase64(trimmedImageUrl)) {
+        const imageToUpload = imageFile
+          ? imageFile
+          : base64toFile(trimmedImageUrl, "menuImage.png");
+
         payload = new FormData();
-        payload.append("name", form.name);
-        payload.append("description", form.description);
-        payload.append("price", form.price);
-        payload.append("quantity", form.quantity);
-        payload.append("categoryId", form.categoryId);
-        payload.append("isActive", form.isActive.toString());
-        payload.append("image", imageFile);
+        payload.append("Name", name);
+        payload.append("Description", form.description);
+        payload.append("Price", numericPrice);
+        payload.append("Quantity", numericQuantity);
+        payload.append("CategoryId", categoryId);
+        payload.append("IsActive", form.isActive.toString());
+        payload.append("ImageUrl", "");
+        payload.append("image", imageToUpload);
 
-        headers = {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        };
-      } else if (isBase64(form.imageUrl)) {
-        const fileFromBase64 = base64toFile(form.imageUrl, "imageFromBase64.png");
-        payload = new FormData();
-        payload.append("name", form.name);
-        payload.append("description", form.description);
-        payload.append("price", form.price);
-        payload.append("quantity", form.quantity);
-        payload.append("categoryId", form.categoryId);
-        payload.append("isActive", form.isActive.toString());
-        payload.append("image", fileFromBase64);
-
-        headers = {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        };
-      } else if (isValidImageUrl(form.imageUrl)) {
-        payload = {
-          name: form.name,
-          description: form.description,
-          price: form.price,
-          quantity: form.quantity,
-          categoryId: form.categoryId,
-          isActive: form.isActive,
-          imageUrl: form.imageUrl,
-        };
-
-        headers = {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        };
+        headers = { Authorization: `Bearer ${token}` };
       } else {
-        Swal.fire(
-          "Validation Error",
-          "Invalid image input. Please upload a valid file, URL or Base64.",
-          "warning"
-        );
-        return;
+        payload = {
+          Name: name,
+          Description: form.description,
+          Price: numericPrice,
+          Quantity: numericQuantity,
+          CategoryId: categoryId,
+          IsActive: form.isActive,
+          ImageUrl: trimmedImageUrl,
+        };
+        headers = {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        };
       }
 
-      await axios.post("http://localhost:5110/api/Menu", payload, { headers });
-
-      Swal.fire("Success", "Product created successfully!", "success").then(() => {
-        navigate("/admin/Product");
+      await axios.post("http://localhost:5110/api/Menu", payload, {
+        headers,
       });
+
+      Swal.fire("Success", "Menu added successfully!", "success").then(() =>
+        navigate("/admin/menu")
+      );
     } catch (error) {
+      console.error("Create Error:", error);
       Swal.fire(
         "Error",
-        error.response?.data?.message || "Failed to create product. Please try again.",
+        error.response?.data || "Failed to add menu.",
         "error"
       );
     }
@@ -205,31 +214,36 @@ const AddProduct = () => {
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Add new Menu</h2>
+        <h2>Add New Menu</h2>
         <button
           type="submit"
-          form="productForm"
+          form="menuForm"
           className="btn btn-dark"
-          disabled={!form.name.trim()}
+          disabled={
+            !form.name.trim() ||
+            imageUrlError !== "" ||
+            validationErrors.price ||
+            validationErrors.quantity
+          }
         >
-          Publish Menu
+          Add Menu
         </button>
       </div>
 
       <form
-        onSubmit={handleSubmit}
-        id="productForm"
+        id="menuForm"
         className="row g-4"
+        onSubmit={handleSubmit}
         encType="multipart/form-data"
       >
         <div className="col-md-6">
-          <h5>Basic information</h5>
+          <h5>Menu Info</h5>
 
-          <label className="form-label">Menu item Name</label>
+          <label className="form-label">Name</label>
           <input
             type="text"
-            className="form-control"
             name="name"
+            className="form-control"
             value={form.name}
             onChange={handleChange}
             required
@@ -237,60 +251,67 @@ const AddProduct = () => {
 
           <label className="form-label mt-3">Description</label>
           <textarea
-            className="form-control"
             name="description"
+            className="form-control"
+            rows="3"
             value={form.description}
             onChange={handleChange}
-            rows={3}
+            required
           />
 
           <label className="form-label mt-3">Price</label>
           <input
             type="number"
-            className="form-control"
             name="price"
-            value={form.price}
-            onChange={handleChange}
+            className="form-control"
             min="0"
             step="0.01"
+            value={form.price}
+            onChange={handleChange}
             required
           />
+          {validationErrors.price && (
+            <small className="text-danger">{validationErrors.price}</small>
+          )}
 
           <label className="form-label mt-3">Quantity</label>
           <input
             type="number"
-            className="form-control"
             name="quantity"
+            className="form-control"
+            min="0"
             value={form.quantity}
             onChange={handleChange}
-            min="0"
             required
           />
+          {validationErrors.quantity && (
+            <small className="text-danger">{validationErrors.quantity}</small>
+          )}
 
           <label className="form-label mt-3">Category</label>
           <select
-            className="form-select"
             name="categoryId"
+            className="form-select"
             value={form.categoryId}
             onChange={handleChange}
             required
           >
-            <option value="">Select category</option>
+            <option value="">-- Select Category --</option>
             {categories.map((cat) => (
-              <option key={cat.categoryId || cat.id} value={cat.categoryId || cat.id}>
+              <option key={cat.categoryId} value={cat.categoryId}>
                 {cat.name}
               </option>
             ))}
           </select>
 
-          <div className="form-check form-switch mt-3">
+          <div className="form-check form-switch mt-4">
             <input
               className="form-check-input"
               type="checkbox"
-              id="isActiveSwitch"
               name="isActive"
               checked={form.isActive}
               onChange={handleChange}
+              id="isActiveSwitch"
             />
             <label className="form-check-label" htmlFor="isActiveSwitch">
               Is Active
@@ -299,16 +320,12 @@ const AddProduct = () => {
         </div>
 
         <div className="col-md-6">
-          <h5>Menu image</h5>
+          <h5>Menu Image</h5>
           <div
             className="border border-secondary rounded p-4 text-center"
             style={{ minHeight: "300px" }}
           >
-            <label
-              htmlFor="uploadImg"
-              className="d-block mb-2"
-              style={{ cursor: "pointer" }}
-            >
+            <label htmlFor="uploadImg" className="d-block mb-2" style={{ cursor: "pointer" }}>
               <i className="bi bi-cloud-arrow-up" style={{ fontSize: "2rem" }}></i>
               <br />
               <strong>Click to upload</strong> or drag and drop
@@ -324,33 +341,28 @@ const AddProduct = () => {
             />
 
             {imagePreviewUrl && (
-              <div className="mt-3">
-                <img
-                  src={imagePreviewUrl}
-                  alt="Preview"
-                  className="img-fluid rounded"
-                  style={{ maxHeight: "200px" }}
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                    Swal.fire("Error", "Invalid image URL or Base64", "error");
-                  }}
-                />
-              </div>
+              <img
+                src={imagePreviewUrl}
+                alt="Preview"
+                className="img-fluid rounded mt-3"
+                style={{ maxHeight: "200px" }}
+              />
             )}
 
             <hr />
 
-            <label htmlFor="onlineImageUrl" className="form-label mt-3">
-              Or enter online image URL or Base64 string
-            </label>
-            <textarea
-              id="onlineImageUrl"
-              name="imageUrl"
+            <label className="form-label">Or provide URL/Base64/relative path</label>
+            <input
+              type="text"
               className="form-control"
+              name="imageUrl"
               value={form.imageUrl}
               onChange={handleChange}
-              rows={4}
+              placeholder="e.g. /MenuImages/img.png or full URL"
             />
+            {imageUrlError && (
+              <small className="text-danger">{imageUrlError}</small>
+            )}
           </div>
         </div>
       </form>
@@ -358,4 +370,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default AddMenu;

@@ -24,7 +24,7 @@ const Sidebar = ({ collapsed: initialCollapsed }) => {
   const [productDropdownOpen, setProductDropdownOpen] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
 
-  const isProductSection = location.pathname.toLowerCase().startsWith("/admin/product");
+  const isProductSection = location.pathname.toLowerCase().startsWith("/admin/menu");
   const isCategorySection = location.pathname.toLowerCase().startsWith("/admin/categories");
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const Sidebar = ({ collapsed: initialCollapsed }) => {
   const toggleProductDropdown = () => {
     setProductDropdownOpen((prev) => {
       const newState = !prev;
-      if (newState) navigate("/admin/Product");
+      if (newState) navigate("/admin/Menu");
       return newState;
     });
   };
@@ -120,7 +120,7 @@ const Sidebar = ({ collapsed: initialCollapsed }) => {
             <ul className="list-unstyled ps-4 pt-2">
               <li>
                 <NavLink
-                  to="/admin/Product"
+                  to="/admin/Menu"
                   end
                   className={({ isActive }) =>
                     `text-decoration-none text-dark d-block py-1 px-2 ${isActive ? "active" : ""}`
@@ -131,7 +131,7 @@ const Sidebar = ({ collapsed: initialCollapsed }) => {
               </li>
               <li>
                 <NavLink
-                  to="/admin/product/add-product"
+                  to="/admin/menu/add-menu-item"
                   className={({ isActive }) =>
                     `text-decoration-none text-dark d-block py-1 px-2 ${isActive ? "active" : ""}`
                   }

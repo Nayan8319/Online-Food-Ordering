@@ -13,12 +13,12 @@
       "PackagePath": "staticwebassets\\CategoryImages\\7480731f-4ab8-43e7-9870-858d9b417f2e.png"
     },
     {
-      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\CategoryImages\\76977f6c-d588-4db9-ac1a-675e957d9d78.png",
-      "PackagePath": "staticwebassets\\CategoryImages\\76977f6c-d588-4db9-ac1a-675e957d9d78.png"
-    },
-    {
       "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\CategoryImages\\8f4ed5ee-5dfd-4575-8017-a60c25ef9308.jpeg",
       "PackagePath": "staticwebassets\\CategoryImages\\8f4ed5ee-5dfd-4575-8017-a60c25ef9308.jpeg"
+    },
+    {
+      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\CategoryImages\\9425e37a-cb4c-4fe8-9391-4fb3e39efa01.jpg",
+      "PackagePath": "staticwebassets\\CategoryImages\\9425e37a-cb4c-4fe8-9391-4fb3e39efa01.jpg"
     },
     {
       "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\CategoryImages\\a23345c5-8ee1-4bb7-afa3-4be0eb856a24.png",
@@ -49,16 +49,20 @@
       "PackagePath": "staticwebassets\\MenuImages\\67d16337-9534-4e91-8589-aadb238f2923.png"
     },
     {
+      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\MenuImages\\6a62b504-044d-4b62-912d-461c6caf33d6.jpg",
+      "PackagePath": "staticwebassets\\MenuImages\\6a62b504-044d-4b62-912d-461c6caf33d6.jpg"
+    },
+    {
+      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\MenuImages\\6c6ebc6f-015c-4c8f-a7d0-279a7fc484c0.jpg",
+      "PackagePath": "staticwebassets\\MenuImages\\6c6ebc6f-015c-4c8f-a7d0-279a7fc484c0.jpg"
+    },
+    {
       "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\MenuImages\\775428f3-f3bc-40a1-98bd-ee6d6bd5444a.jpeg",
       "PackagePath": "staticwebassets\\MenuImages\\775428f3-f3bc-40a1-98bd-ee6d6bd5444a.jpeg"
     },
     {
       "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\MenuImages\\98efd114-1579-4d88-afd0-f6f0f1b28be7.png",
       "PackagePath": "staticwebassets\\MenuImages\\98efd114-1579-4d88-afd0-f6f0f1b28be7.png"
-    },
-    {
-      "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\MenuImages\\a96b681f-e858-4292-a1c0-35f1dce0a642.png",
-      "PackagePath": "staticwebassets\\MenuImages\\a96b681f-e858-4292-a1c0-35f1dce0a642.png"
     },
     {
       "Id": "F:\\ICT\\Sem 2\\Project\\ASP.Net_Project\\FoodieApi\\wwwroot\\MenuImages\\c848c586-c13e-4729-9cdd-c638b0459304.png",

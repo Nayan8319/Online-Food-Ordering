@@ -193,14 +193,15 @@ const EditCategory = () => {
     }
   };
 
+  // ✅ Correct loading block
   if (loading) {
-    return Swal.fire({
-      title: "Loading...",
-      didOpen: () => {
-        Swal.showLoading();
-      },
-      allowOutsideClick: false,
-    });
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: "80vh" }}>
+        <div className="spinner-border text-secondary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -225,7 +226,6 @@ const EditCategory = () => {
       >
         <div className="col-md-6">
           <h5>Basic information</h5>
-
           <label className="form-label">Category Name</label>
           <input
             type="text"
@@ -236,7 +236,6 @@ const EditCategory = () => {
             placeholder="Enter a category name..."
             required
           />
-
           <div className="form-check form-switch mt-4">
             <input
               className="form-check-input"
@@ -258,11 +257,7 @@ const EditCategory = () => {
             className="border border-secondary rounded p-4 text-center"
             style={{ minHeight: "300px" }}
           >
-            <label
-              htmlFor="uploadImg"
-              className="d-block mb-2"
-              style={{ cursor: "pointer" }}
-            >
+            <label htmlFor="uploadImg" className="d-block mb-2" style={{ cursor: "pointer" }}>
               <i className="bi bi-cloud-arrow-up" style={{ fontSize: "2rem" }}></i>
               <br />
               <strong>Click to upload</strong> or drag and drop
@@ -287,7 +282,6 @@ const EditCategory = () => {
             )}
 
             <hr />
-
             <label htmlFor="imageUrl" className="form-label mt-3">
               Or enter an online image URL, Base64 string, or relative path
             </label>
@@ -299,9 +293,7 @@ const EditCategory = () => {
               onChange={handleChange}
               placeholder="e.g., https://example.com/image.png or /CategoryImages/image.png"
             />
-            {imageUrlError && (
-              <small className="text-danger">{imageUrlError}</small>
-            )}
+            {imageUrlError && <small className="text-danger">{imageUrlError}</small>}
           </div>
         </div>
       </form>
