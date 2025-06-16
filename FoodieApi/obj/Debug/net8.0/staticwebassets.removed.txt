@@ -1,0 +1,15 @@
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\6272870d-d10b-479e-ac38-c5448bbfda79.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\6a98ccae-fbdb-4621-b264-60cf706b29d9.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\7480731f-4ab8-43e7-9870-858d9b417f2e.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\8f4ed5ee-5dfd-4575-8017-a60c25ef9308.jpeg
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\9425e37a-cb4c-4fe8-9391-4fb3e39efa01.jpg
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\a23345c5-8ee1-4bb7-afa3-4be0eb856a24.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\d363916c-1131-4796-9198-65958344ad31.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\CategoryImages\f59a66ea-9e9d-408e-b4a1-1b86bd490f99.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\MenuImages\03e8c081-553b-40a1-be61-95c290382cc9.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\MenuImages\2e9e73f7-5a68-4c36-8f9c-8d94170eae84.jpeg
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\MenuImages\67d16337-9534-4e91-8589-aadb238f2923.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\MenuImages\98efd114-1579-4d88-afd0-f6f0f1b28be7.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\MenuImages\c848c586-c13e-4729-9cdd-c638b0459304.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\MenuImages\e443a8c8-65d6-46c1-82cd-448411074d3a.png
+F:\ICT\Sem 2\Project\ASP.Net_Project\FoodieApi\wwwroot\MenuImages\fe233d1b-8040-4068-80b2-e9fcf42290f9.png

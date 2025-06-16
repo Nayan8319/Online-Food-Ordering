@@ -74,7 +74,7 @@ const Header = ({ bgcolor }) => {
       <div className="container">
         <nav className="navbar navbar-expand-lg custom_nav-container">
           <Link className="navbar-brand" to="/">
-            <span>Feane</span>
+            <span>Foodie</span>
           </Link>
           <button
             className="navbar-toggler"
