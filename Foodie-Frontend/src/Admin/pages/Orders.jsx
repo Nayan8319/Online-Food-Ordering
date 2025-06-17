@@ -2,15 +2,17 @@ import React, { useEffect, useState, useRef } from "react";
 import {
   Paper, Table, TableBody, TableCell, TableContainer, TableHead,
   TablePagination, TableRow, Typography, Divider, Stack,
-  Button, TextField, MenuItem, Chip
+  Button, TextField, Chip
 } from "@mui/material";
 import Swal from "sweetalert2";
 import { CSVLink } from "react-csv";
+import Autocomplete from "@mui/material/Autocomplete";
 
 const statusOptions = [
-  { label: "Confirmed", value: 1 },
-  { label: "OutForDelivery", value: 2 },
-  { label: "Delivered", value: 3 }
+  "Placed",
+  "Confirmed",
+  "OutForDelivery",
+  "Delivered",
 ];
 
 export default function Orders() {
@@ -19,16 +21,16 @@ export default function Orders() {
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [sortKey, setSortKey] = useState("");
-  const deliveryTimers = useRef({}); // store active timers
+  const [statusFilter, setStatusFilter] = useState(null);
+  const deliveryTimers = useRef({});
 
   useEffect(() => {
     fetchOrders();
   }, []);
 
   useEffect(() => {
-    filterAndSortOrders();
-  }, [sortKey, orders, searchText]);
+    filterOrders();
+  }, [orders, searchText, statusFilter]);
 
   const fetchOrders = async () => {
     try {
@@ -38,7 +40,6 @@ export default function Orders() {
       });
       const data = await res.json();
       setOrders(data);
-      setFilteredOrders(data);
 
       data.forEach(order => {
         if (order.status === "OutForDelivery" && !deliveryTimers.current[order.orderId]) {
@@ -51,16 +52,15 @@ export default function Orders() {
   };
 
   const setAutoDelivery = (orderId) => {
-    // Set a timeout to auto-update status after 5 minutes
     const timer = setTimeout(() => {
-      updateOrderStatus(orderId, 3);
-      delete deliveryTimers.current[orderId]; // cleanup after status update
+      updateOrderStatus(orderId, 3); // Delivered
+      delete deliveryTimers.current[orderId];
     }, 5 * 60 * 1000);
 
     deliveryTimers.current[orderId] = timer;
   };
 
-  const filterAndSortOrders = () => {
+  const filterOrders = () => {
     let result = [...orders];
 
     if (searchText.trim() !== "") {
@@ -70,18 +70,8 @@ export default function Orders() {
       );
     }
 
-    switch (sortKey) {
-      case "amount":
-        result.sort((a, b) => b.totalAmount - a.totalAmount);
-        break;
-      case "date":
-        result.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-        break;
-      case "status":
-        result.sort((a, b) => a.status.localeCompare(b.status));
-        break;
-      default:
-        break;
+    if (statusFilter) {
+      result = result.filter(order => order.status === statusFilter);
     }
 
     setFilteredOrders(result);
@@ -89,21 +79,27 @@ export default function Orders() {
   };
 
   const handleChangeStatus = async (orderId, currentStatus) => {
+    const statusMapping = {
+      Confirmed: 1,
+      OutForDelivery: 2,
+      Delivered: 3,
+    };
+
     const { value: selectedValue } = await Swal.fire({
       title: "Change Order Status",
       input: "select",
-      inputOptions: statusOptions.reduce((acc, cur) => {
-        acc[cur.value] = cur.label;
+      inputOptions: Object.entries(statusMapping).reduce((acc, [label, value]) => {
+        acc[value] = label;
         return acc;
       }, {}),
-      inputValue: statusOptions.find(s => s.label === currentStatus)?.value,
+      inputValue: statusMapping[currentStatus],
       showCancelButton: true,
     });
 
     if (!selectedValue) return;
 
     const newStatus = parseInt(selectedValue);
-    const selectedLabel = statusOptions.find(s => s.value === newStatus)?.label;
+    const selectedLabel = Object.entries(statusMapping).find(([_, val]) => val === newStatus)?.[0];
 
     if (selectedLabel === currentStatus) return;
 
@@ -127,7 +123,6 @@ export default function Orders() {
         Swal.fire("Updated", result.message || "Status updated", "success");
       }
 
-      // Clear existing timer if any
       if (deliveryTimers.current[orderId]) {
         clearTimeout(deliveryTimers.current[orderId]);
         delete deliveryTimers.current[orderId];
@@ -171,7 +166,7 @@ export default function Orders() {
       </Typography>
       <Divider />
 
-      <Stack direction="row" spacing={2} sx={{ mt: 2, mb: 2 }} justifyContent="space-between" alignItems="center" flexWrap="wrap">
+      <Stack direction="row" spacing={2} sx={{ mt: 2, mb: 2 }} justifyContent="space-between" flexWrap="wrap">
         <Stack direction="row" spacing={2}>
           <TextField
             label="Search"
@@ -180,18 +175,20 @@ export default function Orders() {
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
-          <TextField
-            select
-            label="Sort by"
+          <Autocomplete
             size="small"
-            value={sortKey}
-            onChange={(e) => setSortKey(e.target.value)}
-          >
-            <MenuItem value="">None</MenuItem>
-            <MenuItem value="amount">Amount</MenuItem>
-            <MenuItem value="date">Date</MenuItem>
-            <MenuItem value="status">Status</MenuItem>
-          </TextField>
+            id="status-filter"
+            options={statusOptions}
+            value={statusFilter}
+            onChange={(event, newValue) => setStatusFilter(newValue)}
+            sx={{ width: 200 }}
+            renderInput={(params) => <TextField {...params} label="Filter by Status" />}
+          />
+          {statusFilter && (
+            <Button size="small" onClick={() => setStatusFilter(null)}>
+              Clear
+            </Button>
+          )}
         </Stack>
         {filteredOrders.length > 0 && (
           <CSVLink data={filteredOrders} filename="all_orders.csv">
@@ -282,10 +279,11 @@ export default function Orders() {
             justifyContent: "space-between",
             alignItems: "center",
           },
-          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-            margin: 0,
-            whiteSpace: "nowrap",
-          },
+          "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows":
+            {
+              margin: 0,
+              whiteSpace: "nowrap",
+            },
           "& .MuiTablePagination-select": {
             marginRight: 2,
           },

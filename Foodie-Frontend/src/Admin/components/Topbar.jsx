@@ -8,13 +8,14 @@ const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("token"); // or sessionStorage
+        const token = localStorage.getItem("token");
         const res = await axios.get("http://localhost:5110/api/Auth/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        const imageUrl = res.data.imageUrl;
+
+        const imageUrl = res.data.imageUrl || "";
         setProfileImage(imageUrl);
       } catch (error) {
         console.error("Error fetching profile:", error);
@@ -23,6 +24,16 @@ const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
 
     fetchProfile();
   }, []);
+
+  const getImageUrl = (image) => {
+    if (!image) return "/default-user.png";
+
+    // If full URL (e.g., starting with http/https), use as-is
+    if (image.startsWith("http")) return image;
+
+    // If path starts with /UserImages or is just a filename, prefix the full server path
+    return `http://localhost:5110/UserImages/${image.replace(/^\/?UserImages\//, "")}`;
+  };
 
   return (
     <Navbar
@@ -58,11 +69,11 @@ const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
             style={{ background: "none" }}
           >
             <img
-              src={
-                profileImage?.startsWith("/UserImages")
-                  ? `http://localhost:5110${profileImage}`
-                  : profileImage || "/default-user.png"
-              }
+              src={getImageUrl(profileImage)}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/default-user.png";
+              }}
               alt="Profile"
               className="rounded-circle"
               width="40"
@@ -70,7 +81,10 @@ const Topbar = ({ onEditProfileClick, onLogout, onToggleSidebar }) => {
               style={{ objectFit: "cover" }}
             />
           </button>
-          <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <ul
+            className="dropdown-menu dropdown-menu-end"
+            aria-labelledby="userDropdown"
+          >
             <li>
               <button className="dropdown-item" onClick={onEditProfileClick}>
                 Edit Profile

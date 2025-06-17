@@ -14,7 +14,6 @@ import {
   Stack,
   Button,
   TextField,
-  MenuItem,
   InputAdornment,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -25,6 +24,7 @@ import Swal from "sweetalert2";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
 import { useNavigate } from "react-router-dom";
+import Autocomplete from "@mui/material/Autocomplete";
 
 export default function ProductList() {
   const [page, setPage] = useState(0);
@@ -38,6 +38,13 @@ export default function ProductList() {
 
   const navigate = useNavigate();
 
+  const sortOptions = [
+    { label: "None", value: "" },
+    { label: "Name", value: "name" },
+    { label: "Price", value: "price" },
+    { label: "Quantity", value: "quantity" },
+  ];
+
   useEffect(() => {
     fetchCategories();
     fetchProducts();
@@ -45,7 +52,7 @@ export default function ProductList() {
 
   useEffect(() => {
     handleSearchAndSort();
-  }, [searchTerm, rows, sortKey]);
+  }, [searchTerm, sortKey, rows]);
 
   const handleChangePage = (event, newPage) => setPage(newPage);
 
@@ -80,7 +87,6 @@ export default function ProductList() {
         },
       });
       const data = await response.json();
-
       if (Array.isArray(data)) {
         setRows(data);
         setFilteredRows(data);
@@ -132,7 +138,6 @@ export default function ProductList() {
       Category: categories[item.categoryId] || item.categoryId,
       Active: item.isActive ? "Yes" : "No",
     }));
-
     const csv = Papa.unparse(dataToExport);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     saveAs(blob, "Menus.csv");
@@ -167,7 +172,6 @@ export default function ProductList() {
     }
   };
 
-  // New function to deactivate out-of-stock menu items
   const deactivateOutOfStock = async () => {
     const confirm = await Swal.fire({
       title: "Deactivate Out-of-Stock Items?",
@@ -197,7 +201,6 @@ export default function ProductList() {
 
       if (response.ok) {
         Swal.fire("Success", resultText, "success");
-        // Refresh the product list after deactivation
         fetchProducts();
       } else {
         Swal.fire("Error", resultText || "Failed to deactivate", "error");
@@ -241,22 +244,21 @@ export default function ProductList() {
           }}
         />
 
-        <TextField
-          select
-          label="Sort by"
+        <Autocomplete
           size="small"
-          value={sortKey}
-          onChange={(e) => setSortKey(e.target.value)}
-        >
-          <MenuItem value="">None</MenuItem>
-          <MenuItem value="name">Name</MenuItem>
-          <MenuItem value="price">Price</MenuItem>
-          <MenuItem value="quantity">Quantity</MenuItem>
-        </TextField>
+          options={sortOptions}
+          value={sortOptions.find((opt) => opt.value === sortKey) || sortOptions[0]}
+          onChange={(e, newValue) => setSortKey(newValue?.value || "")}
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          sx={{ width: 200 }}
+          renderInput={(params) => (
+            <TextField {...params} label="Sort by" variant="outlined" />
+          )}
+        />
 
         <Box sx={{ flexGrow: 1 }} />
 
-        {/* New Out of Stock Button */}
         <Button variant="outlined" color="error" onClick={deactivateOutOfStock}>
           Out of Stock
         </Button>
@@ -309,24 +311,17 @@ export default function ProductList() {
                     <TableCell>₹{row.price}</TableCell>
                     <TableCell>
                       {row.quantity === 0 ? (
-                        <span
-                          className="badge rounded-pill"
-                          style={{ backgroundColor: "#ff1a1a", color: "#fff" }} // Red
-                        >
+                        <span className="badge rounded-pill" style={{ backgroundColor: "#ff1a1a", color: "#fff" }}>
                           Out of Stock
                         </span>
                       ) : row.quantity <= 5 ? (
-                        <span
-                          className="badge rounded-pill"
-                          style={{ backgroundColor: "#ffcc00", color: "#000" }} // Yellow
-                        >
+                        <span className="badge rounded-pill" style={{ backgroundColor: "#ffcc00", color: "#000" }}>
                           Low Stock ({row.quantity})
                         </span>
                       ) : (
                         row.quantity
                       )}
                     </TableCell>
-
                     <TableCell>
                       {row.imageUrl ? (
                         <img
@@ -348,14 +343,10 @@ export default function ProductList() {
                           fontWeight: "bold",
                           fontSize: "0.8rem",
                           padding: "0.25em 0.75em",
-                          minHeight: "24px",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
                           borderRadius: "50rem",
-                          userSelect: "none",
+                          display: "inline-flex",
+                          justifyContent: "center",
                           width: "75px",
-                          textAlign: "center",
                         }}
                       >
                         {row.isActive ? "Active" : "Inactive"}
@@ -368,9 +359,7 @@ export default function ProductList() {
                         size="small"
                         startIcon={<EditIcon />}
                         sx={{ mr: 1 }}
-                        onClick={() =>
-                          navigate(`/admin/menu/edit-menu/${row.menuId}`)
-                        }
+                        onClick={() => navigate(`/admin/menu/edit-menu/${row.menuId}`)}
                       >
                         Edit
                       </Button>
@@ -391,7 +380,6 @@ export default function ProductList() {
         </Table>
       </TableContainer>
 
-
       <TablePagination
         rowsPerPageOptions={[5, 10, 20, 25, 100]}
         component="div"
@@ -403,21 +391,10 @@ export default function ProductList() {
         sx={{
           "& .MuiTablePagination-toolbar": {
             display: "flex",
-            flexWrap: "nowrap",
             justifyContent: "space-between",
-            alignItems: "center",
           },
           "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
             margin: 0,
-            whiteSpace: "nowrap",
-          },
-          "& .MuiTablePagination-select": {
-            marginRight: 2,
-          },
-          "& .MuiTablePagination-actions": {
-            whiteSpace: "nowrap",
-            display: "flex",
-            gap: "5px",
           },
         }}
       />

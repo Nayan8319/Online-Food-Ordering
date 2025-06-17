@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Paper,
   Table,
@@ -41,17 +41,6 @@ export default function CategoryList() {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    handleSearchAndSort();
-  }, [searchTerm, rows, sortKey]);
-
-  const handleChangePage = (event, newPage) => setPage(newPage);
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -75,42 +64,36 @@ export default function CategoryList() {
     }
   };
 
-  const handleSearchAndSort = () => {
+  const handleSearchAndSort = useCallback(() => {
     let temp = [...rows];
 
+    // Filter
     if (searchTerm) {
       temp = temp.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    if (sortKey) {
-      temp.sort((a, b) => {
-        if (sortKey === "isActive") {
-          return a.isActive === b.isActive ? 0 : a.isActive ? -1 : 1;
-        }
-        if (sortKey === "name") {
-          return a.name.localeCompare(b.name);
-        }
-        return 0;
-      });
+    // Sort
+    if (sortKey === "name") {
+      temp.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortKey === "isActive") {
+      temp.sort((a, b) => (a.isActive === b.isActive ? 0 : a.isActive ? -1 : 1));
     }
 
     setFilteredRows(temp);
     setPage(0);
-  };
+  }, [rows, searchTerm, sortKey]);
 
-  const exportToCSV = () => {
-    const dataToExport = filteredRows.map((item) => ({
-      ID: item.categoryId,
-      Name: item.name,
-      ImageUrl: item.imageUrl || "No Image",
-      Active: item.isActive ? "Yes" : "No",
-    }));
+  useEffect(() => {
+    handleSearchAndSort();
+  }, [handleSearchAndSort]);
 
-    const csv = Papa.unparse(dataToExport);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    saveAs(blob, "categories.csv");
+  const handleChangePage = (event, newPage) => setPage(newPage);
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   const deleteCategory = async (id) => {
@@ -165,6 +148,19 @@ export default function CategoryList() {
     }
   };
 
+  const exportToCSV = () => {
+    const dataToExport = filteredRows.map((item) => ({
+      ID: item.categoryId,
+      Name: item.name,
+      ImageUrl: item.imageUrl || "No Image",
+      Active: item.isActive ? "Yes" : "No",
+    }));
+
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "categories.csv");
+  };
+
   const getImageSrc = (imageUrl) => {
     if (!imageUrl) return null;
     if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
@@ -182,7 +178,8 @@ export default function CategoryList() {
       </Typography>
       <Divider sx={{ mb: 2 }} />
 
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+      {/* Search and Sort Toolbar */}
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mb: 2 }}>
         <TextField
           label="Search by name"
           variant="outlined"
@@ -203,9 +200,10 @@ export default function CategoryList() {
           size="small"
           value={sortKey}
           onChange={(e) => setSortKey(e.target.value)}
+          sx={{ width: 200 }}
         >
           <MenuItem value="">None</MenuItem>
-          <MenuItem value="name">Name</MenuItem>
+          <MenuItem value="name">Name (A-Z)</MenuItem>
           <MenuItem value="isActive">Active Status</MenuItem>
         </TextField>
         <Box sx={{ flexGrow: 1 }} />
@@ -227,6 +225,7 @@ export default function CategoryList() {
         </Typography>
       )}
 
+      {/* Table */}
       <TableContainer>
         <Table stickyHeader>
           <TableHead>
@@ -335,21 +334,10 @@ export default function CategoryList() {
         sx={{
           "& .MuiTablePagination-toolbar": {
             display: "flex",
-            flexWrap: "nowrap",
             justifyContent: "space-between",
-            alignItems: "center",
           },
           "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
             margin: 0,
-            whiteSpace: "nowrap",
-          },
-          "& .MuiTablePagination-select": {
-            marginRight: 2,
-          },
-          "& .MuiTablePagination-actions": {
-            whiteSpace: "nowrap",
-            display: "flex",
-            gap: "5px",
           },
         }}
       />

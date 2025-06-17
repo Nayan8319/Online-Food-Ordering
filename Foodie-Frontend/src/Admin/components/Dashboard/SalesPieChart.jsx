@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import { Card } from "react-bootstrap";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { Typography, CircularProgress, Box } from "@mui/material";
@@ -12,7 +12,7 @@ const SalesPieChart = () => {
 
   const token = localStorage.getItem("token");
 
-  const fetchChartData = async () => {
+  const fetchChartData = useCallback(async () => {
     setLoading(true);
     try {
       const [statsRes, chartRes] = await Promise.all([
@@ -34,11 +34,11 @@ const SalesPieChart = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchChartData();
-  }, []);
+  }, [fetchChartData]);
 
   return (
     <Card

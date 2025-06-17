@@ -6,13 +6,13 @@ import Topbar from "../Admin/components/Topbar";
 import Sidebar from "../Admin/components/SideBar";
 import ProfileEditModal from "../Pages/Profile/ProfileEditModal";
 import { isAdmin, getToken } from "../utils/auth";
-import LoadingPage from "../Admin/pages/LoadingPage"; // ✅ Import
+import LoadingPage from "../Admin/pages/LoadingPage";
 
 const AdminLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true); // ✅ Loading state
+  const [loading, setLoading] = useState(true);
 
   const [editForm, setEditForm] = useState({
     name: "",
@@ -20,6 +20,7 @@ const AdminLayout = ({ children }) => {
     mobile: "",
     imageUrl: "",
   });
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [editLoading, setEditLoading] = useState(false);
@@ -38,7 +39,7 @@ const AdminLayout = ({ children }) => {
 
   const fetchUserData = async () => {
     try {
-      setLoading(true); // ✅ Start loading
+      setLoading(true);
       const token = getToken();
       const res = await fetch("http://localhost:5110/api/Auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
@@ -48,8 +49,15 @@ const AdminLayout = ({ children }) => {
 
       const data = await res.json();
 
+      // Prefix image path if not full URL
+      const imagePath = data.imageUrl
+        ? data.imageUrl.startsWith("http")
+          ? data.imageUrl
+          : `/UserImages/${data.imageUrl.replace(/^\/?UserImages\//, "")}`
+        : "/UserImages/default.jpg";
+
       setUserData({
-        imageUrl: data.imageUrl || "/UserImages/default.jpg",
+        imageUrl: imagePath,
         name: data.name,
         username: data.username,
         mobile: data.mobile,
@@ -59,7 +67,7 @@ const AdminLayout = ({ children }) => {
     } catch (error) {
       console.error("Failed to load profile data", error);
     } finally {
-      setLoading(false); // ✅ End loading
+      setLoading(false);
     }
   };
 
@@ -104,23 +112,13 @@ const AdminLayout = ({ children }) => {
         body: formData,
       });
 
-      let result;
       const contentType = res.headers.get("content-type");
-
-      if (contentType && contentType.includes("application/json")) {
-        result = await res.json();
-      } else {
-        result = await res.text();
-      }
+      const result = contentType?.includes("application/json")
+        ? await res.json()
+        : await res.text();
 
       if (res.ok) {
-        await Swal.fire({
-          icon: "success",
-          title: "Profile Updated",
-          text: result.message || result || "Your profile was updated successfully.",
-          confirmButtonText: "OK",
-        });
-
+        Swal.fire("Success", result.message || "Profile updated", "success");
         await fetchUserData();
         setShowEditModal(false);
         setSelectedFile(null);
@@ -136,10 +134,7 @@ const AdminLayout = ({ children }) => {
     }
   };
 
-  // ✅ Show loading until userData is fetched
-  if (loading || !userData) {
-    return <LoadingPage />;
-  }
+  if (loading || !userData) return <LoadingPage />;
 
   return (
     <div className="admin-layout">
@@ -147,7 +142,7 @@ const AdminLayout = ({ children }) => {
         onEditProfileClick={() => setShowEditModal(true)}
         onLogout={handleLogout}
         onToggleSidebar={() => setCollapsed(!collapsed)}
-        userData={userData}
+        userData={userData} // ✅ Ensure imageUrl passed here
       />
 
       <div className="d-flex" style={{ height: "calc(100vh - 60px)" }}>
