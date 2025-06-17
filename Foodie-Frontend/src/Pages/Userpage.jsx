@@ -109,8 +109,9 @@ const UserProfile = () => {
           showConfirmButton: false,
         }).then(() => {
           localStorage.removeItem("token");
-          window.location.reload();
           navigate("/login");
+          window.location.reload();
+          
 
         });
       })
@@ -234,14 +235,16 @@ const UserProfile = () => {
         </div>
       </div>
 
-      <PasswordChangeModal
-        showPasswordModal={showPasswordModal}
-        setShowPasswordModal={setShowPasswordModal}
-        passwordForm={passwordForm}
-        setPasswordForm={setPasswordForm}
-        passwordError={passwordError}
-        handlePasswordChange={handlePasswordChange}
-      />
+    <PasswordChangeModal
+  showPasswordModal={showPasswordModal}
+  setShowPasswordModal={setShowPasswordModal}
+  passwordForm={passwordForm}
+  setPasswordForm={setPasswordForm}
+  passwordError={passwordError}
+  setPasswordError={setPasswordError} 
+  handlePasswordChange={handlePasswordChange}
+/>
+
 
       <ProfileEditModal
         showEditModal={showEditModal}

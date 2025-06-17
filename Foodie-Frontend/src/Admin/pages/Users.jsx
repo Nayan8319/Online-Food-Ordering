@@ -14,19 +14,26 @@ import {
   Stack,
   Button,
   TextField,
-  MenuItem,
   InputAdornment,
+  Autocomplete,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { saveAs } from "file-saver";
 import Papa from "papaparse";
+
+const sortOptions = [
+  { label: "Name", value: "name" },
+  { label: "Email", value: "email" },
+  { label: "Verified", value: "isVerified" },
+  { label: "Role", value: "role" },
+];
 
 export default function Users() {
   const [rows, setRows] = useState([]);
   const [filteredRows, setFilteredRows] = useState([]);
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortKey, setSortKey] = useState("");
+  const [sortKey, setSortKey] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -109,7 +116,7 @@ export default function Users() {
       </Typography>
       <Divider sx={{ mb: 2 }} />
 
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+      <Stack direction="row" spacing={2} sx={{ mb: 2, flexWrap: "wrap" }}>
         <TextField
           label="Search by name"
           variant="outlined"
@@ -124,19 +131,20 @@ export default function Users() {
             ),
           }}
         />
-        <TextField
-          select
-          label="Sort by"
+
+        <Autocomplete
+          disableClearable
+          options={sortOptions}
+          getOptionLabel={(option) => option.label}
+          value={sortOptions.find((opt) => opt.value === sortKey) || null}
+          onChange={(event, newValue) => {
+            setSortKey(newValue?.value || "");
+          }}
+          sx={{ width: 200 }}
           size="small"
-          value={sortKey}
-          onChange={(e) => setSortKey(e.target.value)}
-        >
-          <MenuItem value="">None</MenuItem>
-          <MenuItem value="name">Name</MenuItem>
-          <MenuItem value="email">Email</MenuItem>
-          <MenuItem value="isVerified">Verified</MenuItem>
-          <MenuItem value="role">Role</MenuItem>
-        </TextField>
+          renderInput={(params) => <TextField {...params} label="Sort by" />}
+        />
+
         <Box sx={{ flexGrow: 1 }} />
         <Button variant="outlined" onClick={exportToCSV}>
           Export

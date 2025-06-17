@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { resolveImageUrl } from "../../utils/imageUtils";
+// import { resolveImageUrl } from "../../utils/imageUtils"; // Optional helper
 
 const ProfileEditModal = ({
   showEditModal,
@@ -15,31 +15,58 @@ const ProfileEditModal = ({
   editError,
   userData,
 }) => {
+  const BASE_URL = "http://localhost:5110"; // ✅ Your backend base URL
+
+  // Convert relative URLs to full image URLs
+  const resolveImage = (url) => {
+    if (!url) return null;
+    if (url.startsWith("http") || url.startsWith("data:image/")) return url;
+    if (url.startsWith("/")) return `${BASE_URL}${url}`;
+    return null;
+  };
+
+  // 🔁 Reset form when modal opens
+  useEffect(() => {
+    if (showEditModal && userData) {
+      setEditForm({
+        name: userData.name || "",
+        username: userData.username || "",
+        mobile: userData.mobile || "",
+        imageUrl: userData.imageUrl || "",
+      });
+
+      setPreviewUrl(resolveImage(userData.imageUrl));
+      setSelectedFile(null);
+    }
+  }, [setEditForm, setPreviewUrl, setSelectedFile, showEditModal, userData]);
+
+  // 📷 Manual image input
   const handleImageInputChange = (e) => {
-    const value = e.target.value;
+    const value = e.target.value.trim();
     setEditForm({ ...editForm, imageUrl: value });
-    setPreviewUrl(value);
+
+    if (value.startsWith("data:image/") || value.startsWith("http") || value.startsWith("/")) {
+      setPreviewUrl(resolveImage(value));
+    } else {
+      setPreviewUrl(null);
+    }
+
     setSelectedFile(null);
   };
 
+  // 📁 File upload handler
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
-    setSelectedFile(file);
-    setPreviewUrl(file ? URL.createObjectURL(file) : null);
-  };
-
-  useEffect(() => {
-    if (showEditModal) {
-      setEditForm({
-        name: userData?.name || "",
-        username: userData?.username || "",
-        mobile: userData?.mobile || "",
-        imageUrl: userData?.imageUrl || "",
-      });
-      setPreviewUrl(userData?.imageUrl || null);
-      setSelectedFile(null);
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result); // base64 preview
+      };
+      reader.readAsDataURL(file);
+      setEditForm({ ...editForm, imageUrl: "" }); // Clear manual field
     }
-  }, [showEditModal, setEditForm, userData, setPreviewUrl, setSelectedFile]);
+  };
 
   return (
     showEditModal && (
@@ -53,12 +80,9 @@ const ProfileEditModal = ({
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">Edit Profile</h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => setShowEditModal(false)}
-              ></button>
+              <button type="button" className="btn-close" onClick={() => setShowEditModal(false)} />
             </div>
+
             <div className="modal-body">
               {editError && <div className="alert alert-danger">{editError}</div>}
 
@@ -89,7 +113,7 @@ const ProfileEditModal = ({
               <input
                 type="text"
                 className="form-control mb-2"
-                placeholder="Enter Image URL, Base64, or Path URL"
+                placeholder="Enter Image URL or Base64 string"
                 value={editForm.imageUrl || ""}
                 onChange={handleImageInputChange}
               />
@@ -104,29 +128,25 @@ const ProfileEditModal = ({
               {previewUrl && (
                 <div className="mb-3 text-center">
                   <img
-                    src={resolveImageUrl(previewUrl)}
+                    src={previewUrl}
                     alt="Preview"
-                    style={{ maxWidth: "150px", maxHeight: "150px" }}
                     className="img-thumbnail"
+                    style={{ maxWidth: "150px", maxHeight: "150px" }}
                   />
                 </div>
               )}
             </div>
+
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowEditModal(false)}
-              >
+              <button className="btn btn-secondary" onClick={() => setShowEditModal(false)}>
                 Cancel
               </button>
               <button
-                type="button"
                 className="btn btn-primary"
                 disabled={editLoading}
-                onClick={handleProfileUpdate}
+                onClick={() => handleProfileUpdate(editForm, selectedFile)}
               >
-                Save Changes
+                {editLoading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>

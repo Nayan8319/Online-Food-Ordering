@@ -228,19 +228,20 @@ namespace FoodieApi.Controllers
             if (user == null)
                 return NotFound("User not found.");
 
-            // Check for duplicate username (except current user)
-            var usernameExists = await _context.Users.AnyAsync(u => u.Username == model.Username && u.Email != email);
+            // Check for duplicate username (excluding current user)
+            var usernameExists = await _context.Users
+                .AnyAsync(u => u.Username == model.Username && u.Email != email);
             if (usernameExists)
                 return BadRequest("Username already taken.");
 
-            // Handle image upload
+            // Define upload folder path
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UserImages");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            // Handle file upload
             if (imageFile != null && imageFile.Length > 0)
             {
-                // Handle file upload
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UserImages");
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
                 var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -249,21 +250,40 @@ namespace FoodieApi.Controllers
                     await imageFile.CopyToAsync(fileStream);
                 }
 
-                // Save relative path to database, e.g., "/UserImages/filename.jpg"
                 user.ImageUrl = "/UserImages/" + uniqueFileName;
             }
+            // Handle base64 image string (with or without prefix)
             else if (!string.IsNullOrEmpty(model.ImageUrl) && IsValidBase64(model.ImageUrl))
             {
-                // Handle Base64 image string
-                user.ImageUrl = model.ImageUrl;
+                try
+                {
+                    var base64Data = model.ImageUrl;
+                    var commaIndex = base64Data.IndexOf(',');
+                    if (commaIndex >= 0)
+                    {
+                        base64Data = base64Data.Substring(commaIndex + 1);
+                    }
+
+                    byte[] imageBytes = Convert.FromBase64String(base64Data);
+                    var uniqueFileName = Guid.NewGuid().ToString() + ".jpg";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+
+                    user.ImageUrl = "/UserImages/" + uniqueFileName;
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest("Invalid base64 image data: " + ex.Message);
+                }
             }
+            // No image provided (optional: clear image)
             else if (string.IsNullOrEmpty(model.ImageUrl))
             {
-                // In case no image is provided (e.g., remove image)
                 user.ImageUrl = null;
             }
 
-            // Update other fields
+            // Update other profile fields
             user.Name = model.Name;
             user.Username = model.Username;
             user.Mobile = model.Mobile;
@@ -275,9 +295,17 @@ namespace FoodieApi.Controllers
 
         private bool IsValidBase64(string base64String)
         {
+            if (string.IsNullOrWhiteSpace(base64String)) return false;
             try
             {
-                var bytes = Convert.FromBase64String(base64String);
+                var base64Data = base64String;
+                var commaIndex = base64Data.IndexOf(',');
+                if (commaIndex >= 0)
+                {
+                    base64Data = base64Data.Substring(commaIndex + 1);
+                }
+
+                Convert.FromBase64String(base64Data);
                 return true;
             }
             catch
