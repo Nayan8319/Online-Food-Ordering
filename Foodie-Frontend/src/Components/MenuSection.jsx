@@ -47,6 +47,11 @@ const MenuSection = () => {
     setCurrentPage(1);
   };
 
+  const handleCategoryClick = (categoryId) => {
+    setFilterCategory((prev) => (prev === categoryId ? null : categoryId));
+    setCurrentPage(1); // Reset page to 1 on filter
+  };
+
   const sortMenus = (menuList) => {
     switch (sortOption) {
       case 'name':
@@ -60,12 +65,11 @@ const MenuSection = () => {
     }
   };
 
-  const filteredMenus = filterCategory
-    ? menus.filter(menu => menu.categoryId === filterCategory)
+  const filteredMenus = filterCategory !== null
+    ? menus.filter((menu) => Number(menu.categoryId) === Number(filterCategory))
     : menus;
 
   const sortedMenus = sortMenus(filteredMenus);
-
   const totalPages = Math.ceil(sortedMenus.length / itemsPerPage);
   const paginatedMenus = sortedMenus.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -85,11 +89,13 @@ const MenuSection = () => {
 
         {/* Category Filter */}
         <div className="explore-menu-list mb-3">
+          {/* All Category */}
+        
           {categories.map((category) => (
             <div
               key={category.categoryId}
-              onClick={() => setFilterCategory(prev => prev === category.categoryId ? null : category.categoryId)}
-              className="explore-menu-list-item"
+              onClick={() => handleCategoryClick(category.categoryId)}
+              className={`explore-menu-list-item ${filterCategory === category.categoryId ? 'active' : ''}`}
             >
               <img
                 className={filterCategory === category.categoryId ? 'active' : ''}
