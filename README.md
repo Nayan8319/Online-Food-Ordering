@@ -54,7 +54,7 @@
 | 🎨 Frontend        | ReactJS, HTML, CSS, JavaScript     |
 | 🔧 Backend         | ASP.NET Core MVC, C#, RESTful APIs |
 | 📊 Database        | SQL Server, Entity Framework Core  |
-| 🧪 Dev Tools       | Visual Studio, VS Code, Postman    |
+| 🧪 Dev Tools       | Visual Studio, VS Code, Swagger    |
 | 🔗 Version Control | GitHub                             |
 
 ---
