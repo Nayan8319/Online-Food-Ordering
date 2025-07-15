@@ -1,178 +1,264 @@
-🍽️ Foodie – Smart Online Food Ordering System
-"Order food in seconds. Delight in every bite!" 😋
-⚙️ Built with ASP.NET Core MVC + ReactJS + SQL Server + EF Core
+# 🍽️ Foodie – Smart Online Food Ordering System
 
-🚀 Project Highlights
-✨ One-Touch Food Ordering – Browse, click, and eat!
+**Foodie** is a powerful, full-stack 🍝 food ordering and delivery web application designed for local restaurants and cloud kitchens. It brings restaurant menus ✅ online, enables smooth checkout 💳, real-time tracking 📅, and admin management ⚖️—all packed in one sleek, secure system. Whether you're a vendor or a foodie 🥝, Foodie makes ordering food delightful!
 
-🔒 Role-Based Security – 🧑‍🍳 User & 🛡️ Admin panels
+> ⚡ **Built with ASP.NET Core MVC + ReactJS + SQL Server + EF Core**
 
-📈 Smart Analytics – Track top items, sales, and revenue
+---
 
-📱 Mobile Friendly – Works on phones, tablets, and desktops
+## 🚀 Project Highlights
 
-🌐 Scalable Architecture – Ready for multi-vendor and mobile apps
+✨ **One-Touch Food Ordering** – Browse, add to cart, pay, and track with ease
+🔒 **Secure & Role-Based Access** – Separate panels for Users & Admins
+📈 **Live Reports & Analytics** – Track top-selling items and revenue
+🌎 **Scalable for Growth** – Add more vendors, features, or mobile apps
 
-🎯 Key Objectives
-🍽️ Convenience – Order from anywhere
+---
 
-✅ Accuracy – Eliminate call/order mix-ups
+## 🎯 Key Objectives
 
-📊 Admin Control – Manage menu, orders, users, and analytics
+* 🍽️ **Digital Convenience** – Accessible from mobile, tablet, or PC anytime.
+* ✅ **Improved Order Accuracy** – Reduces errors caused by phone calls.
+* 📊 **Admin Dashboard** – Manage food, orders, reports, and users easily.
+* 🌟 **Customer Satisfaction** – Clean UI, smooth ordering, trackable status.
+* ⚙️ **Business Efficiency** – Less manual work, more automation.
+* 🧾 **Paperless Transactions** – Fully digital from order to delivery.
+* 📈 **Future-Ready Platform** – Modular and scalable architecture.
 
-💡 Customer Delight – Smooth UI, fast updates
+---
 
-⚙️ Efficiency – Automate workflow
+## 🧩 Core Features
 
-🧾 Digital Records – Fully paperless
+### 👤 User Features
 
-📈 Growth-Ready – Modular and extensible
+* 🔐 Register/Login
+* 🛒 Add to Cart & Checkout
+* 🗂️ Browse Food Categories
+* 📜 View Order History
+* 💳 Secure Payments
+* 🏠 Manage Delivery Address
 
-🧩 Core Features
-👤 User Panel
-🔐 Register / Login
+### 🛠️ Admin Features
 
-🍴 Browse by Categories
+* 🗃️ Manage Menu, Categories & Users
+* ✅ Approve Orders & Payments
+* 📈 Generate Reports
+* 🧾 Inventory & Performance Monitoring
 
-🛒 Add to Cart & Checkout
+---
 
-💳 Secure Online Payments
+## 🔧 Tech Stack
 
-🏠 Manage Delivery Addresses
+| Layer              | Tech                               |
+| ------------------ | ---------------------------------- |
+| 🎨 Frontend        | ReactJS, HTML, CSS, JavaScript     |
+| 🔧 Backend         | ASP.NET Core MVC, C#, RESTful APIs |
+| 📊 Database        | SQL Server, Entity Framework Core  |
+| 🧪 Dev Tools       | Visual Studio, VS Code, Swagger    |
+| 🔗 Version Control | GitHub                             |
 
-📜 View Order History
+---
 
-🛠️ Admin Panel
-🗂️ Manage Categories & Menu Items
+## 🕹️ Architecture - 3 Tier
 
-✅ Approve Orders & Payments
+1. **Presentation Layer** (ReactJS UI)
+2. **Business Logic Layer** (ASP.NET Controllers & Services)
+3. **Data Access Layer** (EF Core with SQL Server)
 
-📊 View Sales & Performance Reports
+---
 
-🧾 Inventory & Stock Monitoring
+## 📊 Sample Test Cases
 
-🔧 Tech Stack
-Layer	Technology
-🎨 Frontend	ReactJS, HTML5, CSS3, JavaScript
-🔧 Backend	ASP.NET Core MVC (C#), RESTful APIs
-🗄️ Database	SQL Server, Entity Framework Core
-🧪 Dev Tools	Visual Studio, VS Code, Swagger
-🔗 Version Control	Git + GitHub
+| 📄 Test        | 🔎 Input           | 🔢 Output         | 💪 Status |
+| -------------- | ------------------ | ----------------- | --------- |
+| Register/Login | Valid details      | Success dashboard | ✅         |
+| Add to Cart    | Menu ID + Quantity | Cart updated      | ✅         |
+| Checkout       | Payment details    | Order placed      | ✅         |
+| Admin Login    | Admin credentials  | Admin dashboard   | ✅         |
+| View Reports   | Date range         | Report generated  | ✅         |
 
-🏗️ 3‑Tier Architecture
-🎨 Presentation Layer – React components & UI
+---
 
-🧠 Business Layer – Controllers, Services (ASP.NET)
+## 📁 Database Schema
 
-🗄️ Data Layer – SQL Server via EF Core ORM
+### 🏛 Role
 
-🧪 Sample Test Cases
-✅ Test Case	🧾 Input	📌 Expected Output	🧪 Status
-Login/Register	Valid credentials	Redirect to dashboard	✅ Passed
-Add to Cart	Product ID + Quantity	Cart updated	✅ Passed
-Checkout	Valid payment + address	Order placed confirmation	✅ Passed
-Admin Login	Admin credentials	Admin panel access	✅ Passed
-View Reports	Date range	Sales report generated	✅ Passed
+| Column   | Type         | Constraint   |
+| -------- | ------------ | ------------ |
+| RoleId   | INT          | PK, Identity |
+| RoleName | VARCHAR(255) | NOT NULL     |
 
-🗃️ Database Schema – SQL Server (via EF Core)
-Designed to be clean, normalized, and scalable.
+### 👤 User
 
-🔐 Role – User Roles
-Column	Type	Constraint
-RoleId	INT	🔑 Primary Key (Identity)
-RoleName	VARCHAR(255)	❌ Not Null
+| Column      | Type         | Constraint         |
+| ----------- | ------------ | ------------------ |
+| UserId      | INT          | PK, Identity       |
+| Username    | VARCHAR(255) | Unique, NOT NULL   |
+| Email       | VARCHAR(255) | Unique, NOT NULL   |
+| Password    | VARCHAR(255) | NOT NULL           |
+| RoleId      | INT          | FK → Role(RoleId)  |
+| CreatedDate | DATETIME     | Default: GETDATE() |
 
-👤 User – Customers & Admins
-Column	Type	Constraint
-UserId	INT	🔑 Primary Key (Identity)
-Username	VARCHAR(255)	💎 Unique, ❌ Not Null
-Email	VARCHAR(255)	💎 Unique, ❌ Not Null
-Password	VARCHAR(255)	❌ Not Null
-RoleId	INT	🔗 Foreign Key → Role.RoleId
-CreatedDate	DATETIME	🕓 Default: GETDATE()
+### 🍽️ Category
 
-🍽️ Category – Food Categories
-Column	Type	Constraint
-CategoryId	INT	🔑 Primary Key
-Name	VARCHAR(255)	❌ Not Null
-IsActive	BIT	❌ Not Null
-CreatedDate	DATETIME	🕓 Default: GETDATE()
+| Column      | Type         | Constraint         |
+| ----------- | ------------ | ------------------ |
+| CategoryId  | INT          | PK, Identity       |
+| Name        | VARCHAR(255) | NOT NULL           |
+| IsActive    | BIT          | NOT NULL           |
+| CreatedDate | DATETIME     | Default: GETDATE() |
 
-🌮 Menu – Food Items
-Column	Type	Constraint
-MenuId	INT	🔑 Primary Key
-Name	VARCHAR(255)	❌ Not Null
-Price	DECIMAL(18,2)	❌ Not Null
-Quantity	INT	❌ Not Null
-CategoryId	INT	🔗 Foreign Key → Category.CategoryId
-IsActive	BIT	❌ Not Null
+### 🌍 Menu
 
-🛒 Carts – Cart Items
-Column	Type	Constraint
-CartId	INT	🔑 Primary Key
-MenuId	INT	🔗 Foreign Key → Menu.MenuId
-UserId	INT	🔗 Foreign Key → User.UserId
-Quantity	INT	❌ Not Null
-TotalPrice	DECIMAL(18,2)	❌ Not Null
+| Column     | Type          | Constraint                |
+| ---------- | ------------- | ------------------------- |
+| MenuId     | INT           | PK, Identity              |
+| Name       | VARCHAR(255)  | NOT NULL                  |
+| Price      | DECIMAL(18,2) | NOT NULL                  |
+| Quantity   | INT           | NOT NULL                  |
+| CategoryId | INT           | FK → Category(CategoryId) |
+| IsActive   | BIT           | NOT NULL                  |
 
-🏠 Address – Delivery Addresses
-Column	Type	Constraint
-AddressId	INT	🔑 Primary Key
-UserId	INT	🔗 Foreign Key → User.UserId
-Street	VARCHAR(255)	❌ Not Null
-City	VARCHAR(255)	❌ Not Null
-State	VARCHAR(255)	❌ Not Null
-ZipCode	INT	❌ Not Null
+### 🛂 Carts
 
-💳 Payment – Payment Records
-Column	Type	Constraint
-PaymentId	INT	🔑 Primary Key
-AddressId	INT	🔗 Foreign Key → Address.AddressId
-PaymentMode	VARCHAR(255)	❌ Not Null (e.g., UPI, Card, COD)
-TotalAmount	DECIMAL(18,2)	❌ Not Null
-CreatedDate	DATETIME	🕓 Default: GETDATE()
+| Column     | Type          | Constraint        |
+| ---------- | ------------- | ----------------- |
+| CartId     | INT           | PK, Identity      |
+| MenuId     | INT           | FK → Menu(MenuId) |
+| UserId     | INT           | FK → User(UserId) |
+| Quantity   | INT           | NOT NULL          |
+| TotalPrice | DECIMAL(18,2) | NOT NULL          |
 
-📦 Orders – Order Tracking
-Column	Type	Constraint
-OrderId	INT	🔑 Primary Key
-OrderNo	VARCHAR(50)	💎 Unique, ❌ Not Null
-UserId	INT	🔗 Foreign Key → User.UserId
-PaymentId	INT	🔗 Foreign Key → Payment.PaymentId
-Status	VARCHAR(255)	❌ Not Null (e.g., Placed, Delivered)
-OrderDate	DATETIME	🕓 Default: GETDATE()
+### 🏠 Address
 
-📋 OrderDetails – Itemized Order Lines
-Column	Type	Constraint
-OrderDetailId	INT	🔑 Primary Key
-OrderId	INT	🔗 Foreign Key → Orders.OrderId
-MenuId	INT	🔗 Foreign Key → Menu.MenuId
-Quantity	INT	❌ Not Null
-Price	DECIMAL(18,2)	❌ Not Null
+| Column    | Type         | Constraint        |
+| --------- | ------------ | ----------------- |
+| AddressId | INT          | PK, Identity      |
+| UserId    | INT          | FK → User(UserId) |
+| Street    | VARCHAR(255) | NOT NULL          |
+| City      | VARCHAR(255) | NOT NULL          |
+| State     | VARCHAR(255) | NOT NULL          |
+| ZipCode   | INT          | NOT NULL          |
 
-🌈 Future Enhancements
-📱 Mobile App – Android & iOS
+### 💳 Payment
 
-🗺️ Live Order Tracking
+| Column      | Type          | Constraint              |
+| ----------- | ------------- | ----------------------- |
+| PaymentId   | INT           | PK, Identity            |
+| AddressId   | INT           | FK → Address(AddressId) |
+| PaymentMode | VARCHAR(255)  | NOT NULL                |
+| TotalAmount | DECIMAL(18,2) | NOT NULL                |
+| CreatedDate | DATETIME      | Default: GETDATE()      |
 
-🎟️ Coupons & Rewards
+### 📆 Orders
 
-🏪 Multi‑Restaurant Support
+| Column    | Type         | Constraint              |
+| --------- | ------------ | ----------------------- |
+| OrderId   | INT          | PK, Identity            |
+| OrderNo   | VARCHAR(50)  | Unique, NOT NULL        |
+| UserId    | INT          | FK → User(UserId)       |
+| PaymentId | INT          | FK → Payment(PaymentId) |
+| Status    | VARCHAR(255) | NOT NULL                |
+| OrderDate | DATETIME     | Default: GETDATE()      |
 
-🧠 AI Recommendations
+### 📃 OrderDetails
 
-🤖 Chatbot Support
+| Column        | Type          | Constraint           |
+| ------------- | ------------- | -------------------- |
+| OrderDetailId | INT           | PK, Identity         |
+| OrderId       | INT           | FK → Orders(OrderId) |
+| MenuId        | INT           | FK → Menu(MenuId)    |
+| Quantity      | INT           | NOT NULL             |
+| Price         | DECIMAL(18,2) | NOT NULL             |
 
-🖼️ UI Snapshots
-See the screenshots/ folder for login, browsing, cart, checkout, and admin dashboards. Add more visuals as your app grows!
+---
 
-👨‍💻 Authors
-Nayan Padhiyar Prakashbhai – @Nayan8319
+## 📈 Future Enhancements
 
-Sarang Rishit Bhupendra – @Rishitsarang
+* 📱 Mobile App (Android/iOS support)
+* 🌐 Live Order Tracking on Maps
+* 🎁 Coupons, Loyalty, and Rewards
+* 🏢 Multi-Restaurant Support (like Swiggy/Zomato)
+* 🤔 AI-based Recommendations
+* 🔎 Chatbot for Customer Support
 
-Developed as part of M.Sc. (ICT) Semester II at J.P. Dawer Institute, Surat.
+---
 
-📄 License
-This project is for educational purposes only. All rights reserved by the authors.
-⭐ Don’t forget to STAR the repo if you found it useful!
+## 🖼️ UI Snapshots
 
+> Below are the actual UI snapshots of the Foodie web app as described in the system documentation. These interfaces represent real-time interaction flows between the user, admin, and system components, making the user experience intuitive, visually clean, and mobile-friendly.
+
+### 🔑 Login Page
+
+![Login](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/Login.png)
+
+### 📝 Registration Page
+
+![Register](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/Register.png)
+
+### 🏠 Home Page
+
+![Home](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/Home.png)
+
+### 🍽️ Menu Page
+
+![Menu](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/Menu.png)
+
+### 🛒 Cart Page
+
+![Cart](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/Cart.png)
+
+### 💳 Checkout Page
+
+![Checkout](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/Checkout.png)
+
+### 📬 Add Address Page
+
+![Add Address](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/AddAddress.png)
+
+### 📜 Order History
+
+![Order History](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/OrderHistory.png)
+
+### 👨‍💼 Admin Dashboard
+
+![Admin Dashboard](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/AdminDashboard.png)
+
+### 🧾 Manage Orders
+
+![Manage Orders](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/ManageOrders.png)
+
+### 🗂️ Manage Categories
+
+![Manage Categories](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/ManageCategories.png)
+
+### 🧾 Add/Edit Menu
+
+![Menu Management](https://github.com/Nayan8319/Foodie-System/blob/main/screenshots/MenuManagement.png)
+
+> 📂 All UI assets are stored in the /screenshots/ folder and auto-loaded when the README is rendered on GitHub.
+
+Coming Soon: Login Page | Menu List | Cart Page | Checkout | Admin Dashboard
+
+---
+
+## 👨‍💻 Authors
+
+| 👨‍💼 Name                 | 🔗 GitHub Profile                                |
+| -------------------------- | ------------------------------------------------ |
+| Nayan Padhiyar Prakashbhai | [@Nayan8319](https://github.com/Nayan8319)       |
+| Sarang Rishit Bhupendra    | [@Rishitsarang](https://github.com/Rishitsarang) |
+
+> 🎓 Developed as part of **M.Sc. (ICT) Semester II** at JP Dawer Institute, Surat.
+
+---
+
+## 📚 License
+
+This project is for **educational purposes only**. All rights reserved by the authors.
+
+---
+
+> ✨ *"We built Foodie to make food ordering easier, faster, and smarter — one bite at a time!"*
+
+⭐ Don’t forget to **STAR** this repo if you liked it!
