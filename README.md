@@ -2,7 +2,7 @@
 
 🌐 **Foodie** is a powerful, full-stack 🍝 food ordering and delivery web application designed for local restaurants and cloud kitchens. It brings restaurant menus ✅ online, enables smooth checkout 💳, real-time tracking 📅, and admin management ⚖️ — all packed in one sleek, secure system. Whether you're a vendor or a foodie 🥝, **Foodie makes ordering food delightful!**
 
-> ⚡ **Built with ASP.NET Core MVC + ReactJS + SQL Server + EF Core**
+> ⚡ ** Built with ASP.NET Core + ReactJS + SQL Server **
 
 ---
 
